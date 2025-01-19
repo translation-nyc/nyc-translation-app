@@ -1,25 +1,9 @@
-## AWS Amplify React+Vite Starter Template
+# North Yorkshire Council Translation App
 
-This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
+## Setup
 
-## Overview
-
-This template equips you with a foundational React application integrated with AWS Amplify, streamlined for scalability and performance. It is ideal for developers looking to jumpstart their project with pre-configured AWS services like Cognito, AppSync, and DynamoDB.
-
-## Features
-
-- **Authentication**: Setup with Amazon Cognito for secure user authentication.
-- **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
-- **Database**: Real-time database powered by Amazon DynamoDB.
-
-## Deploying to AWS
-
-For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws) of our documentation.
-
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
-## License
-
-This library is licensed under the MIT-0 License. See the LICENSE file.
+1. Clone the repository
+2. Copy the `amplify_outputs.json` file to the root of the project
+3. Run `npm install` to install the dependencies
+4. Run `npm start dev` to start the app
+5. Open the app in your browser at `http://localhost:5173`
