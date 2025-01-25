@@ -17,7 +17,7 @@ frontend:
     artifacts:
         baseDirectory: dist
         files:
-            - '**/*'
+            - "**/*"
     cache:
         paths:
             - .pnpm-store/**/*
