@@ -46,7 +46,9 @@ function TranslationTypeButton(props: TranslationTypeTabButtonProps) {
             disabled={props.selected}
             onClick={props.onClick}
         >
-            {props.text}
+            <p className="text-xl font-bold">
+                {props.text}
+            </p>
         </button>
     );
 }
