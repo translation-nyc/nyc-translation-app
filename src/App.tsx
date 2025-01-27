@@ -2,6 +2,7 @@ import {useAuthenticator} from "@aws-amplify/ui-react";
 import type {TranslationTextEntry} from "./components/TranslationBox.tsx";
 import TranslationBox from "./components/TranslationBox.tsx";
 import TranslationTypeButtonRow from "./components/TranslationTypeButtonRow.tsx";
+import LanguageControls from "./components/LanguageControls.tsx";
 
 function App() {
     const {user, signOut} = useAuthenticator();
@@ -21,6 +22,11 @@ function App() {
                 Sign out
             </button>
             <TranslationTypeButtonRow/>
+            <div className="relative">
+                <div className="absolute -left-44">
+                    <LanguageControls/>
+                </div>
+            </div>
             <TranslationBox texts={texts}/>
         </main>
     );
