@@ -11,7 +11,7 @@ export type TranslationTextType = "native" | "foreign" | "translated";
 
 function TranslationBox(props: TranslationBoxProps) {
     return (
-        <div className="w-xl pt-3 p-4 border-gray-500 border-1 rounded-xl bg-gray-200">
+        <div className="w-3xl min-h-96 pt-3 p-4 border-gray-500 border-1 rounded-xl bg-gray-200">
             <div className="relative">
                 <p className="absolute top-0 right-0 text-gray-500">
                     Transcription
