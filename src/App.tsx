@@ -1,50 +1,33 @@
-import {useEffect, useState} from "react";
-import type {Schema} from "../amplify/data/resource";
-import {generateClient} from "aws-amplify/data";
 import {useAuthenticator} from "@aws-amplify/ui-react";
-
-const client = generateClient<Schema>();
+import type {TranslationTextEntry} from "./components/TranslationBox.tsx";
+import TranslationBox from "./components/TranslationBox.tsx";
+import TranslationTypeButtonRow from "./components/TranslationTypeButtonRow.tsx";
+import LanguageControls from "./components/LanguageControls.tsx";
 
 function App() {
     const {user, signOut} = useAuthenticator();
-    const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
 
-    useEffect(() => {
-        client.models.Todo.observeQuery().subscribe({
-            next: (data) => setTodos([...data.items]),
-        });
-    }, []);
-
-    function createTodo() {
-        client.models.Todo.create({content: window.prompt("Todo content")});
-    }
-
-    function deleteTodo(id: string) {
-        client.models.Todo.delete({id})
-    }
+    const texts: TranslationTextEntry[] = [
+        {text: "Hello!", type: "native"},
+        {text: "Comment vas-tu?", type: "foreign"},
+        {text: "How are you?", type: "translated"},
+    ];
 
     return (
         <main>
-            <h1>{user?.signInDetails?.loginId}'s todos</h1>
-            <button onClick={createTodo}>+ new</button>
-            <ul>
-                {todos.map((todo) => (
-                    <li
-                        key={todo.id}
-                        onClick={() => deleteTodo(todo.id)}
-                    >
-                        {todo.content}
-                    </li>
-                ))}
-            </ul>
-            <div>
-                🥳 App successfully hosted. Try creating a new todo.
-                <br/>
-                <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-                    Review next step of this tutorial.
-                </a>
+            <p className="absolute top-4 left-4 text-white">
+                Welcome, {user.signInDetails?.loginId}
+            </p>
+            <button onClick={signOut} className="regular-button absolute top-4 right-4">
+                Sign out
+            </button>
+            <TranslationTypeButtonRow/>
+            <div className="relative">
+                <div className="absolute top-4 -left-40">
+                    <LanguageControls/>
+                </div>
             </div>
-            <button onClick={signOut}>Sign out</button>
+            <TranslationBox texts={texts}/>
         </main>
     );
 }
