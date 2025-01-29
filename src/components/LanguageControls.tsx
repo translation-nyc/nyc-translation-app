@@ -6,7 +6,7 @@ function LanguageControls() {
     const [selectedLanguage, setSelectedLanguage] = useState("");
 
     return (
-        <div className="flex flex-col gap-4 m-2 items-center">
+        <div className="flex flex-col gap-4 items-center">
             <StartButton
                 on={on}
                 onClick={() => setOn(!on)}

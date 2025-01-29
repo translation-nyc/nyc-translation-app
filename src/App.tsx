@@ -23,7 +23,7 @@ function App() {
             </button>
             <TranslationTypeButtonRow/>
             <div className="relative">
-                <div className="absolute -left-44">
+                <div className="absolute top-4 -left-40">
                     <LanguageControls/>
                 </div>
             </div>
