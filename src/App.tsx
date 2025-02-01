@@ -1,17 +1,24 @@
-import {useEffect, useState} from "react";
-import type {Schema} from "../amplify/data/resource";
-import {generateClient} from "aws-amplify/data";
-import {useAuthenticator} from "@aws-amplify/ui-react";
-
-const client = generateClient<Schema>();
+import Toolbar from "./components/Toolbar";
+import Controls from "./components/Controls";
+import Transcript from "./components/Transcript";
+import { useState } from "react";
 
 function App() {
    
+    const [isTranslating, setIsTranslating] = useState(false)
+
+    const handleToggleTranslation = () => {
+        setIsTranslating(!isTranslating)
+    }
 
     return (
-        <main>
-            <h1>test</h1>
-        </main>
+        <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+            <Toolbar />
+            <main className="flex-1 flex flex-col md:flex-row p-4 gap-4">
+                <Controls isTranslating={isTranslating} onToggleTranslation={handleToggleTranslation} />
+                <Transcript />
+            </main>
+        </div>
     );
 }
 

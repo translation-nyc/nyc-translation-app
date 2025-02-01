@@ -1,0 +1,11 @@
+
+
+.log-in-button {
+    background-color: #2563eb;
+    color: white;
+    transition: background-color 0.2s ease;
+  }
+
+  .log-in-button:hover {
+    background-color: #1d4ed8;
+  }
