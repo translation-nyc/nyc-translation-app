@@ -59,8 +59,9 @@ function LanguageSelector(props: LanguageSelectorProps) {
         <select
             onChange={(event) => props.onChange(event.target.value)}
             className="bg-white border-2 border-gray-500 rounded-full p-2 w-full"
+            defaultValue=""
         >
-            <option value="" disabled selected hidden>
+            <option value="" disabled hidden>
                 Select language
             </option>
             {props.languages.map((language, index) => {
