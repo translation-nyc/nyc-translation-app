@@ -3,7 +3,7 @@ import {useState} from "react";
 function LanguageControls() {
     const [on, setOn] = useState(false);
     const languages = ["French", "Spanish", "German"];
-    const [selectedLanguage, setSelectedLanguage] = useState("");
+    const [, setSelectedLanguage] = useState("");
 
     return (
         <div className="flex flex-col gap-4 items-center">
