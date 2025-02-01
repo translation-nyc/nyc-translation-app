@@ -34,16 +34,18 @@ function TranslationBox(props: TranslationBoxProps) {
                                 className = "mt-4 text-gray-500";
                                 break;
                         }
-                        return <>
-                            {text.type === "translated" &&
-                                <p className="mt-4 text-blue-600">
-                                    (TRANSLATION)
+                        return (
+                            <div key={index}>
+                                {text.type === "translated" &&
+                                    <p className="mt-4 text-blue-600">
+                                        (TRANSLATION)
+                                    </p>
+                                }
+                                <p className={className}>
+                                    {text.text}
                                 </p>
-                            }
-                            <p key={index} className={className}>
-                                {text.text}
-                            </p>
-                        </>
+                            </div>
+                        )
                     })
                 }
             </div>
