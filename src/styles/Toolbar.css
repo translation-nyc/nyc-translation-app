@@ -1,9 +1,9 @@
-.log-in-button {
+.logout-button {
     background-color: #2563eb;
     color: white;
     transition: background-color 0.2s ease;
 }
 
-.log-in-button:hover {
+.logout-button:hover {
     background-color: #1d4ed8;
 }

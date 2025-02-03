@@ -12,10 +12,10 @@ function App() {
 
     return (
         <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-            <Toolbar />
+            <Toolbar/>
             <main className="flex-1 flex flex-col md:flex-row p-4 gap-4">
-                <Controls isTranslating={isTranslating} onToggleTranslation={handleToggleTranslation} />
-                <Transcript />
+                <Controls isTranslating={isTranslating} onToggleTranslation={handleToggleTranslation}/>
+                <Transcript/>
             </main>
         </div>
     );
