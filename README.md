@@ -10,4 +10,13 @@
 
 ## Running the app
 1. Run `pnpm run dev` to start the app
-2. Open the app in your browser at `http://localhost:5173`
+2. Open the app in your browser at http://localhost:5173
+
+## Backend sandbox setup
+
+You can create a personal backend sandbox for yourself to develop on without interfering with the main backend instance.
+
+1. Install the AWS CLI: https://docs.aws.amazon.com/cli/v1/userguide/cli-chap-install.html
+2. Login with your IAM user credentials: https://docs.aws.amazon.com/cli/v1/userguide/cli-authentication-user.html
+3. Create a new sandbox environment: `npx ampx sandbox`
+   - You can delete the sandbox environment with `npx ampx sandbox delete`
