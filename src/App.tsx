@@ -11,13 +11,13 @@ function App() {
     }
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+        <main className="w-screen h-screen flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
             <Toolbar/>
-            <main className="flex-1 flex flex-col md:flex-row p-4 gap-4">
+            <div className="flex-1 flex flex-col md:flex-row p-4 gap-4">
                 <Controls isTranslating={isTranslating} onToggleTranslation={handleToggleTranslation}/>
                 <Transcript/>
-            </main>
-        </div>
+            </div>
+        </main>
     );
 }
 
