@@ -12,7 +12,9 @@
 1. Run `pnpm run dev` to start the app
 2. Open the app in your browser at http://localhost:5173
 
-## Sandbox setup
+## Backend sandbox setup
+
+You can create a personal backend sandbox for yourself to develop on without interfering with the main backend instance.
 
 1. Install the AWS CLI: https://docs.aws.amazon.com/cli/v1/userguide/cli-chap-install.html
 2. Login with your IAM user credentials: https://docs.aws.amazon.com/cli/v1/userguide/cli-authentication-user.html
