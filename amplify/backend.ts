@@ -1,8 +1,29 @@
 import {defineBackend} from "@aws-amplify/backend";
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {auth} from "./auth/resource";
-import {data} from "./data/resource";
 
-defineBackend({
+const backend = defineBackend({
     auth,
-    data,
+});
+
+backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
+    new PolicyStatement({
+        actions: [
+            "translate:TranslateText",
+        ],
+        resources: ["*"],
+    })
+);
+
+backend.addOutput({
+    custom: {
+        Predictions: {
+            convert: {
+                translateText: {
+                    proxy: false,
+                    region: backend.auth.stack.region,
+                },
+            },
+        },
+    },
 });
