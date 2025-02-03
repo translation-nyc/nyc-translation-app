@@ -1,12 +1,10 @@
-import { Button } from "@aws-amplify/ui-react";
-import { ProfileIcon } from "../assets/icons";
+import {Button} from "@aws-amplify/ui-react";
+import {ProfileIcon} from "../assets/icons";
 import "../styles/Toolbar.css";
 
 function Toolbar() {
-
     return (
         <header className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
-
             <div className="flex items-center space-x-4"> {/* Container for logo and dropdown*/}
                 <h1 className="text-3xl font-bold text-gray-800"> {/* Logo */}
                     Conversate.
@@ -23,7 +21,6 @@ function Toolbar() {
                     Log In
                 </Button>
             </div>
-
         </header>
     );
 }

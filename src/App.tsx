@@ -1,10 +1,9 @@
+import {useState} from "react";
 import Toolbar from "./components/Toolbar";
 import Controls from "./components/Controls";
 import Transcript from "./components/Transcript";
-import { useState } from "react";
 
 function App() {
-   
     const [isTranslating, setIsTranslating] = useState(false)
 
     const handleToggleTranslation = () => {

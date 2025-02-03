@@ -1,17 +1,14 @@
-import { Button, SelectField, Heading, SwitchField, useTheme } from "@aws-amplify/ui-react";
-import { PlayIcon, StopIcon } from "../assets/icons";
-import { useState } from "react";
-import "../styles/Controls.css"
-
+import {useState} from "react";
+import {Button, Heading, SelectField, SwitchField, useTheme} from "@aws-amplify/ui-react";
+import {PlayIcon, StopIcon} from "../assets/icons";
+import "../styles/Controls.css";
 
 interface ControlsProps {
     isTranslating: boolean
     onToggleTranslation: () => void
 }
 
-
 function Controls({ isTranslating, onToggleTranslation }: ControlsProps) {
-
     const [targetLanguage, setTargetLanguage] = useState('')
     const [isChecked, setIsChecked] = useState(false)
     const { tokens } = useTheme();
