@@ -1,34 +1,23 @@
-import {useAuthenticator} from "@aws-amplify/ui-react";
-import type {TranslationTextEntry} from "./components/TranslationBox.tsx";
-import TranslationBox from "./components/TranslationBox.tsx";
-import TranslationTypeButtonRow from "./components/TranslationTypeButtonRow.tsx";
-import LanguageControls from "./components/LanguageControls.tsx";
+import {useState} from "react";
+import Toolbar from "./components/Toolbar";
+import Controls from "./components/Controls";
+import Transcript from "./components/Transcript";
 
 function App() {
-    const {user, signOut} = useAuthenticator();
+    const [isTranslating, setIsTranslating] = useState(false)
 
-    const texts: TranslationTextEntry[] = [
-        {text: "Hello!", type: "native"},
-        {text: "Comment vas-tu?", type: "foreign"},
-        {text: "How are you?", type: "translated"},
-    ];
+    const handleToggleTranslation = () => {
+        setIsTranslating(!isTranslating)
+    }
 
     return (
-        <main>
-            <p className="absolute top-4 left-4 text-white">
-                Welcome, {user.signInDetails?.loginId}
-            </p>
-            <button onClick={signOut} className="regular-button absolute top-4 right-4">
-                Sign out
-            </button>
-            <TranslationTypeButtonRow/>
-            <div className="relative">
-                <div className="absolute top-4 -left-40">
-                    <LanguageControls/>
-                </div>
-            </div>
-            <TranslationBox texts={texts}/>
-        </main>
+        <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
+            <Toolbar />
+            <main className="flex-1 flex flex-col md:flex-row p-4 gap-4">
+                <Controls isTranslating={isTranslating} onToggleTranslation={handleToggleTranslation} />
+                <Transcript />
+            </main>
+        </div>
     );
 }
 
