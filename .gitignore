@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# JavaScript
 node_modules
 dist
 dist-ssr
@@ -23,7 +24,10 @@ dist-ssr
 *.sln
 *.sw?
 
-# amplify
+# Amplify
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+
+# Other
+.env
