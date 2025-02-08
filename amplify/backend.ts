@@ -10,6 +10,7 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
     new PolicyStatement({
         actions: [
             "translate:TranslateText",
+            "polly:SynthesizeSpeech"
         ],
         resources: ["*"],
     })
@@ -20,6 +21,10 @@ backend.addOutput({
         Predictions: {
             convert: {
                 translateText: {
+                    proxy: false,
+                    region: backend.auth.stack.region,
+                },
+                speechGenerator: {
                     proxy: false,
                     region: backend.auth.stack.region,
                 },
