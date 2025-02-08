@@ -10,7 +10,7 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
     new PolicyStatement({
         actions: [
             "translate:TranslateText",
-            "speak:TextToText"
+            "polly:SynthesizeSpeech"
         ],
         resources: ["*"],
     })
@@ -26,7 +26,7 @@ backend.addOutput({
                 },
                 textToSpeech: {
                     proxy: false,
-                    region: 'eu-west-2'
+                    region: backend.auth.stack.region,
                 },
             },
         },

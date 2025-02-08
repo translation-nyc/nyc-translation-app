@@ -1,6 +1,8 @@
 import {Predictions} from "@aws-amplify/predictions";
 
-export const textToSpeech = async function (text: string): Promise<void> {
+// Possible extension by adding an option to select different voice options
+// Each language has different option for male or female voices
+export async function textToSpeech(text: string): Promise<void> {
     const speech = await Predictions.convert({
         textToSpeech: {
             source: {
@@ -9,6 +11,7 @@ export const textToSpeech = async function (text: string): Promise<void> {
             voiceId: "Emma"
         }
     });
+    console.log(speech)
     const audioStream = speech.audioStream
     const audioBlob = new Blob([audioStream], { type : 'audio/mp3'})
     const audioURL = URL.createObjectURL(audioBlob)
