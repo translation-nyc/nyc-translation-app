@@ -1,5 +1,6 @@
 import {useState} from "react";
-import {TextAreaField} from "@aws-amplify/ui-react";
+import {TextAreaField, Button} from "@aws-amplify/ui-react";
+import { textToSpeech } from "../utils/textToSpeech";
 
 function Transcript() {
     const [transcription] = useState("");
@@ -17,6 +18,9 @@ function Transcript() {
                 variation="quiet"
                 value={transcription}
             />
+            <Button onClick={() => textToSpeech(transcription)} variation="primary">
+                Play Transcription
+            </Button>
         </div>
     );
 }
