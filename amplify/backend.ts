@@ -24,7 +24,7 @@ backend.addOutput({
                     proxy: false,
                     region: backend.auth.stack.region,
                 },
-                textToSpeech: {
+                speechGenerator: {
                     proxy: false,
                     region: backend.auth.stack.region,
                 },

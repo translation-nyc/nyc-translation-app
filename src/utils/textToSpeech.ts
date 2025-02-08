@@ -11,7 +11,7 @@ export async function textToSpeech(text: string): Promise<void> {
             voiceId: "Emma"
         }
     });
-    console.log(speech)
+    console.log("generated...",speech.text)
     const audioStream = speech.audioStream
     const audioBlob = new Blob([audioStream], { type : 'audio/mp3'})
     const audioURL = URL.createObjectURL(audioBlob)

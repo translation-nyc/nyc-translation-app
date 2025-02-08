@@ -3,7 +3,7 @@ import {TextAreaField, Button} from "@aws-amplify/ui-react";
 import { textToSpeech } from "../utils/textToSpeech";
 
 function Transcript() {
-    const [transcription] = useState("");
+    const [transcription] = useState("This is where the transcription will be generated.");
     // Transcription set as aws sends it in
     // Text area field maybe not best to use for transcription?
     return (
