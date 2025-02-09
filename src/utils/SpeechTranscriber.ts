@@ -18,8 +18,10 @@ export class SpeechTranscriber {
 
     private readonly onTranscription: (event: TranscriptResultStream) => void;
 
+    private audioContext: AudioContext | undefined;
+    private audioWorkletNode: AudioWorkletNode | undefined;
     private mediaStream: MediaStream | undefined;
-    private mediaRecorder: MediaRecorder | undefined;
+    private audioSource: MediaStreamAudioSourceNode | undefined;
     private transcribeClient: TranscribeStreamingClient | undefined;
 
     constructor(onTranscription: (event: TranscriptResultStream) => void) {
@@ -27,25 +29,23 @@ export class SpeechTranscriber {
     }
 
     async start() {
+        this.audioContext = new AudioContext();
+        await this.audioContext.audioWorklet.addModule("pcm-processor.js");
+
+        const audioQueue = new AsyncBlockingQueue<ArrayBuffer>();
+
+        this.audioWorkletNode = new AudioWorkletNode(this.audioContext, "pcm-processor");
+        this.audioWorkletNode.port.onmessage = (event: MessageEvent<ArrayBuffer>) => {
+            audioQueue.enqueue(event.data);
+        };
+
         this.mediaStream = await navigator.mediaDevices.getUserMedia({
             audio: {
                 channelCount: 1,
             },
         });
-
-        const audioContext = new AudioContext();
-        const source = audioContext.createMediaStreamSource(this.mediaStream);
-        const processor = audioContext.createScriptProcessor(4096, 1, 1);
-
-        const audioQueue = new AsyncBlockingQueue<Float32Array>();
-
-        processor.onaudioprocess = (event) => {
-            const data = event.inputBuffer.getChannelData(0);
-            audioQueue.enqueue(data);
-        };
-
-        source.connect(processor);
-        processor.connect(audioContext.destination);
+        this.audioSource = this.audioContext.createMediaStreamSource(this.mediaStream);
+        this.audioSource.connect(this.audioWorkletNode);
 
         const env = import.meta.env
         const config: TranscribeStreamingClientConfig = {
@@ -60,13 +60,12 @@ export class SpeechTranscriber {
         const params: StartStreamTranscriptionCommandInput = {
             LanguageCode: LanguageCode.EN_GB,
             MediaEncoding: MediaEncoding.PCM,
-            MediaSampleRateHertz: audioContext.sampleRate,
+            MediaSampleRateHertz: this.audioContext.sampleRate,
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {
                 for await (const data of audioQueue) {
-                    const pcmData = float32ToUInt8Pcm(data);
                     yield {
                         AudioEvent: {
-                            AudioChunk: pcmData,
+                            AudioChunk: new Uint8Array(data),
                         },
                     };
                 }
@@ -80,18 +79,11 @@ export class SpeechTranscriber {
         }
     }
 
-    stop() {
-        this.mediaRecorder?.stop();
+    async stop() {
+        this.audioWorkletNode?.disconnect();
+        this.audioSource?.disconnect();
+        await this.audioContext?.close();
         this.mediaStream?.getTracks().forEach(track => track.stop());
         this.transcribeClient?.destroy();
     }
-}
-
-function float32ToUInt8Pcm(input: Float32Array): Uint8Array {
-    const output = new DataView(new ArrayBuffer(input.length * 2));
-    for (let i = 0; i < input.length; i++) {
-        const sample = Math.max(-1, Math.min(1, input[i]));
-        output.setInt16(i * 2, sample * 32767, true);
-    }
-    return new Uint8Array(output.buffer);
 }

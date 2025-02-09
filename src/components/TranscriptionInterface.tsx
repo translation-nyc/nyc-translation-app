@@ -19,7 +19,7 @@ function TranscriptionInterface() {
         if (!isTranslating) {
             await transcriber.start();
         } else {
-            transcriber.stop();
+            await transcriber.stop();
         }
     }
 
