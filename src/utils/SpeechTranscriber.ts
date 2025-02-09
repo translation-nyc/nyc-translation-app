@@ -30,22 +30,23 @@ export class SpeechTranscriber {
 
     async start() {
         this.stopped = false;
-
         this.audioContext = new AudioContext();
-        await this.audioContext.audioWorklet.addModule("pcm-processor.js");
-
         const audioQueue = new AsyncBlockingQueue<ArrayBuffer>();
 
-        this.audioWorkletNode = new AudioWorkletNode(this.audioContext, "pcm-processor");
-        this.audioWorkletNode.port.onmessage = (event: MessageEvent<ArrayBuffer>) => {
-            audioQueue.enqueue(event.data);
-        };
+        const audioWorkletSetup = this.audioContext.audioWorklet.addModule("pcm-processor.js");
 
         this.mediaStream = await navigator.mediaDevices.getUserMedia({
             audio: {
                 channelCount: 1,
             },
         });
+
+        await audioWorkletSetup;
+        this.audioWorkletNode = new AudioWorkletNode(this.audioContext, "pcm-processor");
+        this.audioWorkletNode.port.onmessage = (event: MessageEvent<ArrayBuffer>) => {
+            audioQueue.enqueue(event.data);
+        };
+
         this.audioSource = this.audioContext.createMediaStreamSource(this.mediaStream);
         this.audioSource.connect(this.audioWorkletNode);
 
