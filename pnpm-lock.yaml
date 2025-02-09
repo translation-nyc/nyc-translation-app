@@ -39,6 +39,9 @@ importers:
       '@aws-amplify/backend-cli':
         specifier: ^1.2.9
         version: 1.4.9(@aws-sdk/types@3.734.0)(aws-cdk-lib@2.177.0(constructs@10.4.2))(aws-cdk@2.177.0)(constructs@10.4.2)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.7.3)
+      '@types/audioworklet':
+        specifier: ^0.0.70
+        version: 0.0.70
       '@types/react':
         specifier: ^18.2.66
         version: 18.3.18
@@ -2998,6 +3001,9 @@ packages:
     resolution: {integrity: sha512-Qj6rSO+EvXnNDymloKZ11D54JJTnDrkRWJBzNHENDxjt0HtrCZJbSLIrcJ/WdaoU4othrel/oFqHpO/doxIS/Q==}
     peerDependencies:
       vite: ^5.2.0 || ^6
+
+  '@types/audioworklet@0.0.70':
+    resolution: {integrity: sha512-Hdrt4J7rOQrIiigxh3zkCiicVxIy7AVH5R5QhoLVjBP7HywkvMLNkGZEVAO4frNF6Gk7phFQr7ZdJgIy/EbnyA==}
 
   '@types/aws-lambda@8.10.147':
     resolution: {integrity: sha512-nD0Z9fNIZcxYX5Mai2CTmFD7wX7UldCkW2ezCF8D1T5hdiLsnTWDGRpfRYntU6VjTdLQjOvyszru7I1c1oCQew==}
@@ -10634,6 +10640,8 @@ snapshots:
       lightningcss: 1.29.1
       tailwindcss: 4.0.3
       vite: 5.4.14(@types/node@20.17.17)(lightningcss@1.29.1)
+
+  '@types/audioworklet@0.0.70': {}
 
   '@types/aws-lambda@8.10.147': {}
 

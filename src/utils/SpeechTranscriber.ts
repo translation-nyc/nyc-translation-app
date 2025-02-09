@@ -9,7 +9,8 @@ import {
 import {
     StartStreamTranscriptionCommandInput,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/commands/StartStreamTranscriptionCommand";
-import {AsyncBlockingQueue} from "./AsyncBlockingQueue";
+import {AsyncBlockingQueue} from "./AsyncBlockingQueue.ts";
+import pcmProcessorUrl from "./pcm-processor.ts?url";
 
 export class SpeechTranscriber {
 
@@ -33,7 +34,7 @@ export class SpeechTranscriber {
         this.audioContext = new AudioContext();
         const audioQueue = new AsyncBlockingQueue<ArrayBuffer>();
 
-        const audioWorkletSetup = this.audioContext.audioWorklet.addModule("pcm-processor.js");
+        const audioWorkletSetup = this.audioContext.audioWorklet.addModule(pcmProcessorUrl);
 
         this.mediaStream = await navigator.mediaDevices.getUserMedia({
             audio: {

@@ -1,14 +1,7 @@
-// noinspection JSUnresolvedReference
 class PcmProcessor extends AudioWorkletProcessor {
 
     // noinspection JSUnusedGlobalSymbols
-    /**
-     * Processes the audio data.
-     *
-     * @param inputs {Float32Array[][]}
-     * @returns {boolean}
-     */
-    process(inputs) {
+    process(inputs: Float32Array[][]): boolean {
         if (inputs[0].length > 0) {
             const float32Data = inputs[0][0];
             const uint8Buffer = float32ToUint8Pcm(float32Data);
@@ -18,13 +11,7 @@ class PcmProcessor extends AudioWorkletProcessor {
     }
 }
 
-/**
- * Converts Float32 PCM data to a Uint8 buffer.
- *
- * @param input {Float32Array}
- * @returns {ArrayBuffer}
- */
-function float32ToUint8Pcm(input) {
+function float32ToUint8Pcm(input: Float32Array): ArrayBuffer {
     const output = new DataView(new ArrayBuffer(input.length * 2));
     for (let i = 0; i < input.length; i++) {
         const sample = Math.max(-1, Math.min(1, input[i]));
@@ -33,5 +20,4 @@ function float32ToUint8Pcm(input) {
     return output.buffer;
 }
 
-// noinspection JSUnresolvedReference
 registerProcessor("pcm-processor", PcmProcessor);
