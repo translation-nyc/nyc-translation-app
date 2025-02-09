@@ -9,24 +9,20 @@ import {
 import {
     StartStreamTranscriptionCommandInput,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/commands/StartStreamTranscriptionCommand";
-import {
-    TranscribeStreamingClientConfig,
-} from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
 import {AsyncBlockingQueue} from "./AsyncBlockingQueue";
-import {client} from "../main.tsx";
-import type {TranscribeDetails} from "../../amplify/functions/transcribe-details/handler.ts";
 
 export class SpeechTranscriber {
 
+    private readonly transcribeClient: TranscribeStreamingClient;
     private readonly onTranscription: (event: TranscriptResultStream) => void;
 
     private audioContext: AudioContext | undefined;
     private audioWorkletNode: AudioWorkletNode | undefined;
     private mediaStream: MediaStream | undefined;
     private audioSource: MediaStreamAudioSourceNode | undefined;
-    private transcribeClient: TranscribeStreamingClient | undefined;
 
-    constructor(onTranscription: (event: TranscriptResultStream) => void) {
+    constructor(client: TranscribeStreamingClient, onTranscription: (event: TranscriptResultStream) => void) {
+        this.transcribeClient = client;
         this.onTranscription = onTranscription;
     }
 
@@ -48,17 +44,6 @@ export class SpeechTranscriber {
         });
         this.audioSource = this.audioContext.createMediaStreamSource(this.mediaStream);
         this.audioSource.connect(this.audioWorkletNode);
-
-        const transcribeDetailsResponse = await client.queries.getTranscribeDetails();
-        const transcribeDetails = JSON.parse(transcribeDetailsResponse.data!) as TranscribeDetails;
-        const config: TranscribeStreamingClientConfig = {
-            region: transcribeDetails.region,
-            credentials: {
-                accessKeyId: transcribeDetails.accessKeyId,
-                secretAccessKey: transcribeDetails.secretAccessKey,
-            },
-        };
-        this.transcribeClient = new TranscribeStreamingClient(config);
 
         const params: StartStreamTranscriptionCommandInput = {
             LanguageCode: LanguageCode.EN_GB,
@@ -87,6 +72,5 @@ export class SpeechTranscriber {
         this.audioSource?.disconnect();
         await this.audioContext?.close();
         this.mediaStream?.getTracks().forEach(track => track.stop());
-        this.transcribeClient?.destroy();
     }
 }

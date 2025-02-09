@@ -4,6 +4,7 @@ import {PlayIcon, StopIcon} from "../assets/icons";
 import "../styles/Controls.css";
 
 interface ControlsProps {
+    isLoading: boolean;
     isTranslating: boolean;
     onToggleTranslation: () => void;
 }
@@ -19,19 +20,24 @@ function Controls(props: ControlsProps) {
                 <div className="flex justify-center"> {/* Container for start/stop button*/}
                     <Button
                         className={`start-stop-button ${props.isTranslating ? "stop-button" : "start-button"}`}
+                        disabled={props.isLoading}
                         isFullWidth={true}
                         onClick={props.onToggleTranslation}
                     >
-                        {props.isTranslating ? (
-                            <>
-                                <StopIcon className="mr-2 h-5 w-5"/>
-                                Stop Translation
-                            </>
+                        {props.isLoading ? (
+                            "Loading..."
                         ) : (
-                            <>
-                                <PlayIcon className="mr-2 h-5 w-5"/>
-                                Start Translation
-                            </>
+                            props.isTranslating ? (
+                                <>
+                                    <StopIcon className="mr-2 h-5 w-5"/>
+                                    Stop Translation
+                                </>
+                            ) : (
+                                <>
+                                    <PlayIcon className="mr-2 h-5 w-5"/>
+                                    Start Translation
+                                </>
+                            )
                         )}
                     </Button>
                 </div>
