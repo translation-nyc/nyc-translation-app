@@ -34,7 +34,7 @@ export class SpeechTranscriber {
         });
 
         const options: MediaRecorderOptions = {
-            mimeType: "audio/ogg; codecs=opus"
+            mimeType: "audio/ogg; codecs=opus",
         };
         this.mediaRecorder = new MediaRecorder(this.mediaStream, options);
 
@@ -62,7 +62,7 @@ export class SpeechTranscriber {
             MediaSampleRateHertz: audioContext.sampleRate,
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {
                 for await (const chunk of queue) {
-                    const data = await blobToUint8Array(chunk);
+                    const data = await chunk.bytes();
                     yield {
                         AudioEvent: {
                             AudioChunk: data,
@@ -84,9 +84,4 @@ export class SpeechTranscriber {
         this.mediaStream?.getTracks().forEach(track => track.stop());
         this.transcribeClient?.destroy();
     }
-}
-
-async function blobToUint8Array(blob: Blob): Promise<Uint8Array> {
-    const buffer = await new Response(blob).arrayBuffer();
-    return new Uint8Array(buffer);
 }
