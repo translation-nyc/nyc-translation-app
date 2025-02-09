@@ -4,27 +4,33 @@ import {PlayIcon, StopIcon} from "../assets/icons";
 import "../styles/Controls.css";
 
 interface ControlsProps {
-    isTranslating: boolean
-    onToggleTranslation: () => void
+    isTranslating: boolean;
+    onToggleTranslation: () => void;
 }
 
-function Controls({ isTranslating, onToggleTranslation }: ControlsProps) {
-    const [targetLanguage, setTargetLanguage] = useState('')
+function Controls(props: ControlsProps) {
+    const [targetLanguage, setTargetLanguage] = useState("")
     const [isChecked, setIsChecked] = useState(false)
-    const { tokens } = useTheme();
+    const {tokens} = useTheme();
 
     return (
         <div className="w-full md:w-72 p-6 bg-white rounded-lg shadow-lg"> {/* Container for controls*/}
             <div className="space-y-6">
                 <div className="flex justify-center"> {/* Container for start/stop button*/}
-                    <Button className={`start-stop-button ${isTranslating ? 'stop-button' : 'start-button'}`} isFullWidth={true} onClick={onToggleTranslation} >
-                        {isTranslating ? (
+                    <Button
+                        className={`start-stop-button ${props.isTranslating ? "stop-button" : "start-button"}`}
+                        isFullWidth={true}
+                        onClick={props.onToggleTranslation}
+                    >
+                        {props.isTranslating ? (
                             <>
-                                <StopIcon className="mr-2 h-5 w-5"/> Stop Translation
+                                <StopIcon className="mr-2 h-5 w-5"/>
+                                Stop Translation
                             </>
                         ) : (
                             <>
-                                <PlayIcon className="mr-2 h-5 w-5"/> Start Translation
+                                <PlayIcon className="mr-2 h-5 w-5"/>
+                                Start Translation
                             </>
                         )}
                     </Button>
@@ -44,7 +50,7 @@ function Controls({ isTranslating, onToggleTranslation }: ControlsProps) {
                             placeholder="Select a language"
                             value={targetLanguage}
                             onChange={(e) => setTargetLanguage(e.target.value)}
-                            options={['French', 'Spanish', 'Arabic', 'Chinese']}
+                            options={["French", "Spanish", "Arabic", "Chinese"]}
                         >
                         </SelectField>
                     </div>

@@ -15,9 +15,6 @@ function Toolbar() {
             </div>
 
             <div className="flex items-center space-x-2"> {/* Container for dark mode button and sign in button*/}
-                {/* <Button>
-                    darkmode
-                </Button> */}
                 <Button className="logout-button" size="small" onClick={signOut}> {/* Log in button */}
                     <ProfileIcon className="mr-2 h-4 w-4"/>
                     Logout
