@@ -21,12 +21,16 @@ export class SpeechTranscriber {
     private mediaStream: MediaStream | undefined;
     private audioSource: MediaStreamAudioSourceNode | undefined;
 
+    private stopped: boolean = false;
+
     constructor(client: TranscribeStreamingClient, onTranscription: (event: TranscriptResultStream) => void) {
         this.transcribeClient = client;
         this.onTranscription = onTranscription;
     }
 
     async start() {
+        this.stopped = false;
+
         this.audioContext = new AudioContext();
         await this.audioContext.audioWorklet.addModule("pcm-processor.js");
 
@@ -64,10 +68,12 @@ export class SpeechTranscriber {
         const response = await this.transcribeClient.send(command);
         for await (const event of response.TranscriptResultStream!) {
             this.onTranscription(event);
+            if (this.stopped) break;
         }
     }
 
     async stop() {
+        this.stopped = true;
         this.audioWorkletNode?.disconnect();
         this.audioSource?.disconnect();
         await this.audioContext?.close();
