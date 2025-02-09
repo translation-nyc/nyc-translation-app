@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Button, TextAreaField} from "@aws-amplify/ui-react";
-import {textToSpeech} from "../utils/textToSpeech";
+import {textToSpeech} from "../utils/text-to-speech.ts";
 
 function Transcript() {
     const [transcription] = useState("This is where the transcription will be generated.");
