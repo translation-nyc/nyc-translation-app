@@ -10,7 +10,7 @@ import {
     StartStreamTranscriptionCommandInput,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/commands/StartStreamTranscriptionCommand";
 import {AsyncBlockingQueue} from "./AsyncBlockingQueue.ts";
-import pcmProcessorUrl from "./pcm-processor.ts?url";
+import pcmProcessorUrl from "./pcm-processor.ts?worker&url";
 
 export class SpeechTranscriber {
 
