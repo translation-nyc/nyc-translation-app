@@ -13,6 +13,8 @@ import {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
 import {AsyncBlockingQueue} from "./AsyncBlockingQueue";
+import {client} from "../main.tsx";
+import type {TranscribeDetails} from "../../amplify/functions/transcribe-details/handler.ts";
 
 export class SpeechTranscriber {
 
@@ -47,14 +49,15 @@ export class SpeechTranscriber {
         this.audioSource = this.audioContext.createMediaStreamSource(this.mediaStream);
         this.audioSource.connect(this.audioWorkletNode);
 
-        const env = import.meta.env
+        const transcribeDetailsResponse = await client.queries.getTranscribeDetails();
+        const transcribeDetails = JSON.parse(transcribeDetailsResponse.data!) as TranscribeDetails;
         const config: TranscribeStreamingClientConfig = {
-            region: env.VITE_AWS_TRANSCRIBE_REGION,
+            region: transcribeDetails.region,
             credentials: {
-                accessKeyId: env.VITE_AWS_TRANSCRIBE_ACCESS_KEY_ID,
-                secretAccessKey: env.VITE_AWS_TRANSCRIBE_SECRET_ACCESS_KEY,
+                accessKeyId: transcribeDetails.accessKeyId,
+                secretAccessKey: transcribeDetails.secretAccessKey,
             },
-        }
+        };
         this.transcribeClient = new TranscribeStreamingClient(config);
 
         const params: StartStreamTranscriptionCommandInput = {
