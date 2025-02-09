@@ -62,7 +62,7 @@ export class SpeechTranscriber {
             MediaSampleRateHertz: audioContext.sampleRate,
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {
                 for await (const chunk of queue) {
-                    const data = await chunk.bytes();
+                    const data = new Uint8Array(await chunk.arrayBuffer());
                     yield {
                         AudioEvent: {
                             AudioChunk: data,
