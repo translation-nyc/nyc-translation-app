@@ -33,17 +33,19 @@ export class SpeechTranscriber {
             },
         });
 
-        const options: MediaRecorderOptions = {
-            mimeType: "audio/ogg; codecs=opus",
-        };
-        this.mediaRecorder = new MediaRecorder(this.mediaStream, options);
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(this.mediaStream);
+        const processor = audioContext.createScriptProcessor(4096, 1, 1);
 
-        const queue = new AsyncBlockingQueue<Blob>();
+        const audioQueue = new AsyncBlockingQueue<Float32Array>();
 
-        this.mediaRecorder.ondataavailable = event => {
-            queue.enqueue(event.data);
+        processor.onaudioprocess = (event) => {
+            const data = event.inputBuffer.getChannelData(0);
+            audioQueue.enqueue(data);
         };
-        this.mediaRecorder.start(1000);
+
+        source.connect(processor);
+        processor.connect(audioContext.destination);
 
         const env = import.meta.env
         const config: TranscribeStreamingClientConfig = {
@@ -55,17 +57,16 @@ export class SpeechTranscriber {
         }
         this.transcribeClient = new TranscribeStreamingClient(config);
 
-        const audioContext = new AudioContext();
         const params: StartStreamTranscriptionCommandInput = {
             LanguageCode: LanguageCode.EN_GB,
-            MediaEncoding: MediaEncoding.OGG_OPUS,
+            MediaEncoding: MediaEncoding.PCM,
             MediaSampleRateHertz: audioContext.sampleRate,
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {
-                for await (const chunk of queue) {
-                    const data = new Uint8Array(await chunk.arrayBuffer());
+                for await (const data of audioQueue) {
+                    const pcmData = float32ToUInt8Pcm(data);
                     yield {
                         AudioEvent: {
-                            AudioChunk: data,
+                            AudioChunk: pcmData,
                         },
                     };
                 }
@@ -84,4 +85,13 @@ export class SpeechTranscriber {
         this.mediaStream?.getTracks().forEach(track => track.stop());
         this.transcribeClient?.destroy();
     }
+}
+
+function float32ToUInt8Pcm(input: Float32Array): Uint8Array {
+    const output = new DataView(new ArrayBuffer(input.length * 2));
+    for (let i = 0; i < input.length; i++) {
+        const sample = Math.max(-1, Math.min(1, input[i]));
+        output.setInt16(i * 2, sample * 32767, true);
+    }
+    return new Uint8Array(output.buffer);
 }

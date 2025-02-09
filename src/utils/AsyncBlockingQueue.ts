@@ -38,7 +38,7 @@ export class AsyncBlockingQueue<T> implements AsyncIterable<T> {
                 return {
                     done: false,
                     value: element,
-                }
+                };
             },
         };
     }
