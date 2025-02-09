@@ -9,8 +9,8 @@ interface ControlsProps {
 }
 
 function Controls(props: ControlsProps) {
-    const [targetLanguage, setTargetLanguage] = useState("")
-    const [isChecked, setIsChecked] = useState(false)
+    const [targetLanguage, setTargetLanguage] = useState("");
+    const [isChecked, setIsChecked] = useState(false);
     const {tokens} = useTheme();
 
     return (
@@ -64,7 +64,7 @@ function Controls(props: ControlsProps) {
                         isChecked={isChecked}
                         label="Auto-punctuation"
                         labelPosition="end"
-                        onChange={(e) => {setIsChecked(e.target.checked)}}
+                        onChange={(e) => setIsChecked(e.target.checked)}
                         trackCheckedColor={tokens.colors.blue[80]}
                     />
                 </div>

@@ -66,4 +66,4 @@ export {
     ProfileIcon,
     PlayIcon,
     StopIcon
-} 
+};
