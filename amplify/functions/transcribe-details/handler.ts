@@ -1,11 +1,6 @@
 import type {Schema} from "../../data/resource";
 import {env} from "$amplify/env/getTranscribeDetails";
-
-export interface TranscribeDetails {
-    region: string;
-    accessKeyId: string;
-    secretAccessKey: string;
-}
+import type {TranscribeDetails} from "./types";
 
 // noinspection JSUnusedGlobalSymbols
 export const handler: Schema["getTranscribeDetails"]["functionHandler"] = async () => {
