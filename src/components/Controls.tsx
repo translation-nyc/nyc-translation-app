@@ -4,28 +4,40 @@ import {PlayIcon, StopIcon} from "../assets/icons";
 import "../styles/Controls.css";
 
 interface ControlsProps {
-    isTranslating: boolean
-    onToggleTranslation: () => void
+    isLoading: boolean;
+    isTranslating: boolean;
+    onToggleTranslation: () => void;
 }
 
-function Controls({ isTranslating, onToggleTranslation }: ControlsProps) {
-    const [targetLanguage, setTargetLanguage] = useState('')
-    const [isChecked, setIsChecked] = useState(false)
-    const { tokens } = useTheme();
+function Controls(props: ControlsProps) {
+    const [targetLanguage, setTargetLanguage] = useState("");
+    const [isChecked, setIsChecked] = useState(false);
+    const {tokens} = useTheme();
 
     return (
         <div className="w-full md:w-72 p-6 bg-white rounded-lg shadow-lg"> {/* Container for controls*/}
             <div className="space-y-6">
                 <div className="flex justify-center"> {/* Container for start/stop button*/}
-                    <Button className={`start-stop-button ${isTranslating ? 'stop-button' : 'start-button'}`} isFullWidth={true} onClick={onToggleTranslation} >
-                        {isTranslating ? (
-                            <>
-                                <StopIcon className="mr-2 h-5 w-5"/> Stop Translation
-                            </>
+                    <Button
+                        className={`start-stop-button ${props.isTranslating ? "stop-button" : "start-button"}`}
+                        disabled={props.isLoading}
+                        isFullWidth={true}
+                        onClick={props.onToggleTranslation}
+                    >
+                        {props.isLoading ? (
+                            "Loading..."
                         ) : (
-                            <>
-                                <PlayIcon className="mr-2 h-5 w-5"/> Start Translation
-                            </>
+                            props.isTranslating ? (
+                                <>
+                                    <StopIcon className="mr-2 h-5 w-5"/>
+                                    Stop Translation
+                                </>
+                            ) : (
+                                <>
+                                    <PlayIcon className="mr-2 h-5 w-5"/>
+                                    Start Translation
+                                </>
+                            )
                         )}
                     </Button>
                 </div>
@@ -44,7 +56,7 @@ function Controls({ isTranslating, onToggleTranslation }: ControlsProps) {
                             placeholder="Select a language"
                             value={targetLanguage}
                             onChange={(e) => setTargetLanguage(e.target.value)}
-                            options={['French', 'Spanish', 'Arabic', 'Chinese']}
+                            options={["French", "Spanish", "Arabic", "Chinese"]}
                         >
                         </SelectField>
                     </div>
@@ -58,7 +70,7 @@ function Controls({ isTranslating, onToggleTranslation }: ControlsProps) {
                         isChecked={isChecked}
                         label="Auto-punctuation"
                         labelPosition="end"
-                        onChange={(e) => {setIsChecked(e.target.checked)}}
+                        onChange={(e) => setIsChecked(e.target.checked)}
                         trackCheckedColor={tokens.colors.blue[80]}
                     />
                 </div>

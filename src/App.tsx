@@ -1,22 +1,11 @@
-import {useState} from "react";
 import Toolbar from "./components/Toolbar";
-import Controls from "./components/Controls";
-import Transcript from "./components/Transcript";
+import TranscriptionInterface from "./components/TranscriptionInterface.tsx";
 
 function App() {
-    const [isTranslating, setIsTranslating] = useState(false)
-
-    const handleToggleTranslation = () => {
-        setIsTranslating(!isTranslating)
-    }
-
     return (
         <main className="w-screen h-screen flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
             <Toolbar/>
-            <div className="flex-1 flex flex-col md:flex-row p-4 gap-4">
-                <Controls isTranslating={isTranslating} onToggleTranslation={handleToggleTranslation}/>
-                <Transcript/>
-            </div>
+            <TranscriptionInterface/>
         </main>
     );
 }
