@@ -5,7 +5,7 @@ import type {
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
 import {client} from "../main.tsx";
 import type {TranscribeDetails} from "../../amplify/functions/transcribe-details/handler.ts";
-import {SpeechTranscriber} from "../utils/SpeechTranscriber.ts";
+import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import Transcript from "./Transcript.tsx";
 
