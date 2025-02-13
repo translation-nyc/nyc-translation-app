@@ -1,10 +1,9 @@
 import {useEffect, useState} from "react";
+import {Amplify, fetchAuthSession} from "@aws-amplify/core";
 import {TranscribeStreamingClient, type TranscriptResultStream} from "@aws-sdk/client-transcribe-streaming";
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
-import {client} from "../main.tsx";
-import type {TranscribeDetails} from "../../amplify/functions/transcribe-details/types.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import Transcript from "./Transcript.tsx";
@@ -20,13 +19,19 @@ function TranscriptionInterface() {
     }
 
     async function loadClient() {
-        const transcribeDetailsResponse = await client.queries.getTranscribeDetails();
-        const transcribeDetails = JSON.parse(transcribeDetailsResponse.data!) as TranscribeDetails;
+        const region = Amplify.getConfig()
+            .Predictions!
+            .convert!
+            .transcription!
+            .region!;
+        const authSession = await fetchAuthSession();
+        const credentials = authSession.credentials!;
         const config: TranscribeStreamingClientConfig = {
-            region: transcribeDetails.region,
+            region: region,
             credentials: {
-                accessKeyId: transcribeDetails.accessKeyId,
-                secretAccessKey: transcribeDetails.secretAccessKey,
+                accessKeyId: credentials.accessKeyId,
+                secretAccessKey: credentials.secretAccessKey,
+                sessionToken: credentials.sessionToken,
             },
         };
         const transcribeClient = new TranscribeStreamingClient(config);
