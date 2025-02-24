@@ -16,6 +16,9 @@ function TranscriptionInterface() {
 
     const [targetLanguage, setTargetLanguage] = useState("");
 
+    const [transcriptParts, setTranscriptParts] = useState<string[]>([]);
+    const transcript = transcriptParts.join(" ");
+
     function onTranscription(event: TranscriptResultStream) {
         console.log(JSON.stringify(event));
     }
@@ -67,8 +70,9 @@ function TranscriptionInterface() {
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
                 onChangeTargetLanguage={setTargetLanguage}
+                transcript={transcript}
             />
-            <Transcript/>
+            <Transcript transcript={transcript}/>
         </div>
     );
 }

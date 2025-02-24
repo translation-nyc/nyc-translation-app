@@ -1,9 +1,10 @@
-import {useState} from "react";
-import {Button, TextAreaField} from "@aws-amplify/ui-react";
-import {textToSpeech} from "../utils/text-to-speech.ts";
+import {TextAreaField} from "@aws-amplify/ui-react";
 
-function Transcript() {
-    const [transcription] = useState("This is where the transcription will be generated.");
+interface TranscriptProps {
+    transcript: string;
+}
+
+function Transcript(props: TranscriptProps) {
     // Transcription set as aws sends it in
     // Text area field maybe not best to use for transcription?
     return (
@@ -16,14 +17,8 @@ function Transcript() {
                 rows={20}
                 isReadOnly={true}
                 variation="quiet"
-                value={transcription}
+                value={props.transcript}
             />
-            <Button
-                variation="primary"
-                onClick={() => textToSpeech(transcription)}
-            >
-                Play Transcription
-            </Button>
         </div>
     );
 }

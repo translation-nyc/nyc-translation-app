@@ -2,6 +2,7 @@ import {useState} from "react";
 import {Button, Heading, SelectField, SwitchField, useTheme} from "@aws-amplify/ui-react";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import "../styles/Controls.css";
+import {textToSpeech} from "../utils/text-to-speech.ts";
 
 interface ControlsProps {
     isLoading: boolean;
@@ -9,6 +10,7 @@ interface ControlsProps {
     onToggleTranslation: () => void;
     targetLanguage: string;
     onChangeTargetLanguage: (language: string) => void;
+    transcript: string;
 }
 
 function Controls(props: ControlsProps) {
@@ -66,14 +68,25 @@ function Controls(props: ControlsProps) {
                     </div>
                 </div>
 
-                <SwitchField
-                    isDisabled={false}
-                    isChecked={isChecked}
-                    label="Auto-punctuation"
-                    labelPosition="end"
-                    onChange={(e) => setIsChecked(e.target.checked)}
-                    trackCheckedColor={tokens.colors.blue[80]}
-                />
+                <div>
+                    <SwitchField
+                        isDisabled={false}
+                        isChecked={isChecked}
+                        label="Auto-punctuation"
+                        labelPosition="end"
+                        onChange={(e) => setIsChecked(e.target.checked)}
+                        trackCheckedColor={tokens.colors.blue[80]}
+                    />
+                </div>
+
+                <div>
+                    <Button
+                        variation="primary"
+                        onClick={() => textToSpeech(props.transcript)}
+                    >
+                        Play Transcription
+                    </Button>
+                </div>
             </div>
         </div>
     );
