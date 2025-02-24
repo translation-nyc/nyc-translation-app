@@ -15,7 +15,7 @@ function Controls(props: ControlsProps) {
     const {tokens} = useTheme();
 
     return (
-        <div className="w-full md:w-72 p-6 bg-white rounded-lg shadow-lg"> {/* Container for controls*/}
+        <div className="controls w-full md:w-72 p-6 bg-white rounded-lg shadow-lg"> {/* Container for controls*/}
             <div className="space-y-6">
                 <div className="flex justify-center"> {/* Container for start/stop button*/}
                     <Button
@@ -44,7 +44,7 @@ function Controls(props: ControlsProps) {
 
                 <div className="space-y-2"> {/* Container for target language controls*/}
                     <div>
-                        <Heading>
+                        <Heading className="target">
                             Target Language
                         </Heading>
                     </div>
@@ -66,13 +66,15 @@ function Controls(props: ControlsProps) {
 
                 <div>
                     <SwitchField
+                        className="auto-punctuation"
                         isDisabled={false}
                         isChecked={isChecked}
                         label="Auto-punctuation"
                         labelPosition="end"
                         onChange={(e) => setIsChecked(e.target.checked)}
                         trackCheckedColor={tokens.colors.blue[80]}
-                    />
+                    >
+                    </SwitchField>
                 </div>
             </div>
         </div>

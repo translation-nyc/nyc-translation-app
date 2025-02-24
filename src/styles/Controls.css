@@ -1,3 +1,11 @@
+.controls {
+    background-color: var(--background-light);
+}
+
+.dark .controls {
+    background-color: var(--background-dark);
+}
+
 .start-stop-button {
     color: white;
     transition: all 0.3s;
@@ -17,4 +25,45 @@
 
 .stop-button:hover {
     background-color: #DC2626;
+}
+
+.dark .start-stop-button {
+    color: white;
+    transition: all 0.3s;
+}
+
+.dark .start-button {
+    background-color: #2563eb;
+    color: var(--text-dark);
+}
+
+.dark .start-button:hover {
+    background-color: #1d4ed8;
+    color: var(--text-dark);
+}
+
+.dark .stop-button {
+    background-color: #EF4444;
+    color: var(--text-dark);
+}
+
+.dark .stop-button:hover {
+    background-color: #DC2626;
+    color: var(--text-dark);
+}
+
+.target {
+    color: var(--text-light);
+}
+
+.dark .target {
+    color: var(--text-dark);
+}
+
+.auto-punctuation {
+    color: var(--text-light);
+}
+
+.dark .auto-punctuation {
+    color: var(--text-dark);
 }

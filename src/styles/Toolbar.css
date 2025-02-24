@@ -16,12 +16,6 @@
     color: var(--text-dark);
 }
 
-.logout-button {
-    background-color: #2563eb;
-    color: pink;
-    transition: background-color 0.2s ease;
-}
-
 .logout-button:hover {
     background-color: #1d4ed8;
 }

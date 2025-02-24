@@ -3,7 +3,15 @@
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
-    background-color: var(--background-color);
+    background-color: var(--background-light);
+}
+
+.dark #root {
+    background-color: var(--background-dark);
+}
+
+.main {
+    background-color: pink;
 }
 
 .logo {
