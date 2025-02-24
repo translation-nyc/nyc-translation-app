@@ -7,10 +7,11 @@ interface ControlsProps {
     isLoading: boolean;
     isTranslating: boolean;
     onToggleTranslation: () => void;
+    targetLanguage: string;
+    onChangeTargetLanguage: (language: string) => void;
 }
 
 function Controls(props: ControlsProps) {
-    const [targetLanguage, setTargetLanguage] = useState("");
     const [isChecked, setIsChecked] = useState(false);
     const {tokens} = useTheme();
 
@@ -54,26 +55,25 @@ function Controls(props: ControlsProps) {
                             label="Fruit"
                             labelHidden
                             placeholder="Select a language"
-                            value={targetLanguage}
-                            onChange={(e) => setTargetLanguage(e.target.value)}
+                            value={props.targetLanguage}
+                            onChange={(e) => props.onChangeTargetLanguage(e.target.value)}
                             options={["French", "Spanish", "Arabic", "Chinese"]}
-                        >
-                        </SelectField>
+                        />
                     </div>
 
-                    <div>The currently selected language is: {targetLanguage}</div>
+                    <div>
+                        The currently selected language is: {props.targetLanguage}
+                    </div>
                 </div>
 
-                <div>
-                    <SwitchField
-                        isDisabled={false}
-                        isChecked={isChecked}
-                        label="Auto-punctuation"
-                        labelPosition="end"
-                        onChange={(e) => setIsChecked(e.target.checked)}
-                        trackCheckedColor={tokens.colors.blue[80]}
-                    />
-                </div>
+                <SwitchField
+                    isDisabled={false}
+                    isChecked={isChecked}
+                    label="Auto-punctuation"
+                    labelPosition="end"
+                    onChange={(e) => setIsChecked(e.target.checked)}
+                    trackCheckedColor={tokens.colors.blue[80]}
+                />
             </div>
         </div>
     );
