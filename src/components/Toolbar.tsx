@@ -20,7 +20,7 @@ function Toolbar() {
 
                 <ButtonGroup size="small">
                     {/* Dark mode toggle button */}
-                    <Button onClick={cycleTheme} className="p-2">
+                    <Button onClick={cycleTheme} className="dark-mode p-2">
                         {theme === "light" && <Sun className="w-5 h-5 text-yellow-500" />}
                         {theme === "dark" && <Moon className="w-5 h-5 text-black-200" />}
                     </Button>

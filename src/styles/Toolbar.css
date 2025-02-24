@@ -19,3 +19,20 @@
 .logout-button:hover {
     background-color: #1d4ed8;
 }
+
+.dark .logout-button {
+    color: var(--text-dark);
+}
+
+.dark .logout-button:hover {
+    background-color: #1d4ed8;
+}
+
+.dark .dark-mode {
+    outline: white;
+    color: var(--text-dark);
+}
+
+.dark .dark-mode:hover {
+    background-color: #1d4ed8;
+}
