@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Amplify, fetchAuthSession} from "@aws-amplify/core";
 import {TranscribeStreamingClient, type TranscriptResultStream} from "@aws-sdk/client-transcribe-streaming";
 import type {
@@ -8,9 +8,9 @@ import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import Transcript from "./Transcript.tsx";
 
-let speechTranscriber: SpeechTranscriber;
-
 function TranscriptionInterface() {
+    const speechTranscriber = useRef<SpeechTranscriber | null>(null);
+
     const [isLoading, setIsLoading] = useState(true);
     const [isTranslating, setIsTranslating] = useState(false);
 
@@ -35,7 +35,7 @@ function TranscriptionInterface() {
             },
         };
         const transcribeClient = new TranscribeStreamingClient(config);
-        speechTranscriber = new SpeechTranscriber(transcribeClient, onTranscription);
+        speechTranscriber.current = new SpeechTranscriber(transcribeClient, onTranscription);
         setIsLoading(false);
     }
 
@@ -46,11 +46,14 @@ function TranscriptionInterface() {
     }, []);
 
     async function toggleTranslation() {
+        if (speechTranscriber.current === null) {
+            return;
+        }
         setIsTranslating(!isTranslating);
         if (!isTranslating) {
-            await speechTranscriber.start();
+            await speechTranscriber.current.start();
         } else {
-            await speechTranscriber.stop();
+            await speechTranscriber.current.stop();
         }
     }
 
