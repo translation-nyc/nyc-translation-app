@@ -18,8 +18,14 @@ import { defineAuth, secret } from '@aws-amplify/backend';
                     scopes: ["openid", "profile", "email"],
                 },
             ],
-            logoutUrls: ['http://localhost:5176/', 'https://main.d1bxv4xqup7i2d.amplifyapp.com/'],
-            callbackUrls: ['http://localhost:5176/', 'https://main.d1bxv4xqup7i2d.amplifyapp.com/'],
+            callbackUrls: [
+                'http://localhost:5173/', 
+                'https://main.d1bxv4xqup7i2d.amplifyapp.com/'
+            ],
+            logoutUrls: [
+                'http://localhost:5173/',
+                'https://main.d1bxv4xqup7i2d.amplifyapp.com/'
+            ]
         },
     },
  });
