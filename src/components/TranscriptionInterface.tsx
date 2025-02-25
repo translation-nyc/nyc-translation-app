@@ -8,6 +8,11 @@ import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import Transcript from "./Transcript.tsx";
 
+interface Transcript {
+    parts: string[];
+    lastId: string;
+}
+
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
 
@@ -16,11 +21,46 @@ function TranscriptionInterface() {
 
     const [targetLanguage, setTargetLanguage] = useState("");
 
-    const [transcriptParts, setTranscriptParts] = useState<string[]>([]);
-    const transcript = transcriptParts.join(" ");
+    const [transcript, setTranscript] = useState<Transcript>({
+        parts: [],
+        lastId: "",
+    });
+    const transcriptString = transcript.parts.join(" ");
 
     function onTranscription(event: TranscriptResultStream) {
-        console.log(JSON.stringify(event));
+        if (event.TranscriptEvent === undefined) {
+            console.error("Transcription error");
+            console.error(event);
+            return;
+        }
+        const transcriptResults = event.TranscriptEvent.Transcript?.Results;
+        if (transcriptResults === undefined || transcriptResults.length === 0) {
+            return;
+        }
+        const transcriptResult = transcriptResults[0];
+        const alternatives = transcriptResult.Alternatives;
+        if (alternatives === undefined || alternatives.length === 0) {
+            return;
+        }
+        const transcriptPart = alternatives[0].Transcript;
+        if (transcriptPart === undefined) {
+            return;
+        }
+
+        setTranscript(previousTranscriptParts => {
+            const newTranscriptParts = [...previousTranscriptParts.parts];
+            if (newTranscriptParts.length === 0) {
+                newTranscriptParts.push(transcriptPart);
+            } else if (previousTranscriptParts.lastId === transcriptResult.ResultId) {
+                newTranscriptParts[newTranscriptParts.length - 1] = transcriptPart;
+            } else {
+                newTranscriptParts.push(transcriptPart);
+            }
+            return {
+                parts: newTranscriptParts,
+                lastId: transcriptResult.ResultId || "",
+            };
+        });
     }
 
     async function loadClient() {
@@ -70,9 +110,9 @@ function TranscriptionInterface() {
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
                 onChangeTargetLanguage={setTargetLanguage}
-                transcript={transcript}
+                transcript={transcriptString}
             />
-            <Transcript transcript={transcript}/>
+            <Transcript transcript={transcriptString}/>
         </div>
     );
 }
