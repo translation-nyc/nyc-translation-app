@@ -12,6 +12,8 @@ import {
 import {AsyncBlockingQueue} from "./async-blocking-queue.ts";
 import pcmProcessorUrl from "./pcm-processor.ts?worker&url";
 
+const TARGET_SAMPLE_RATE = 16000;
+
 export class SpeechTranscriber {
 
     private readonly transcribeClient: TranscribeStreamingClient;
@@ -44,7 +46,8 @@ export class SpeechTranscriber {
 
         await audioWorkletSetup;
         this.audioWorkletNode = new AudioWorkletNode(this.audioContext, "pcm-processor");
-        this.audioWorkletNode.port.onmessage = (event: MessageEvent<ArrayBuffer>) => {
+        this.audioWorkletNode.port.postMessage(TARGET_SAMPLE_RATE);
+        this.audioWorkletNode.port.onmessage = event => {
             audioQueue.enqueue(event.data);
         };
 
@@ -55,7 +58,7 @@ export class SpeechTranscriber {
         const params: StartStreamTranscriptionCommandInput = {
             LanguageCode: LanguageCode.EN_GB,
             MediaEncoding: MediaEncoding.PCM,
-            MediaSampleRateHertz: this.audioContext.sampleRate,
+            MediaSampleRateHertz: TARGET_SAMPLE_RATE,
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {
                 for await (const data of audioQueue) {
                     yield {
