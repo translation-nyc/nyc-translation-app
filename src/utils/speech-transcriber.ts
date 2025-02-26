@@ -59,7 +59,7 @@ export class SpeechTranscriber {
         const params: StartStreamTranscriptionCommandInput = {
             LanguageCode: LanguageCode.EN_GB,
             MediaEncoding: MediaEncoding.PCM,
-            MediaSampleRateHertz: TARGET_SAMPLE_RATE,
+            MediaSampleRateHertz: Math.min(this.audioContext.sampleRate, TARGET_SAMPLE_RATE),
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {
                 for await (const data of audioQueue) {
                     yield {
