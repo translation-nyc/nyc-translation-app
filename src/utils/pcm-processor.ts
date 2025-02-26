@@ -54,11 +54,8 @@ class PcmProcessor extends AudioWorkletProcessor {
 }
 
 function downSampleBuffer(buffer: Float32Array, originalSampleRate: number, targetSampleRate: number): Float32Array {
-    if (targetSampleRate == originalSampleRate) {
+    if (targetSampleRate === originalSampleRate || targetSampleRate > originalSampleRate) {
         return buffer;
-    }
-    if (targetSampleRate > originalSampleRate) {
-        throw new Error("Target sample rate should be less than original sample rate");
     }
     const sampleRateRatio = originalSampleRate / targetSampleRate;
     const newLength = Math.round(buffer.length / sampleRateRatio);
