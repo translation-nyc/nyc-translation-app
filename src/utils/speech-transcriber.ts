@@ -1,5 +1,6 @@
 import {
     type AudioStream,
+    BadRequestException,
     LanguageCode,
     MediaEncoding,
     StartStreamTranscriptionCommand,
@@ -73,10 +74,18 @@ export class SpeechTranscriber {
         };
 
         const command = new StartStreamTranscriptionCommand(params);
-        const response = await this.transcribeClient.send(command);
-        for await (const event of response.TranscriptResultStream!) {
-            this.onTranscription(event);
-            if (this.stopped) break;
+        while (!this.stopped) {
+            try {
+                const response = await this.transcribeClient.send(command);
+                for await (const event of response.TranscriptResultStream!) {
+                    this.onTranscription(event);
+                    if (this.stopped) break;
+                }
+            } catch (e) {
+                if (!(e instanceof BadRequestException)) {
+                    console.error(e);
+                }
+            }
         }
     }
 
