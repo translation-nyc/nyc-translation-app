@@ -1,17 +1,19 @@
 const VOLUME_THRESHOLD = 0.01;
 const MAX_SILENCE_DURATION_SECONDS = 2;
+const MAX_BUFFER_SIZE = 10;
 
 class PcmProcessor extends AudioWorkletProcessor {
 
     private targetSampleRate = 0;
     private silenceCountDown = 0;
+    private readonly audioBuffer: Float32Array[] = [];
 
     constructor() {
         super();
         this.port.onmessage = this.handleMessage.bind(this);
     }
 
-    handleMessage(event: MessageEvent) {
+    private handleMessage(event: MessageEvent) {
         this.targetSampleRate = event.data;
     }
 
@@ -22,18 +24,32 @@ class PcmProcessor extends AudioWorkletProcessor {
             const downSampled = downSampleBuffer(float32Data, sampleRate, this.targetSampleRate);
             const volume = calculateRootMeanSquare(downSampled);
             if (volume >= VOLUME_THRESHOLD) {
-                const uint8Buffer = float32ToUint8Pcm(downSampled);
-                this.port.postMessage(uint8Buffer);
+                this.sendAudio(downSampled);
                 this.silenceCountDown = MAX_SILENCE_DURATION_SECONDS;
             } else if (this.silenceCountDown > 0) {
-                const uint8Buffer = float32ToUint8Pcm(downSampled);
-                this.port.postMessage(uint8Buffer);
+                this.sendAudio(downSampled);
                 const samples = downSampled.length;
                 this.silenceCountDown -= calculateChunkDuration(samples, this.targetSampleRate);
                 this.silenceCountDown = Math.max(0, this.silenceCountDown);
             }
         }
         return true;
+    }
+
+    private sendAudio(audio: Float32Array) {
+        this.audioBuffer.push(audio);
+        if (this.audioBuffer.length === MAX_BUFFER_SIZE) {
+            const totalLength = this.audioBuffer.reduce((acc, val) => acc + val.length, 0);
+            const combined = new Float32Array(totalLength);
+            let offset = 0;
+            for (const audio of this.audioBuffer) {
+                combined.set(audio, offset);
+                offset += audio.length;
+            }
+            const uint8Buffer = float32ToUint8Pcm(combined);
+            this.port.postMessage(uint8Buffer);
+            this.audioBuffer.length = 0;
+        }
     }
 }
 
