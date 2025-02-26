@@ -1,5 +1,7 @@
+
 .controls {
     background-color: var(--background-light);
+    border: 0.1px solid black;
 }
 
 .dark .controls {
