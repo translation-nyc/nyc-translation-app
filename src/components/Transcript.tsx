@@ -1,9 +1,15 @@
-import {useState} from "react";
-import {Button, TextAreaField} from "@aws-amplify/ui-react";
-import {textToSpeech} from "../utils/text-to-speech.ts";
+import { useState } from "react";
+import { Button, TextAreaField } from "@aws-amplify/ui-react";
+import { textToSpeech } from "../utils/text-to-speech.ts";
+import TranscriptModal from "./TranscriptModal.tsx";
 
 function Transcript() {
     const [transcription] = useState("This is where the transcription will be generated.");
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
     // Transcription set as aws sends it in
     // Text area field maybe not best to use for transcription?
     return (
@@ -18,12 +24,30 @@ function Transcript() {
                 variation="quiet"
                 value={transcription}
             />
-            <Button
-                variation="primary"
-                onClick={() => textToSpeech(transcription)}
-            >
-                Play Transcription
-            </Button>
+            <div>
+                <div>
+                    <Button
+                        variation="primary"
+                        onClick={() => textToSpeech(transcription)}
+                    >
+                        Play Transcription
+                    </Button>
+                </div>
+
+                <div>
+                    <Button
+                        variation="primary"
+                        onClick={openModal}
+                    >
+                        Review
+                    </Button>
+                </div>
+            </div>
+
+            {isModalOpen && (
+                <TranscriptModal transcription={transcription} closeModal={closeModal}/>
+            )}
+
         </div>
     );
 }
