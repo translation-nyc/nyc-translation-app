@@ -54,7 +54,8 @@ export class SpeechTranscriber {
         this.audioSource = this.audioContext.createMediaStreamSource(this.mediaStream);
         this.audioSource.connect(this.audioWorkletNode);
 
-        const stopped = () => this.stopped;
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
         const params: StartStreamTranscriptionCommandInput = {
             LanguageCode: LanguageCode.EN_GB,
             MediaEncoding: MediaEncoding.PCM,
@@ -66,7 +67,7 @@ export class SpeechTranscriber {
                             AudioChunk: new Uint8Array(data),
                         },
                     };
-                    if (stopped()) break;
+                    if (self.stopped) break;
                 }
             })(),
         };
