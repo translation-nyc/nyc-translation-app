@@ -2,7 +2,6 @@ import { Button, ButtonGroup, useAuthenticator, SliderField,  } from "@aws-ampli
 import { ProfileIcon } from "../assets/icons";
 import { Moon, Sun, HelpCircle, ZoomIn, ZoomOut } from "lucide-react";
 import { useTheme } from "../hooks/useTheme";
-import { useState } from "react";
 import "../styles/Toolbar.css";
 
 function Toolbar() {
