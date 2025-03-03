@@ -1,11 +1,13 @@
 .navbar {
     background-color: var(--background-light);
     color: var(--text-light);
+    border: 0.1px solid black;
 }
 
 .dark .navbar{
     background-color: var(--background-dark);
     color: var(--text-dark);
+    border: 0.1px solid white;
 }
 
 .name {

@@ -1,4 +1,4 @@
-import { Button, ButtonGroup, useAuthenticator, SliderField,  } from "@aws-amplify/ui-react";
+import { Button, ButtonGroup, useAuthenticator, SliderField} from "@aws-amplify/ui-react";
 import { ProfileIcon } from "../assets/icons";
 import { Moon, Sun, HelpCircle, ZoomIn, ZoomOut } from "lucide-react";
 import { useTheme } from "../hooks/useTheme";
@@ -6,7 +6,10 @@ import "../styles/Toolbar.css";
 
 function Toolbar() {
     const { signOut } = useAuthenticator();
-    const { theme, cycleTheme } = useTheme();
+    const { theme, cycleTheme, textSize, setTextSize } = useTheme();   
+    const handleTextSizeChange = (value: number) => {
+        setTextSize(value);
+    };
     
     return (
         <header className="navbar flex items-center justify-between p-4 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
@@ -19,20 +22,21 @@ function Toolbar() {
             <div className="flex items-center space-x-2">
                 {/* Text Size Slider */}
                 <div className="flex items-center space-x-2 ml-4">
-                    <span className="text-sm">A</span>
                     <SliderField
-                        label="Text Size Slider"
+                        label="Text size"
+                        labelHidden
                         outerStartComponent={
-                            <ZoomOut />
+                            <ZoomOut className="text-gray-600 dark:text-gray-400" />
                         }
                         outerEndComponent={
-                            <ZoomIn />
+                            <ZoomIn className="text-gray-600 dark:text-gray-400" />
                         }
                         min={8}
                         max={24}
                         step={2}
-                        />
-                    <span className="text-lg">A</span>
+                        value={textSize}               // Changed from defaultValue to value
+                        onChange={handleTextSizeChange} // Added onChange handler
+                    />
                 </div>
                 
                 <ButtonGroup size="small">

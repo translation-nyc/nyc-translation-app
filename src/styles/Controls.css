@@ -6,6 +6,7 @@
 
 .dark .controls {
     background-color: var(--background-dark);
+    border: 0.1px solid white;
 }
 
 .start-stop-button {

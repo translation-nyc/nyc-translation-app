@@ -6,4 +6,5 @@
 .dark .transcript {
     background-color: var(--background-dark);
     color: var(--text-dark);
+    border: 0.1px solid white;
 }
