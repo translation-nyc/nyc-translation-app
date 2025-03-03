@@ -64,7 +64,8 @@ export class SpeechTranscriber {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
         const params: StartStreamTranscriptionCommandInput = {
-            LanguageCode: LanguageCode.EN_GB,
+            IdentifyMultipleLanguages: true,
+            LanguageOptions: LanguageCode.EN_GB + "," + this.language,
             MediaEncoding: MediaEncoding.PCM,
             MediaSampleRateHertz: Math.min(this.audioContext.sampleRate, TARGET_SAMPLE_RATE),
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {

@@ -4,10 +4,10 @@ import {TranscribeStreamingClient, type TranscriptResultStream} from "@aws-sdk/c
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
+import {Language} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import Transcript from "./Transcript.tsx";
-import {Language} from "../utils/languages.ts";
 
 interface Transcript {
     parts: string[];
