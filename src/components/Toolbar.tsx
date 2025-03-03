@@ -19,7 +19,7 @@ function Toolbar() {
                 <Button className="logout-button" size="small" 
                     onClick={() =>
                         signInWithRedirect({
-                            provider: { custom: "MicrosoftEntraID" },
+                            provider: { custom: "Microsoft" },
                         })
                 }>
                     <ProfileIcon className="mr-2 h-4 w-4"/>
