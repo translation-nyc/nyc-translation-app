@@ -63,14 +63,14 @@ function TranscriptModal(props: TranscriptModalProps) {
         }
     };
 
-    const blobToBase64 = (blob: Blob) => {
-        return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result as string);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    };
+    // const blobToBase64 = (blob: Blob) => {
+    //     return new Promise<string>((resolve, reject) => {
+    //         const reader = new FileReader();
+    //         reader.onloadend = () => resolve(reader.result as string);
+    //         reader.onerror = reject;
+    //         reader.readAsDataURL(blob);
+    //     });
+    // };
 
     const transcriptionWords = props.transcription.split(' ');
 
