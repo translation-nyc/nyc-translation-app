@@ -1,15 +1,16 @@
 import {useState} from "react";
-import {Button, Heading, SelectField, SwitchField, useTheme} from "@aws-amplify/ui-react";
+import {Button, Heading, SwitchField, useTheme} from "@aws-amplify/ui-react";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import "../styles/Controls.css";
 import {textToSpeech} from "../utils/text-to-speech.ts";
+import {Language, Languages} from "../utils/languages.ts";
 
 interface ControlsProps {
     isLoading: boolean;
     isTranslating: boolean;
     onToggleTranslation: () => void;
-    targetLanguage: string;
-    onChangeTargetLanguage: (language: string) => void;
+    targetLanguage: Language | null;
+    onChangeTargetLanguage: (language: Language) => void;
     transcript: string;
 }
 
@@ -52,19 +53,23 @@ function Controls(props: ControlsProps) {
                         </Heading>
                     </div>
 
-                    <div>
-                        <SelectField
-                            label="Fruit"
-                            labelHidden
-                            placeholder="Select a language"
-                            value={props.targetLanguage}
-                            onChange={(e) => props.onChangeTargetLanguage(e.target.value)}
-                            options={["French", "Spanish", "Arabic", "Chinese"]}
-                        />
-                    </div>
+                    <select
+                        onChange={e => props.onChangeTargetLanguage(Languages[parseInt(e.target.value)])}
+                        defaultValue="default"
+                        className="border border-gray-400 w-full rounded p-2"
+                    >
+                        <option disabled hidden value="default">
+                            Select a language
+                        </option>
+                        {Languages.map((language, index) =>
+                            <option key={index} value={index}>
+                                {language.name}
+                            </option>
+                        )}
+                    </select>
 
                     <div>
-                        The currently selected language is: {props.targetLanguage}
+                        The currently selected language is: {props.targetLanguage?.name ?? "none"}
                     </div>
                 </div>
 
@@ -74,7 +79,7 @@ function Controls(props: ControlsProps) {
                         isChecked={isChecked}
                         label="Auto-punctuation"
                         labelPosition="end"
-                        onChange={(e) => setIsChecked(e.target.checked)}
+                        onChange={e => setIsChecked(e.target.checked)}
                         trackCheckedColor={tokens.colors.blue[80]}
                     />
                 </div>

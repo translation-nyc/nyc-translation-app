@@ -7,6 +7,7 @@ import type {
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import Transcript from "./Transcript.tsx";
+import {Language} from "../utils/languages.ts";
 
 interface Transcript {
     parts: string[];
@@ -19,7 +20,7 @@ function TranscriptionInterface() {
     const [isLoading, setIsLoading] = useState(true);
     const [isTranslating, setIsTranslating] = useState(false);
 
-    const [targetLanguage, setTargetLanguage] = useState("");
+    const [targetLanguage, setTargetLanguage] = useState<Language | null>(null);
 
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
@@ -58,7 +59,7 @@ function TranscriptionInterface() {
             }
             return {
                 parts: newTranscriptParts,
-                lastId: transcriptResult.ResultId || "",
+                lastId: transcriptResult.ResultId ?? "",
             };
         });
     }
