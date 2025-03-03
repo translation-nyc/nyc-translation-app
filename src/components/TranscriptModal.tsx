@@ -42,34 +42,26 @@ function TranscriptModal(props: TranscriptModalProps) {
         // return pdfBlob;
     };
 
-    // const emailTranscript = async () => {
-    //     const pdfBlob = generatePDF(); // Generate the PDF Blob
+    const emailTranscript = async () => {
+        // const pdfBlob = generatePDF(); // Generate the PDF Blob
 
-    //     const email = 'ggmihaylov@yahoo.co.uk'; // Replace with the actual recipient's email
+        const email = "ggmihaylov@yahoo.co.uk"; // Replace with the actual recipient's email
 
-    //     try {
-    //         const response = await fetch('YOUR_API_GATEWAY_ENDPOINT/send-email', {
-    //             method: 'POST',
-    //             body: JSON.stringify({
-    //                 email: email,
-    //                 pdfBlob: await blobToBase64(pdfBlob), // Convert Blob to base64
-    //             }),
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //         });
+        try {
+            const response = await fetch('https://6b8a5sx46e.execute-api.eu-west-2.amazonaws.com/emailTranscript', {
+                method: 'POST',
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: email,
+                  })
+            });
 
-    //         const data = await response.json();
-    //         if (response.ok) {
-    //             alert('Email sent successfully!');
-    //         } else {
-    //             alert('Failed to send email: ' + data.message);
-    //         }
-    //     } catch (error) {
-    //         console.error('Error sending email:', error);
-    //         alert('Error sending email: ' + error);
-    //     }
-    // };
+            const data = await response.json();
+        } catch (error) {
+            console.error('Error sending email:', error);
+            alert(error);
+        }
+    };
 
     const blobToBase64 = (blob: Blob) => {
         return new Promise<string>((resolve, reject) => {
@@ -122,7 +114,7 @@ function TranscriptModal(props: TranscriptModalProps) {
                         <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                             {/* <button type="button" className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 sm:ml-3 sm:w-auto" onClick={emailTranscript}>Email Transcript</button>
                              */}
-                            <button type="button" className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 sm:ml-3 sm:w-auto" onClick={generatePDF}>Email Transcript</button>
+                            <button type="button" className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 sm:ml-3 sm:w-auto" onClick={emailTranscript}>Email Transcript</button>
                             <button type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto" onClick={props.closeModal}>Cancel</button>
                         </div>
                     </div>
