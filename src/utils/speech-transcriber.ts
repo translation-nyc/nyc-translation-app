@@ -17,6 +17,8 @@ const TARGET_SAMPLE_RATE = 16000;
 
 export class SpeechTranscriber {
 
+    public language: LanguageCode | undefined;
+
     private readonly transcribeClient: TranscribeStreamingClient;
     private readonly onTranscription: (event: TranscriptResultStream) => void;
 
@@ -33,6 +35,10 @@ export class SpeechTranscriber {
     }
 
     async start() {
+        if (this.language === undefined) {
+            throw new Error("Language is not set");
+        }
+
         this.stopped = false;
         this.audioContext = new AudioContext();
         const audioQueue = new AsyncBlockingQueue<ArrayBuffer>();

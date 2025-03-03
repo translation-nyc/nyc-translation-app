@@ -93,7 +93,7 @@ function TranscriptionInterface() {
 
     async function toggleTranslation() {
         if (speechTranscriber.current === null) {
-            return;
+            throw new Error("SpeechTranscriber is not initialized");
         }
         setIsTranslating(!isTranslating);
         if (!isTranslating) {
@@ -103,6 +103,15 @@ function TranscriptionInterface() {
         }
     }
 
+    function setLanguage(language: Language) {
+        if (speechTranscriber.current === null) {
+            throw new Error("SpeechTranscriber is not initialized");
+        } else {
+            speechTranscriber.current.language = language.code;
+        }
+        setTargetLanguage(language);
+    }
+
     return (
         <div className="flex-1 flex flex-col md:flex-row p-4 gap-4">
             <Controls
@@ -110,7 +119,7 @@ function TranscriptionInterface() {
                 isTranslating={isTranslating}
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
-                onChangeTargetLanguage={setTargetLanguage}
+                onChangeTargetLanguage={setLanguage}
                 transcript={transcriptString}
             />
             <Transcript transcript={transcriptString}/>

@@ -24,25 +24,31 @@ function Controls(props: ControlsProps) {
                 <div className="flex justify-center"> {/* Container for start/stop button*/}
                     <Button
                         className={`start-stop-button ${props.isTranslating ? "stop-button" : "start-button"}`}
-                        disabled={props.isLoading}
+                        disabled={props.isLoading || props.targetLanguage === null}
                         isFullWidth={true}
                         onClick={props.onToggleTranslation}
                     >
-                        {props.isLoading ? (
-                            "Loading..."
-                        ) : (
-                            props.isTranslating ? (
-                                <>
-                                    <StopIcon className="mr-2 h-5 w-5"/>
-                                    Stop Translation
-                                </>
-                            ) : (
-                                <>
-                                    <PlayIcon className="mr-2 h-5 w-5"/>
-                                    Start Translation
-                                </>
-                            )
-                        )}
+                        {(() => {
+                            if (props.isLoading) {
+                                return "Loading...";
+                            } else if (props.targetLanguage === null) {
+                                return "Select a language";
+                            } else if (props.isTranslating) {
+                                return (
+                                    <>
+                                        <StopIcon className="mr-2 h-5 w-5"/>
+                                        Stop Translation
+                                    </>
+                                );
+                            } else {
+                                return (
+                                    <>
+                                        <PlayIcon className="mr-2 h-5 w-5"/>
+                                        Start Translation
+                                    </>
+                                );
+                            }
+                        })()}
                     </Button>
                 </div>
 
@@ -56,7 +62,8 @@ function Controls(props: ControlsProps) {
                     <select
                         onChange={e => props.onChangeTargetLanguage(Languages[parseInt(e.target.value)])}
                         defaultValue="default"
-                        className="border border-gray-400 w-full rounded p-2"
+                        disabled={props.isTranslating}
+                        className="border border-gray-400 w-full rounded p-2 disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed"
                     >
                         <option disabled hidden value="default">
                             Select a language
