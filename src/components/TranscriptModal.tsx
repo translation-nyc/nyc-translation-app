@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { jsPDF } from "jspdf";
+// import { jsPDF } from "jspdf";
 
 interface TranscriptModalProps {
     transcription: string;
@@ -17,30 +17,30 @@ function TranscriptModal(props: TranscriptModalProps) {
         }
     }
 
-    const generatePDF = () => {
-        const doc = new jsPDF();
+    // const generatePDF = () => {
+    //     const doc = new jsPDF();
     
-        // Add title
-        doc.setFontSize(16);
-        doc.text("Transcription with Comments", 10, 10);
+    //     // Add title
+    //     doc.setFontSize(16);
+    //     doc.text("Transcription with Comments", 10, 10);
 
-        let fullTranscription = '';
+    //     let fullTranscription = '';
 
-        transcriptionWords.forEach((word, index) => {
-            const comment = comments.find(comment => comment.index === index);
-            const text =  comment ? `${word} [${comment.text}]` : word;
-            fullTranscription += text + ' ';
-        }) 
+    //     transcriptionWords.forEach((word, index) => {
+    //         const comment = comments.find(comment => comment.index === index);
+    //         const text =  comment ? `${word} [${comment.text}]` : word;
+    //         fullTranscription += text + ' ';
+    //     }) 
 
-        doc.setFontSize(12);
-        doc.text(fullTranscription.trim(), 10, 20);
+    //     doc.setFontSize(12);
+    //     doc.text(fullTranscription.trim(), 10, 20);
     
-        // Download the PDF
-        doc.save("transcription.pdf");
+    //     // Download the PDF
+    //     doc.save("transcription.pdf");
 
-        // const pdfBlob = doc.output('blob');
-        // return pdfBlob;
-    };
+    //     // const pdfBlob = doc.output('blob');
+    //     // return pdfBlob;
+    // };
 
     const emailTranscript = async () => {
         // const pdfBlob = generatePDF(); // Generate the PDF Blob
@@ -57,6 +57,7 @@ function TranscriptModal(props: TranscriptModalProps) {
             });
 
             const data = await response.json();
+            console.log(data)
         } catch (error) {
             console.error('Error sending email:', error);
             alert(error);
