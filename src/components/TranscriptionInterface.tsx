@@ -1,18 +1,18 @@
 import {useEffect, useRef, useState} from "react";
 import {Amplify, fetchAuthSession} from "@aws-amplify/core";
-import {TranscribeStreamingClient, type TranscriptResultStream} from "@aws-sdk/client-transcribe-streaming";
+import {
+    LanguageCode,
+    TranscribeStreamingClient,
+    type TranscriptResultStream
+} from "@aws-sdk/client-transcribe-streaming";
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
-import {Language} from "../utils/languages.ts";
+import {Language, Transcript} from "../utils/types.ts";
+import {getLanguage} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
-import Transcript from "./Transcript.tsx";
-
-interface Transcript {
-    parts: string[];
-    lastId: string;
-}
+import TranscriptBox from "./TranscriptBox.tsx";
 
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
@@ -24,9 +24,8 @@ function TranscriptionInterface() {
 
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
-        lastId: "",
+        lastLanguageCode: LanguageCode.EN_GB,
     });
-    const transcriptString = transcript.parts.join(" ");
 
     function onTranscription(event: TranscriptResultStream) {
         if (event.TranscriptEvent === undefined) {
@@ -43,23 +42,74 @@ function TranscriptionInterface() {
         if (alternatives === undefined || alternatives.length === 0) {
             return;
         }
-        const transcriptPart = alternatives[0].Transcript;
-        if (transcriptPart === undefined) {
+        const transcriptPartText = alternatives[0].Transcript;
+        if (transcriptPartText === undefined) {
             return;
         }
+        const languageCode = transcriptResult.LanguageCode ?? LanguageCode.EN_GB;
+        const resultId = transcriptResult.ResultId ?? "";
 
-        setTranscript(previousTranscriptParts => {
-            const newTranscriptParts = [...previousTranscriptParts.parts];
+        setTranscript(previousTranscript => {
+            const newTranscriptParts = [...previousTranscript.parts];
             if (newTranscriptParts.length === 0) {
-                newTranscriptParts.push(transcriptPart);
-            } else if (previousTranscriptParts.lastId === transcriptResult.ResultId) {
-                newTranscriptParts[newTranscriptParts.length - 1] = transcriptPart;
+                // No transcription yet
+                const language = getLanguage(languageCode);
+                newTranscriptParts.push({
+                    text: transcriptPartText,
+                    language: language,
+                    resultId: resultId,
+                    lastCompleteIndex: 0,
+                });
             } else {
-                newTranscriptParts.push(transcriptPart);
+                let newText: string;
+                let newResultId = resultId;
+                let newLastCompleteIndex: number;
+                const lastIndex = newTranscriptParts.length - 1;
+                const lastPart = newTranscriptParts[lastIndex];
+                if (lastPart.resultId === resultId) {
+                    // In-progress transcription
+                    newText = lastPart.text.slice(0, lastPart.lastCompleteIndex);
+                    if (previousTranscript.lastLanguageCode === languageCode) {
+                        // Same language
+                        newText += " " + transcriptPartText;
+                    } else {
+                        // Different language
+                        newResultId = lastPart.resultId;
+                    }
+                    newLastCompleteIndex = lastPart.lastCompleteIndex;
+                } else {
+                    // New transcription
+                    newText = lastPart.text + " " + transcriptPartText;
+                    newLastCompleteIndex = lastPart.text.length;
+                }
+
+                if (newText.length === 0) {
+                    // Remove in-progress transcription if language changed
+                    newTranscriptParts.pop();
+                } else {
+                    const previousLanguage = getLanguage(previousTranscript.lastLanguageCode);
+                    newTranscriptParts[lastIndex] = {
+                        text: newText,
+                        language: previousLanguage,
+                        resultId: newResultId,
+                        lastCompleteIndex: newLastCompleteIndex,
+                    };
+                }
+
+                if (previousTranscript.lastLanguageCode !== languageCode) {
+                    const language = getLanguage(languageCode);
+                    newTranscriptParts.push({
+                        text: transcriptPartText,
+                        language: language,
+                        resultId: resultId,
+                        lastCompleteIndex: 0,
+                    });
+                }
             }
+
             return {
                 parts: newTranscriptParts,
-                lastId: transcriptResult.ResultId ?? "",
+                lastLanguageCode: languageCode,
             };
         });
     }
@@ -120,9 +170,9 @@ function TranscriptionInterface() {
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
                 onChangeTargetLanguage={setLanguage}
-                transcript={transcriptString}
+                transcript={transcript}
             />
-            <Transcript transcript={transcriptString}/>
+            <TranscriptBox transcript={transcript}/>
         </div>
     );
 }

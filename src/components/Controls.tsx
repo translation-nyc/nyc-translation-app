@@ -3,15 +3,17 @@ import {Button, Heading, SwitchField, useTheme} from "@aws-amplify/ui-react";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import "../styles/Controls.css";
 import {textToSpeech} from "../utils/text-to-speech.ts";
-import {Language, Languages} from "../utils/languages.ts";
+import {Languages} from "../utils/languages.ts";
+import {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
+import {Language, Transcript} from "../utils/types.ts";
 
-interface ControlsProps {
+export interface ControlsProps {
     isLoading: boolean;
     isTranslating: boolean;
     onToggleTranslation: () => void;
     targetLanguage: Language | null;
     onChangeTargetLanguage: (language: Language) => void;
-    transcript: string;
+    transcript: Transcript;
 }
 
 function Controls(props: ControlsProps) {
@@ -63,6 +65,8 @@ function ToggleTranslationButton(props: ControlsProps) {
 }
 
 function LanguageSelector(props: ControlsProps) {
+    const languagesNoEnglish = Languages.filter(language => language.code !== LanguageCode.EN_GB);
+
     return (
         <div className="space-y-2">
             <div>
@@ -72,7 +76,7 @@ function LanguageSelector(props: ControlsProps) {
             </div>
 
             <select
-                onChange={e => props.onChangeTargetLanguage(Languages[parseInt(e.target.value)])}
+                onChange={e => props.onChangeTargetLanguage(languagesNoEnglish[parseInt(e.target.value)])}
                 defaultValue="default"
                 disabled={props.isTranslating}
                 className="border border-gray-400 w-full rounded p-2 disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed"
@@ -80,7 +84,7 @@ function LanguageSelector(props: ControlsProps) {
                 <option disabled hidden value="default">
                     Select a language
                 </option>
-                {Languages.map((language, index) =>
+                {languagesNoEnglish.map((language, index) =>
                     <option key={index} value={index}>
                         {language.name}
                     </option>
@@ -113,11 +117,18 @@ function AutoPunctuationSwitch() {
 }
 
 function TextToSpeechButton(props: ControlsProps) {
+    async function playTranscript() {
+        const transcriptString = props.transcript.parts
+            .map(part => part.text)
+            .join(" ");
+        await textToSpeech(transcriptString);
+    }
+
     return (
         <div>
             <Button
                 variation="primary"
-                onClick={() => textToSpeech(props.transcript)}
+                onClick={playTranscript}
             >
                 Play Transcription
             </Button>
