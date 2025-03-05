@@ -5,6 +5,7 @@
 
 :root {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --scale-factor: 1;
 }
 
 body {
@@ -15,16 +16,36 @@ body {
     width: 100vw;
     justify-content: center;
     align-items: center;
-    font-size: var(--dynamic-text-size, 16px);
+    /* Font size is now controlled by the html element */
 }
 
+/* Remove the fixed font size override */
 .toolbar, 
 .fixed-size-element {
-    font-size: 16px !important;
+    /* Use rem units to scale with the root */
+    font-size: 1rem;
 }
 
 #root {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+}
+
+/* Scale spacing based on font size */
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+
+.m-2 { margin: 0.5rem; }
+.m-4 { margin: 1rem; }
+.m-6 { margin: 1.5rem; }
+
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+/* Scale controls */
+.btn, .card, .modal, .input, .select, .textarea {
+    font-size: inherit;
 }

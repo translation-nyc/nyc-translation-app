@@ -1,8 +1,8 @@
-import { Button } from "@aws-amplify/ui-react";
 import { ProfileIcon } from "../assets/icons";
 import { Moon, Sun, HelpCircle, ZoomIn, ZoomOut } from "lucide-react";
 import { useTheme } from "../hooks/useTheme";
 import { useAuthenticator } from "@aws-amplify/ui-react";
+import Help from "./Help.tsx";
 
 function Toolbar() {
     const { signOut } = useAuthenticator();
@@ -15,7 +15,7 @@ function Toolbar() {
     return (
         <div className="navbar bg-base-100 shadow-md">
             <div className="navbar-start">
-                <h1 className="btn btn-ghost normal-case text-3xl font-bold">
+                <h1 className="normal-case text-3xl font-bold">
                     Conversate.
                 </h1>
             </div>
@@ -27,9 +27,9 @@ function Toolbar() {
                         <ZoomOut className="w-5 h-5" />
                         <input 
                             type="range" 
-                            min={8}
-                            max={24} 
-                            step={2}
+                            min={14}
+                            max={36} 
+                            step={4}
                             value={textSize} 
                             onChange={handleTextSizeChange}
                             className="range range-xs range-primary w-32" 
@@ -51,23 +51,7 @@ function Toolbar() {
                 </button>
 
                 {/* Help Modal Button */}
-                <button 
-                    className="btn btn-ghost btn-circle" 
-                    onClick={() => document.getElementById('help_modal')?.showModal()}
-                >
-                    <HelpCircle className="w-5 h-5 text-blue-500" />
-                </button>
-
-                {/* Help Modal */}
-                <dialog id="help_modal" className="modal">
-                    <div className="modal-box">
-                        <form method="dialog">
-                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                        </form>
-                        <h3 className="font-bold text-lg">Help</h3>
-                        <p className="py-4">Press ESC key or click ✕ to close</p>
-                    </div>
-                </dialog>
+                <Help/>
 
                 {/* Logout Button */}
                 <button 

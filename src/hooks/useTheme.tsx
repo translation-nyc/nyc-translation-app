@@ -25,14 +25,24 @@ export function useTheme() {
         setTextSize(size);
         localStorage.setItem('app-text-size', size.toString());
         
-        // Optional: Apply text size to root element for global scaling
+        // Set the base font size on the html element
+        // This will allow everything sized in rem to scale proportionally
+        document.documentElement.style.fontSize = `${size}px`;
+        
+        // Also keep the CSS variable for backward compatibility
         document.documentElement.style.setProperty('--dynamic-text-size', `${size}px`);
+        
+        // Set a scaling factor for non-text elements
+        const scaleFactor = size / 16;
+        document.documentElement.style.setProperty('--scale-factor', scaleFactor.toString());
     };
 
-    // Apply theme to body
+    // Apply theme and initial text size
     useEffect(() => {
         document.body.setAttribute('data-theme', theme);
-    }, [theme]);
+        // Ensure text size is applied on initial render
+        updateTextSize(textSize);
+    }, [theme, textSize]);
 
     return {
         theme, 
