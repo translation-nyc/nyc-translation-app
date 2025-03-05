@@ -145,21 +145,15 @@ function TranscriptionInterface() {
         if (speechTranscriber.current === null) {
             throw new Error("SpeechTranscriber is not initialized");
         }
+        if (targetLanguage === null) {
+            throw new Error("Target language is not set");
+        }
         setIsTranslating(!isTranslating);
         if (!isTranslating) {
-            await speechTranscriber.current.start();
+            await speechTranscriber.current.start(targetLanguage.code);
         } else {
             await speechTranscriber.current.stop();
         }
-    }
-
-    function setLanguage(language: Language) {
-        if (speechTranscriber.current === null) {
-            throw new Error("SpeechTranscriber is not initialized");
-        } else {
-            speechTranscriber.current.language = language.code;
-        }
-        setTargetLanguage(language);
     }
 
     return (
@@ -169,7 +163,7 @@ function TranscriptionInterface() {
                 isTranslating={isTranslating}
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
-                onChangeTargetLanguage={setLanguage}
+                onChangeTargetLanguage={setTargetLanguage}
                 transcript={transcript}
             />
             <TranscriptBox transcript={transcript}/>
