@@ -3,10 +3,10 @@ import {Language} from "./types.ts";
 
 export const Languages: Language[] = [
     {code: LanguageCode.EN_GB, name: "English"},
-    { code: LanguageCode.FR_FR, name: "French" },
-    { code: LanguageCode.ES_ES, name: "Spanish" },
-    { code: LanguageCode.AR_SA, name: "Arabic" },
-    { code: LanguageCode.ZH_CN, name: "Chinese" },
+    {code: LanguageCode.FR_FR, name: "French"},
+    {code: LanguageCode.ES_ES, name: "Spanish"},
+    {code: LanguageCode.AR_SA, name: "Arabic"},
+    {code: LanguageCode.ZH_CN, name: "Chinese"},
 ];
 
 export function getLanguage(code: LanguageCode): Language {
