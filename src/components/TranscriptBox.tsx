@@ -7,22 +7,11 @@ export interface TranscriptProps {
 function TranscriptBox(props: TranscriptProps) {
     return (
         <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-4 text-white">
-            {props.transcript.parts.map((part, index) => {
-                if (index === 0) {
-                    return (
-                        <div key={index}>
-                            {part.text}
-                        </div>
-                    );
-                } else {
-                    return (
-                        <div key={index}>
-                            <br/>
-                            {part.text}
-                        </div>
-                    );
-                }
-            })}
+            {props.transcript.parts.map((part, index) =>
+                <p key={index} className="mb-4">
+                    {part.text}
+                </p>
+            )}
         </div>
     );
 }
