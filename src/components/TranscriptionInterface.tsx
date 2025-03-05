@@ -5,7 +5,6 @@ import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
-import "../styles/Interface.css";
 import Controls from "./Controls.tsx";
 import Transcript from "./Transcript.tsx";
 
@@ -56,7 +55,7 @@ function TranscriptionInterface() {
     }
 
     return (
-        <div className="interface flex-1 flex flex-col md:flex-row p-4 gap-4">
+        <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4">
             <Controls
                 isLoading={isLoading}
                 isTranslating={isTranslating}

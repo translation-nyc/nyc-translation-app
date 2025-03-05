@@ -12,7 +12,7 @@ function Controls(props: ControlsProps) {
     const [isChecked, setIsChecked] = useState(false);
 
     return (
-        <div className="card bg-base-100 shadow-xl p-6 w-full md:w-80">
+        <div className="card bg-base-100 shadow-xl p-6 w-full md:w-90">
             <div className="space-y-6">
                 {/* Start/Stop Translation Button */}
                 <button 

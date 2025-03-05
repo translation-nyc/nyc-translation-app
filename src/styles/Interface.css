@@ -1,9 +1,0 @@
-.interface {
-    background-color: var(--background-light);
-    color: var(--text-light);
-}
-
-.dark .interface {
-    background-color: rgba(0, 0, 0, 0.285);
-    color: var(--text-dark);
-}
