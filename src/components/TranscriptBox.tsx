@@ -1,4 +1,4 @@
-import {Transcript} from "../utils/types.ts";
+import type {Transcript} from "../utils/types.ts";
 
 export interface TranscriptProps {
     transcript: Transcript;

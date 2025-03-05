@@ -1,5 +1,5 @@
 import {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
-import {Language} from "./types.ts";
+import type {Language} from "./types.ts";
 
 export const Languages: Language[] = [
     {code: LanguageCode.EN_GB, name: "English"},

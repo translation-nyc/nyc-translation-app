@@ -8,7 +8,7 @@ import {
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
-import {Language, Transcript} from "../utils/types.ts";
+import type {Language, Transcript} from "../utils/types.ts";
 import {getLanguage} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
@@ -33,6 +33,7 @@ function TranscriptionInterface() {
             console.error(event);
             return;
         }
+
         const transcriptResults = event.TranscriptEvent.Transcript?.Results;
         if (transcriptResults === undefined || transcriptResults.length === 0) {
             return;
@@ -47,63 +48,80 @@ function TranscriptionInterface() {
             return;
         }
         const languageCode = transcriptResult.LanguageCode ?? LanguageCode.EN_GB;
+        const language = getLanguage(languageCode);
         const resultId = transcriptResult.ResultId ?? "";
 
         setTranscript(previousTranscript => {
             const newTranscriptParts = [...previousTranscript.parts];
             if (newTranscriptParts.length === 0) {
                 // No transcription yet
-                const language = getLanguage(languageCode);
                 newTranscriptParts.push({
                     text: transcriptPartText,
                     language: language,
-                    resultId: resultId,
+                    lastResultId: resultId,
                     lastCompleteIndex: 0,
                 });
             } else {
-                let newText: string;
-                let newResultId = resultId;
-                let newLastCompleteIndex: number;
                 const lastIndex = newTranscriptParts.length - 1;
                 const lastPart = newTranscriptParts[lastIndex];
-                if (lastPart.resultId === resultId) {
+                if (lastPart.lastResultId === resultId) {
                     // In-progress transcription
-                    newText = lastPart.text.slice(0, lastPart.lastCompleteIndex);
+                    const lastCompleteText = lastPart.text.slice(0, lastPart.lastCompleteIndex);
                     if (previousTranscript.lastLanguageCode === languageCode) {
                         // Same language
-                        newText += " " + transcriptPartText;
+                        newTranscriptParts[lastIndex] = {
+                            text: lastCompleteText + " " + transcriptPartText,
+                            language: language,
+                            lastResultId: resultId,
+                            lastCompleteIndex: lastPart.lastCompleteIndex,
+                        };
                     } else {
                         // Different language
-                        newResultId = lastPart.resultId;
+                        if (lastCompleteText.length === 0) {
+                            // Merge transcript parts if previous transcript part is empty
+                            newTranscriptParts.pop();
+                            const lastLastIndex = newTranscriptParts.length - 1;
+                            const lastLastPart = newTranscriptParts[lastLastIndex];
+                            newTranscriptParts[lastLastIndex] = {
+                                text: lastLastPart.text + " " + transcriptPartText,
+                                language: language,
+                                lastResultId: resultId,
+                                lastCompleteIndex: lastLastPart.lastCompleteIndex,
+                            };
+                        } else {
+                            newTranscriptParts[lastIndex] = {
+                                text: lastCompleteText,
+                                language: lastPart.language,
+                                lastResultId: lastPart.lastResultId,
+                                lastCompleteIndex: lastPart.lastCompleteIndex,
+                            };
+                            newTranscriptParts.push({
+                                text: transcriptPartText,
+                                language: language,
+                                lastResultId: resultId,
+                                lastCompleteIndex: 0,
+                            });
+                        }
                     }
-                    newLastCompleteIndex = lastPart.lastCompleteIndex;
                 } else {
                     // New transcription
-                    newText = lastPart.text + " " + transcriptPartText;
-                    newLastCompleteIndex = lastPart.text.length;
-                }
-
-                if (newText.length === 0) {
-                    // Remove in-progress transcription if language changed
-                    newTranscriptParts.pop();
-                } else {
-                    const previousLanguage = getLanguage(previousTranscript.lastLanguageCode);
-                    newTranscriptParts[lastIndex] = {
-                        text: newText,
-                        language: previousLanguage,
-                        resultId: newResultId,
-                        lastCompleteIndex: newLastCompleteIndex,
-                    };
-                }
-
-                if (previousTranscript.lastLanguageCode !== languageCode) {
-                    const language = getLanguage(languageCode);
-                    newTranscriptParts.push({
-                        text: transcriptPartText,
-                        language: language,
-                        resultId: resultId,
-                        lastCompleteIndex: 0,
-                    });
+                    if (previousTranscript.lastLanguageCode === languageCode) {
+                        // Same language
+                        newTranscriptParts[lastIndex] = {
+                            text: lastPart.text + " " + transcriptPartText,
+                            language: language,
+                            lastResultId: resultId,
+                            lastCompleteIndex: lastPart.text.length,
+                        };
+                    } else {
+                        // Different language
+                        newTranscriptParts.push({
+                            text: transcriptPartText,
+                            language: language,
+                            lastResultId: resultId,
+                            lastCompleteIndex: 0,
+                        });
+                    }
                 }
             }
 

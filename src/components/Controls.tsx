@@ -1,11 +1,11 @@
 import {useState} from "react";
 import {Button, Heading, SwitchField, useTheme} from "@aws-amplify/ui-react";
-import {PlayIcon, StopIcon} from "../assets/icons";
-import "../styles/Controls.css";
+import {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
 import {textToSpeech} from "../utils/text-to-speech.ts";
 import {Languages} from "../utils/languages.ts";
-import {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
-import {Language, Transcript} from "../utils/types.ts";
+import type {Language, Transcript} from "../utils/types.ts";
+import {PlayIcon, StopIcon} from "../assets/icons";
+import "../styles/Controls.css";
 
 export interface ControlsProps {
     isLoading: boolean;

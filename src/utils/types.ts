@@ -8,7 +8,7 @@ export interface Language {
 export interface TranscriptPart {
     text: string;
     language: Language;
-    resultId: string;
+    lastResultId: string;
     lastCompleteIndex: number;
 }
 
