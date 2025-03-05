@@ -1,28 +1,30 @@
 @import "tailwindcss";
+@tailwind components;
+@tailwind utilities;
+@plugin "daisyui";
 
 :root {
-    --background-light: #ffffff;
-    --text-light: #000000;
-    --background-dark: #092b3e;
-    --text-dark: #ffffff;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 body {
     margin: 0;
     background: cornflowerblue;
-    backdrop-filter: var(--background-light);
-    color: var(--text-light);
     display: flex;
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     height: 100vh;
     width: 100vw;
     justify-content: center;
     align-items: center;
-
+    font-size: var(--dynamic-text-size, 16px);
 }
 
-.dark body {
-    background-color: var(--background-dark);
-    color: var(--text-dark);
+.toolbar, 
+.fixed-size-element {
+    font-size: 16px !important;
 }
 
+#root {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}

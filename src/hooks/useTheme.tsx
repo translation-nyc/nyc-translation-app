@@ -1,38 +1,43 @@
-import { useState, useEffect } from "react";
-
-type Theme = "light" | "dark";
+import { useState, useEffect } from 'react';
 
 export function useTheme() {
-	const [theme, setTheme] = useState<Theme>(() => {
-		return (localStorage.getItem("theme") as Theme) || "light"; // Default to light
-	});
+    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+        // Check local storage or default to light theme
+        const savedTheme = localStorage.getItem('app-theme');
+        return savedTheme === 'dark' ? 'dark' : 'light';
+    });
 
-	const [textSize, setTextSize] = useState<number>(() => {
-		const savedSize = localStorage.getItem("textSize");
-		return savedSize ? Number(savedSize) : 14; // Default to 14px
-	});
+    const [textSize, setTextSize] = useState<number>(() => {
+        // Check local storage or default to 16
+        const savedTextSize = localStorage.getItem('app-text-size');
+        return savedTextSize ? Number(savedTextSize) : 16;
+    });
 
-	// Handle theme changes
-	useEffect(() => {
-		const root = document.documentElement;
-		if (theme === "dark") {
-			root.classList.add("dark");
-			localStorage.setItem("theme", "dark");
-		} else {
-			root.classList.remove("dark");
-			localStorage.setItem("theme", "light");
-		}
-	}, [theme]);
+    // Cycle through themes
+    const cycleTheme = () => {
+        const newTheme = theme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('app-theme', newTheme);
+    };
 
-	// Handle text size changes
-	useEffect(() => {
-		document.documentElement.style.fontSize = `${textSize}px`;
-		localStorage.setItem("textSize", textSize.toString());
-	}, [textSize]);
+    // Update text size and persist to local storage
+    const updateTextSize = (size: number) => {
+        setTextSize(size);
+        localStorage.setItem('app-text-size', size.toString());
+        
+        // Optional: Apply text size to root element for global scaling
+        document.documentElement.style.setProperty('--dynamic-text-size', `${size}px`);
+    };
 
-	const cycleTheme = () => {
-		setTheme(theme === "light" ? "dark" : "light");
-	};
+    // Apply theme to body
+    useEffect(() => {
+        document.body.setAttribute('data-theme', theme);
+    }, [theme]);
 
-	return { theme, cycleTheme, textSize, setTextSize };
+    return {
+        theme, 
+        cycleTheme, 
+        textSize, 
+        setTextSize: updateTextSize
+    };
 }

@@ -1,30 +1,27 @@
-import {useState} from "react";
-import {Button, TextAreaField} from "@aws-amplify/ui-react";
-import {textToSpeech} from "../utils/text-to-speech.ts";
-import "../styles/Transcript.css";
+import { useState } from "react";
+import { textToSpeech } from "../utils/text-to-speech.ts";
 
 function Transcript() {
     const [transcription] = useState("This is where the transcription will be generated.");
-    // Transcription set as aws sends it in
-    // Text area field maybe not best to use for transcription?
+
     return (
-        <div className="transcript flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-            <TextAreaField
-                descriptiveText="This is where transcription will be generated"
-                label="Transcription"
-                labelHidden={true}
-                placeholder="This is where transcription will be generated"
-                rows={20}
-                isReadOnly={true}
-                variation="quiet"
-                value={transcription}
-            />
-            <Button
-                variation="primary"
-                onClick={() => textToSpeech(transcription)}
-            >
-                Play Transcription
-            </Button>
+        <div className="card bg-base-100 shadow-xl h-full w-full flex flex-col">
+            <div className="card-body flex-grow">
+                <textarea 
+                    className="textarea textarea-bordered h-full w-full resize-none" 
+                    placeholder="Transcription will be generated here"
+                    value={transcription}
+                    readOnly
+                />
+                <div className="card-actions justify-end">
+                    <button 
+                        className="btn btn-primary" 
+                        onClick={() => textToSpeech(transcription)}
+                    >
+                        Play Transcription
+                    </button>
+                </div>
+            </div>
         </div>
     );
 }

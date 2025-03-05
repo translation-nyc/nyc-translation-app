@@ -38,3 +38,11 @@
 .dark .dark-mode:hover {
     background-color: #1d4ed8;
 }
+
+.modal-box {
+    @apply bg-[var(--background-light)] text-[var(--text-light)];
+}
+
+.dark .modal-box {
+    @apply bg-[var(--background-dark)] text-[var(--text-dark)];
+}
