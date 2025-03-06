@@ -57,7 +57,7 @@ function TranscriptModal(props: TranscriptModalProps) {
         try {
             const base64PDF = getBase64();
 
-            const response = await fetch('https://6b8a5sx46e.execute-api.eu-west-2.amazonaws.com/emailTranscript', {
+            await fetch('https://6b8a5sx46e.execute-api.eu-west-2.amazonaws.com/emailTranscript', {
                 mode: "no-cors",
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
@@ -66,7 +66,7 @@ function TranscriptModal(props: TranscriptModalProps) {
                     pdf: base64PDF,
                 }),
             });
-
+            
         } catch (error) {
             console.error('Error sending email:', error);
             alert(error);
