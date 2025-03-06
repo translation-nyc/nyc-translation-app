@@ -1,27 +1,13 @@
-import { useState } from "react";
-import { textToSpeech } from "../utils/text-to-speech.ts";
+interface TranscriptProps {
+    transcript: string;
+}
 
-function Transcript() {
-    const [transcription] = useState("This is where the transcription will be generated.");
-
+function Transcript(props: TranscriptProps) {
+    // Transcription set as aws sends it in
+    // Text area field maybe not best to use for transcription?
     return (
-        <div className="card bg-base-100 shadow-xl h-full w-full flex flex-col">
-            <div className="card-body flex-grow">
-                <textarea 
-                    className="textarea textarea-bordered h-full w-full resize-none" 
-                    placeholder="Transcription will be generated here"
-                    value={transcription}
-                    readOnly
-                />
-                <div className="card-actions justify-end">
-                    <button 
-                        className="btn btn-primary" 
-                        onClick={() => textToSpeech(transcription)}
-                    >
-                        Play Transcription
-                    </button>
-                </div>
-            </div>
+        <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden p-4 text-white">
+            {props.transcript}
         </div>
     );
 }
