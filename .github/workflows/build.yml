@@ -28,13 +28,13 @@ jobs:
 
             -   name: Create dummy amplify_outputs.json file
                 run: |
-                    echo "{
+                    echo '{
                         "custom": {
                             "Predictions": {
                                 "convert": {}
                             }
                         }
-                    }" > amplify_outputs.json
+                    }' > amplify_outputs.json
 
             -   name: Build
                 run: pnpm build
