@@ -15,7 +15,7 @@ function Controls(props: ControlsProps) {
 	const [isChecked, setIsChecked] = useState(false);
 
 	return (
-		<div className="w-full md:w-72 p-6 bg-white rounded-lg shadow-lg"> {/* Container for controls*/}
+		<div className="w-full md:w-72 bg-base-100 rounded-lg shadow-lg p-6"> {/* Container for controls*/}
 			<div className="space-y-6">
 				<div className="flex justify-center"> {/* Container for start/stop button*/}
 					<button
