@@ -1,5 +1,5 @@
 import { useState } from "react";
-// import { jsPDF } from "jspdf";
+import { jsPDF } from "jspdf";
 
 interface TranscriptModalProps {
     transcription: string;
@@ -8,70 +8,70 @@ interface TranscriptModalProps {
 
 function TranscriptModal(props: TranscriptModalProps) {
 
-    const [comments, setComments] = useState<{ text: string; index: number}[]>([]);
+    const [comments, setComments] = useState<{ text: string; index: number }[]>([]);
 
     const addComment = (index: number) => {
         const commentText = prompt("Enter your comment");
         if (commentText) {
-            setComments([...comments, {text: commentText, index }]);
+            setComments([...comments, { text: commentText, index }]);
         }
     }
 
-    // const generatePDF = () => {
-    //     const doc = new jsPDF();
-    
-    //     // Add title
-    //     doc.setFontSize(16);
-    //     doc.text("Transcription with Comments", 10, 10);
+    const generatePDF = () => {
+        const doc = new jsPDF();
 
-    //     let fullTranscription = '';
+        // Add title
+        doc.setFontSize(16);
+        doc.text("Transcription with Comments", 10, 10);
 
-    //     transcriptionWords.forEach((word, index) => {
-    //         const comment = comments.find(comment => comment.index === index);
-    //         const text =  comment ? `${word} [${comment.text}]` : word;
-    //         fullTranscription += text + ' ';
-    //     }) 
+        let fullTranscription = '';
 
-    //     doc.setFontSize(12);
-    //     doc.text(fullTranscription.trim(), 10, 20);
-    
-    //     // Download the PDF
-    //     doc.save("transcription.pdf");
+        transcriptionWords.forEach((word, index) => {
+            const comment = comments.find(comment => comment.index === index);
+            const text =  comment ? `${word} [${comment.text}]` : word;
+            fullTranscription += text + ' ';
+        }) 
 
-    //     // const pdfBlob = doc.output('blob');
-    //     // return pdfBlob;
-    // };
+        doc.setFontSize(12);
+        doc.text(fullTranscription.trim(), 10, 20);
+        
+        return doc;
+    };
+
+    const downloadPDF = () => {
+        const doc = generatePDF();
+        doc.save("transcription.pdf")
+    };
+
+    const getBase64 = () => {
+        const doc = generatePDF();
+        const dataUri = doc.output('datauristring');
+        const base64PDF = dataUri.split(",")[1];
+        return base64PDF
+        // console.log(base64PDF)
+    }
 
     const emailTranscript = async () => {
-        // const pdfBlob = generatePDF(); // Generate the PDF Blob
-
         const email = "ggmihaylov@yahoo.co.uk"; // Replace with the actual recipient's email
 
         try {
+            const base64PDF = getBase64();
+
             const response = await fetch('https://6b8a5sx46e.execute-api.eu-west-2.amazonaws.com/emailTranscript', {
+                mode: "no-cors",
                 method: 'POST',
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     email: email,
-                  })
+                    pdf: base64PDF,
+                }),
             });
 
-            const data = await response.json();
-            console.log(data)
         } catch (error) {
             console.error('Error sending email:', error);
             alert(error);
         }
     };
-
-    // const blobToBase64 = (blob: Blob) => {
-    //     return new Promise<string>((resolve, reject) => {
-    //         const reader = new FileReader();
-    //         reader.onloadend = () => resolve(reader.result as string);
-    //         reader.onerror = reject;
-    //         reader.readAsDataURL(blob);
-    //     });
-    // };
 
     const transcriptionWords = props.transcription.split(' ');
 
@@ -116,6 +116,7 @@ function TranscriptModal(props: TranscriptModalProps) {
                             {/* <button type="button" className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 sm:ml-3 sm:w-auto" onClick={emailTranscript}>Email Transcript</button>
                              */}
                             <button type="button" className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 sm:ml-3 sm:w-auto" onClick={emailTranscript}>Email Transcript</button>
+                            <button type="button" className="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-blue-500 sm:ml-3 sm:w-auto" onClick={downloadPDF}>Download</button>
                             <button type="button" className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto" onClick={props.closeModal}>Cancel</button>
                         </div>
                     </div>
