@@ -3,7 +3,11 @@ import { Button, TextAreaField } from "@aws-amplify/ui-react";
 import { textToSpeech } from "../utils/text-to-speech.ts";
 import TranscriptModal from "./TranscriptModal.tsx";
 
-function Transcript() {
+interface TranscriptProps {
+    transcript: string;
+}              
+        
+function Transcript(props: TranscriptProps) {
     const [transcription] = useState("This is where the transcription will be generated.");
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -13,7 +17,7 @@ function Transcript() {
     // Transcription set as aws sends it in
     // Text area field maybe not best to use for transcription?
     return (
-        <div className="flex-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <div className="flex-1 bg-base-100 rounded-lg shadow-lg overflow-hidden p-4">
             <TextAreaField
                 descriptiveText="This is where transcription will be generated"
                 label="Transcription"
@@ -22,7 +26,7 @@ function Transcript() {
                 rows={20}
                 isReadOnly={true}
                 variation="quiet"
-                value={transcription}
+                value={props.transcript}
             />
             <div>
                 <div>
@@ -45,7 +49,7 @@ function Transcript() {
             </div>
 
             {isModalOpen && (
-                <TranscriptModal transcription={transcription} closeModal={closeModal}/>
+                <TranscriptModal transcription={props.transcript} closeModal={closeModal}/>
             )}
 
         </div>

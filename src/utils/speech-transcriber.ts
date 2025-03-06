@@ -1,5 +1,6 @@
 import {
     type AudioStream,
+    BadRequestException,
     LanguageCode,
     MediaEncoding,
     StartStreamTranscriptionCommand,
@@ -11,6 +12,8 @@ import {
 } from "@aws-sdk/client-transcribe-streaming/dist-types/commands/StartStreamTranscriptionCommand";
 import {AsyncBlockingQueue} from "./async-blocking-queue.ts";
 import pcmProcessorUrl from "./pcm-processor.ts?worker&url";
+
+const TARGET_SAMPLE_RATE = 16000;
 
 export class SpeechTranscriber {
 
@@ -44,17 +47,20 @@ export class SpeechTranscriber {
 
         await audioWorkletSetup;
         this.audioWorkletNode = new AudioWorkletNode(this.audioContext, "pcm-processor");
-        this.audioWorkletNode.port.onmessage = (event: MessageEvent<ArrayBuffer>) => {
+        this.audioWorkletNode.port.postMessage(TARGET_SAMPLE_RATE);
+        this.audioWorkletNode.port.onmessage = event => {
             audioQueue.enqueue(event.data);
         };
 
         this.audioSource = this.audioContext.createMediaStreamSource(this.mediaStream);
         this.audioSource.connect(this.audioWorkletNode);
 
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
         const params: StartStreamTranscriptionCommandInput = {
             LanguageCode: LanguageCode.EN_GB,
             MediaEncoding: MediaEncoding.PCM,
-            MediaSampleRateHertz: this.audioContext.sampleRate,
+            MediaSampleRateHertz: Math.min(this.audioContext.sampleRate, TARGET_SAMPLE_RATE),
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {
                 for await (const data of audioQueue) {
                     yield {
@@ -62,15 +68,24 @@ export class SpeechTranscriber {
                             AudioChunk: new Uint8Array(data),
                         },
                     };
+                    if (self.stopped) break;
                 }
             })(),
         };
 
         const command = new StartStreamTranscriptionCommand(params);
-        const response = await this.transcribeClient.send(command);
-        for await (const event of response.TranscriptResultStream!) {
-            this.onTranscription(event);
-            if (this.stopped) break;
+        while (!this.stopped) {
+            try {
+                const response = await this.transcribeClient.send(command);
+                for await (const event of response.TranscriptResultStream!) {
+                    this.onTranscription(event);
+                    if (this.stopped) break;
+                }
+            } catch (e) {
+                if (!(e instanceof BadRequestException)) {
+                    console.error(e);
+                }
+            }
         }
     }
 
