@@ -1,5 +1,5 @@
 import { ProfileIcon } from "../assets/icons";
-import { Moon, Sun, HelpCircle, ZoomIn, ZoomOut } from "lucide-react";
+import { Moon, Sun, ZoomIn, ZoomOut } from "lucide-react";
 import { useTheme } from "../hooks/useTheme";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import Help from "./Help.tsx";
