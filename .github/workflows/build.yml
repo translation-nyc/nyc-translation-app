@@ -26,5 +26,15 @@ jobs:
             -   name: Install dependencies
                 run: pnpm install
 
+            -   name: Create dummy amplify_outputs.json file
+                run: |
+                    echo "{
+                        "custom": {
+                            "Predictions": {
+                                "convert": {}
+                            }
+                        }
+                    }" > amplify_outputs.json
+
             -   name: Build
                 run: pnpm build
