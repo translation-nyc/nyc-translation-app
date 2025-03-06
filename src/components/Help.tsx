@@ -1,17 +1,24 @@
 import { HelpCircle, Mic, Languages, Volume2, Mail } from "lucide-react";
+import { useRef } from "react";
 
 function Help() {
+    const dialogRef = useRef<HTMLDialogElement>(null);
+
+    const openModal = () => {
+        dialogRef.current?.showModal();
+    };
+
   return (
     <>
         <button
             className="btn btn-ghost btn-circle"
-            onClick={() => document.getElementById('help_modal')?.showModal()}
+            onClick={openModal}
         >
             <HelpCircle className="w-5 h-5 text-blue-500" />
         </button>
       
         {/* Help Modal */}
-        <dialog id="help_modal" className="modal">
+        <dialog ref={dialogRef} className="modal">
             <div className="modal-box max-w-xl max-h-150 p-5">
                 <form method="dialog">
                     <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
@@ -77,7 +84,7 @@ function Help() {
                     </ul>
                 </div>
             </div>
-        s</dialog>
+        </dialog>
     </>
   );
 }
