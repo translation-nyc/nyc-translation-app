@@ -103,7 +103,7 @@ function TranscriptionInterface() {
     }
 
     return (
-        <div className="flex-1 flex flex-col md:flex-row p-4 gap-4">
+        <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4">
             <Controls
                 isLoading={isLoading}
                 isTranslating={isTranslating}
