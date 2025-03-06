@@ -79,15 +79,24 @@ function TranscriptionInterface() {
                         // Different language
                         if (lastCompleteText.length === 0) {
                             // Merge transcript parts if previous transcript part is empty
-                            newTranscriptParts.pop();
-                            const lastLastIndex = newTranscriptParts.length - 1;
-                            const lastLastPart = newTranscriptParts[lastLastIndex];
-                            newTranscriptParts[lastLastIndex] = {
-                                text: lastLastPart.text + " " + transcriptPartText,
-                                language: language,
-                                lastResultId: resultId,
-                                lastCompleteIndex: lastLastPart.lastCompleteIndex,
-                            };
+                            if (newTranscriptParts.length > 1) {
+                                newTranscriptParts.pop();
+                                const lastLastIndex = newTranscriptParts.length - 1;
+                                const lastLastPart = newTranscriptParts[lastLastIndex];
+                                newTranscriptParts[lastLastIndex] = {
+                                    text: lastLastPart.text + " " + transcriptPartText,
+                                    language: language,
+                                    lastResultId: resultId,
+                                    lastCompleteIndex: lastLastPart.lastCompleteIndex,
+                                };
+                            } else {
+                                newTranscriptParts[0] = {
+                                    text: transcriptPartText,
+                                    language: language,
+                                    lastResultId: resultId,
+                                    lastCompleteIndex: 0,
+                                };
+                            }
                         } else {
                             newTranscriptParts[lastIndex] = {
                                 text: lastCompleteText,
