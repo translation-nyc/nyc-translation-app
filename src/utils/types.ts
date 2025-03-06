@@ -1,8 +1,9 @@
 import {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
 
 export interface Language {
-    code: LanguageCode;
     name: string;
+    transcribeCode: LanguageCode;
+    translateCode: string;
 }
 
 export interface TranscriptPart {
@@ -10,6 +11,9 @@ export interface TranscriptPart {
     language: Language;
     lastResultId: string;
     lastCompleteIndex: number;
+    translatedText: string;
+    translatedLanguage: Language;
+    lastCompleteTranslatedIndex: number;
 }
 
 export interface Transcript {

@@ -1,8 +1,7 @@
 import {useState} from "react";
 import {Button, Heading, SwitchField, useTheme} from "@aws-amplify/ui-react";
-import {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
 import {textToSpeech} from "../utils/text-to-speech.ts";
-import {Languages} from "../utils/languages.ts";
+import {ENGLISH, Languages} from "../utils/languages.ts";
 import type {Language, Transcript} from "../utils/types.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import "../styles/Controls.css";
@@ -65,7 +64,7 @@ function ToggleTranslationButton(props: ControlsProps) {
 }
 
 function LanguageSelector(props: ControlsProps) {
-    const languagesNoEnglish = Languages.filter(language => language.code !== LanguageCode.EN_GB);
+    const languagesNoEnglish = Languages.filter(language => language !== ENGLISH);
 
     return (
         <div className="space-y-2">
