@@ -6,13 +6,13 @@ import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
 
 function Toolbar() {
-    const { signOut } = useAuthenticator();
-    const { theme, cycleTheme, textSize, setTextSize } = useTheme();
+    const {signOut} = useAuthenticator();
+    const {theme, cycleTheme, textSize, setTextSize} = useTheme();
     const handleTextSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newSize = Number(e.target.value);
         setTextSize(newSize);
     };
-    
+
     return (
         <div className="navbar bg-base-100 shadow-md">
             <div className="navbar-start">
@@ -20,7 +20,7 @@ function Toolbar() {
                     Conversate.
                 </h1>
             </div>
-            
+
             <div className="navbar-end space-x-2">
                 {/* Text Size Slider */}
                 <div className="dropdown dropdown-end">
