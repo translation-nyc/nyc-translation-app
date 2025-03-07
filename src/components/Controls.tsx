@@ -1,8 +1,7 @@
 import {useState} from "react";
-import {Button, Heading, SwitchField, useTheme} from "@aws-amplify/ui-react";
-import {textToSpeech} from "../utils/text-to-speech.ts";
-import {ENGLISH, Languages} from "../utils/languages.ts";
 import type {Language, Transcript} from "../utils/types.ts";
+import {ENGLISH, Languages} from "../utils/languages.ts";
+import {textToSpeech} from "../utils/text-to-speech.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import "../styles/Controls.css";
 
@@ -17,7 +16,7 @@ export interface ControlsProps {
 
 function Controls(props: ControlsProps) {
     return (
-        <div className="w-full md:w-72 p-6 bg-white rounded-lg shadow-lg"> {/* Container for controls*/}
+        <div className="w-full md:w-72 bg-base-100 rounded-lg shadow-lg p-6">
             <div className="space-y-6">
                 <ToggleTranslationButton {...props}/>
                 <LanguageSelector {...props}/>
@@ -31,10 +30,9 @@ function Controls(props: ControlsProps) {
 function ToggleTranslationButton(props: ControlsProps) {
     return (
         <div className="flex justify-center">
-            <Button
-                className={`start-stop-button ${props.isTranslating ? "stop-button" : "start-button"}`}
+            <button
+                className={`btn w-full ${props.isTranslating ? "btn-error" : "btn-success"}`}
                 disabled={props.isLoading || props.targetLanguage === null}
-                isFullWidth={true}
                 onClick={props.onToggleTranslation}
             >
                 {(() => {
@@ -58,7 +56,7 @@ function ToggleTranslationButton(props: ControlsProps) {
                         );
                     }
                 })()}
-            </Button>
+            </button>
         </div>
     );
 }
@@ -69,16 +67,16 @@ function LanguageSelector(props: ControlsProps) {
     return (
         <div className="space-y-2">
             <div>
-                <Heading>
+                <h3 className="font-bold text-lg">
                     Target Language
-                </Heading>
+                </h3>
             </div>
 
             <select
+                className="select select-bordered w-full"
                 onChange={e => props.onChangeTargetLanguage(languagesNoEnglish[parseInt(e.target.value)])}
                 defaultValue="default"
                 disabled={props.isTranslating}
-                className="border border-gray-400 w-full rounded p-2 disabled:text-gray-400 disabled:border-gray-200 disabled:cursor-not-allowed"
             >
                 <option disabled hidden value="default">
                     Select a language
@@ -102,15 +100,18 @@ function AutoPunctuationSwitch() {
     const {tokens} = useTheme();
 
     return (
-        <div>
-            <SwitchField
-                isDisabled={false}
-                isChecked={isChecked}
-                label="Auto-punctuation"
-                labelPosition="end"
-                onChange={e => setIsChecked(e.target.checked)}
-                trackCheckedColor={tokens.colors.blue[80]}
-            />
+        <div className="form-control">
+            <label className="label cursor-pointer justify-start gap-2">
+                <input
+                    type="checkbox"
+                    className="toggle toggle-primary"
+                    checked={isChecked}
+                    onChange={e => setIsChecked(e.target.checked)}
+                />
+                <span className="label-text">
+                    Auto-punctuation
+                </span>
+            </label>
         </div>
     );
 }
@@ -125,12 +126,12 @@ function TextToSpeechButton(props: ControlsProps) {
 
     return (
         <div>
-            <Button
-                variation="primary"
+            <button
+                className="btn btn-primary w-full"
                 onClick={playTranscript}
             >
                 Play Transcription
-            </Button>
+            </button>
         </div>
     );
 }

@@ -1,26 +1,68 @@
-import {Button, useAuthenticator} from "@aws-amplify/ui-react";
-import {ProfileIcon} from "../assets/icons";
-import "../styles/Toolbar.css";
+import { ProfileIcon } from "../assets/icons";
+import { Moon, Sun, ZoomIn, ZoomOut } from "lucide-react";
+import { useTheme } from "../hooks/useTheme";
+import { useAuthenticator } from "@aws-amplify/ui-react";
+import Help from "./Help.tsx";
 
 function Toolbar() {
-    const {signOut} = useAuthenticator();
-
+    const { signOut } = useAuthenticator();
+    const { theme, cycleTheme, textSize, setTextSize } = useTheme();   
+    const handleTextSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newSize = Number(e.target.value);
+        setTextSize(newSize);
+    };
+    
     return (
-        <header className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
-            <div className="flex items-center space-x-4"> {/* Container for logo and dropdown*/}
-                <h1 className="text-3xl font-bold text-gray-800"> {/* Logo */}
+        <div className="navbar bg-base-100 shadow-md">
+            <div className="navbar-start">
+                <h1 className="normal-case text-3xl font-bold">
                     Conversate.
                 </h1>
-                {/* dropdown menu for tools */}
             </div>
+            
+            <div className="navbar-end space-x-2">
+                {/* Text Size Slider */}
+                <div className="dropdown dropdown-end">
+                    <div tabIndex={0} role="button" className="btn btn-ghost">
+                        <ZoomOut className="w-5 h-5" />
+                        <input 
+                            type="range" 
+                            min={14}
+                            max={36} 
+                            step={4}
+                            value={textSize} 
+                            onChange={handleTextSizeChange}
+                            className="range range-xs range-primary w-32" 
+                        />
+                        <ZoomIn className="w-5 h-5" />
+                    </div>
+                </div>
 
-            <div className="flex items-center space-x-2"> {/* Container for dark mode button and sign in button*/}
-                <Button className="logout-button" size="small" onClick={signOut}> {/* Log in button */}
-                    <ProfileIcon className="mr-2 h-4 w-4"/>
+                {/* Theme Toggle */}
+                <button 
+                    className="btn btn-ghost btn-circle" 
+                    onClick={cycleTheme}
+                >
+                    {theme === "light" ? (
+                        <Sun className="w-5 h-5 text-yellow-500" />
+                    ) : (
+                        <Moon className="w-5 h-5 text-blue-200" />
+                    )}
+                </button>
+
+                {/* Help Modal Button */}
+                <Help/>
+
+                {/* Logout Button */}
+                <button 
+                    className="btn btn-primary" 
+                    onClick={signOut}
+                >
+                    <ProfileIcon className="mr-2 h-4 w-4" />
                     Logout
-                </Button>
+                </button>
             </div>
-        </header>
+        </div>
     );
 }
 

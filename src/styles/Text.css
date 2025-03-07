@@ -1,0 +1,37 @@
+/* styles/textSize.css */
+
+/* Use relative units throughout the application */
+body {
+  line-height: 1.5;
+}
+
+/* Define relative text sizes */
+.text-xs { font-size: 0.75rem; }
+.text-sm { font-size: 0.875rem; }
+.text-base { font-size: 1rem; }
+.text-lg { font-size: 1.125rem; }
+.text-xl { font-size: 1.25rem; }
+.text-2xl { font-size: 1.5rem; }
+.text-3xl { font-size: 1.875rem; }
+.text-4xl { font-size: 2.25rem; }
+
+/* Ensure headings scale properly */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+}
+
+/* Add this to make form elements scale with font size */
+input, select, textarea, button {
+  font-size: inherit;
+}
+
+/* Scale UI components */
+.card, .btn, .modal-box, .select, .textarea {
+  font-size: inherit;
+}
+
+/* Scale icons */
+svg, .icon {
+  width: calc(1em * var(--scale-factor, 1));
+  height: calc(1em * var(--scale-factor, 1));
+}
