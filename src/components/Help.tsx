@@ -1,5 +1,5 @@
-import { HelpCircle, Mic, Languages, Volume2, Mail } from "lucide-react";
-import { useRef } from "react";
+import {HelpCircle, Languages, Mail, Mic, Volume2} from "lucide-react";
+import {useRef} from "react";
 
 function Help() {
     const dialogRef = useRef<HTMLDialogElement>(null);

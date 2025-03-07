@@ -3,7 +3,7 @@ import type {Language, Transcript} from "../utils/types.ts";
 import {ENGLISH, Languages} from "../utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
-import "../styles/Controls.css";
+import TranscriptModal from "./TranscriptModal.tsx";
 
 export interface ControlsProps {
     isLoading: boolean;
@@ -22,6 +22,7 @@ function Controls(props: ControlsProps) {
                 <LanguageSelector {...props}/>
                 <AutoPunctuationSwitch/>
                 <TextToSpeechButton {...props}/>
+                <ReviewButton {...props}/>
             </div>
         </div>
     );
@@ -97,7 +98,6 @@ function LanguageSelector(props: ControlsProps) {
 
 function AutoPunctuationSwitch() {
     const [isChecked, setIsChecked] = useState(false);
-    const {tokens} = useTheme();
 
     return (
         <div className="form-control">
@@ -133,6 +133,34 @@ function TextToSpeechButton(props: ControlsProps) {
                 Play Transcription
             </button>
         </div>
+    );
+}
+
+function ReviewButton(props: ControlsProps) {
+    const transcript = props.transcript.parts.map(part =>
+        part.text + "\n" + part.translatedText
+    ).join("\n\n");
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    return (
+        <>
+            <div>
+                <button
+                    className="btn btn-primary w-full"
+                    onClick={openModal}
+                >
+                    Review
+                </button>
+            </div>
+
+            {isModalOpen && (
+                <TranscriptModal transcription={transcript} closeModal={closeModal}/>
+            )}
+        </>
     );
 }
 

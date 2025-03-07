@@ -1,13 +1,14 @@
-import { ProfileIcon } from "../assets/icons";
-import { Moon, Sun, ZoomIn, ZoomOut } from "lucide-react";
-import { useTheme } from "../hooks/useTheme";
-import { useAuthenticator } from "@aws-amplify/ui-react";
+import {ChangeEvent} from "react";
+import {useAuthenticator} from "@aws-amplify/ui-react";
+import {Moon, Sun, ZoomIn, ZoomOut} from "lucide-react";
+import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
+import {ProfileIcon} from "../assets/icons";
 
 function Toolbar() {
     const { signOut } = useAuthenticator();
-    const { theme, cycleTheme, textSize, setTextSize } = useTheme();   
-    const handleTextSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { theme, cycleTheme, textSize, setTextSize } = useTheme();
+    const handleTextSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newSize = Number(e.target.value);
         setTextSize(newSize);
     };
