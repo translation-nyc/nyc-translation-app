@@ -3,6 +3,7 @@ import {Moon, Sun, ZoomIn, ZoomOut} from "lucide-react";
 import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
+import {signInWithRedirect} from "aws-amplify/auth";
 
 function Toolbar() {
     const handleSignIn = async () => {
@@ -72,7 +73,6 @@ function Toolbar() {
             </div>
         </div>
     );
->>>>>>> main
 }
 
 export default Toolbar;
