@@ -1,21 +1,47 @@
-import {ChangeEvent} from "react";
+import {ChangeEvent, useEffect, useState} from "react";
 import {Moon, Sun, ZoomIn, ZoomOut} from "lucide-react";
 import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
-import {signInWithRedirect} from "aws-amplify/auth";
+import {signInWithRedirect, signOut, getCurrentUser} from "aws-amplify/auth";
 
 function Toolbar() {
-    const handleSignIn = async () => {
-		try {
-			await signInWithRedirect({
-				provider: { custom: "MicrosoftEntraIDSAML" },
-			});
-		} catch (error) {
-			console.error("Error signing in:", error);
-		}
-	};
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const {theme, cycleTheme, textSize, setTextSize} = useTheme();
+
+    useEffect(() => {
+        checkAuthStatus();
+    }, []);
+
+    const checkAuthStatus = async () => {
+        try {
+            const user = await getCurrentUser();
+            setIsAuthenticated(!!user);
+        } catch (error) {
+            console.log('Not authenticated');
+            setIsAuthenticated(false);
+        }
+    };
+
+    const handleSignIn = async () => {
+        try {
+            await signInWithRedirect({
+                provider: { custom: "MicrosoftEntraIDSAML" },
+            });
+        } catch (error) {
+            console.error("Error signing in:", error);
+        }
+    };
+
+    const handleSignOut = async () => {
+        try {
+            await signOut();
+            setIsAuthenticated(false);
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+    };
+
     const handleTextSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newSize = Number(e.target.value);
         setTextSize(newSize);
@@ -62,14 +88,24 @@ function Toolbar() {
                 {/* Help Modal Button */}
                 <Help/>
 
-                {/* Logout Button */}
-                <button 
-                    className="btn btn-primary" 
-                    onClick={handleSignIn}
-                >
-                    <ProfileIcon className="mr-2 h-4 w-4" />
-                    Log In
-                </button>
+                {/* Authentication Button - conditionally renders Login or Logout */}
+                {isAuthenticated ? (
+                    <button 
+                        className="btn btn-error" 
+                        onClick={handleSignOut}
+                    >
+                        <ProfileIcon className="mr-2 h-4 w-4" />
+                        Sign Out
+                    </button>
+                ) : (
+                    <button 
+                        className="btn btn-primary" 
+                        onClick={handleSignIn}
+                    >
+                        <ProfileIcon className="mr-2 h-4 w-4" />
+                        Log In
+                    </button>
+                )}
             </div>
         </div>
     );

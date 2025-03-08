@@ -9,15 +9,6 @@ import { defineAuth, secret } from '@aws-amplify/backend';
     loginWith: {
         email: true,
         externalProviders: {
-            // oidc: [
-            //     {
-            //         name: 'MicrosoftEntraID',
-            //         clientId: secret('MICROSOFT_ENTRA_ID_CLIENT_ID'),
-            //         clientSecret: secret('MICROSOFT_ENTRA_ID_CLIENT_SECRET'),
-            //         issuerUrl: 'https://login.microsoftonline.com/7fd93033-e7a0-483b-87b7-0796e1b212a8/v2.0',
-            //         scopes: ["openid", "profile", "email"],
-            //     },
-            // ],
             saml: {
                 name: "MicrosoftEntraIDSAML",
                 metadata: {
