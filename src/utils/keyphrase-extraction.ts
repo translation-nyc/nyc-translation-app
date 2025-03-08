@@ -77,5 +77,3 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
     };
   }
 };
-export const detectSentiment = async (text: string) => {
-};
