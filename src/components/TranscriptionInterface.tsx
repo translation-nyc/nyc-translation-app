@@ -1,17 +1,19 @@
 import {useEffect, useRef, useState} from "react";
 import {Amplify, fetchAuthSession} from "@aws-amplify/core";
-import {TranscribeStreamingClient, type TranscriptResultStream} from "@aws-sdk/client-transcribe-streaming";
+import {
+    LanguageCode,
+    TranscribeStreamingClient,
+    type TranscriptResultStream
+} from "@aws-sdk/client-transcribe-streaming";
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
+import type {Language, Transcript} from "../utils/types.ts";
+import {ENGLISH, getLanguage} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
-import Transcript from "./Transcript.tsx";
-
-interface Transcript {
-    parts: string[];
-    lastId: string;
-}
+import TranscriptBox from "./TranscriptBox.tsx";
+import {translate} from "../utils/translation.ts";
 
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
@@ -19,20 +21,21 @@ function TranscriptionInterface() {
     const [isLoading, setIsLoading] = useState(true);
     const [isTranslating, setIsTranslating] = useState(false);
 
-    const [targetLanguage, setTargetLanguage] = useState("");
+    const [targetLanguage, setTargetLanguage] = useState<Language | null>(null);
+    const targetLanguageRef = useRef<Language | null>(null);
 
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
-        lastId: "",
+        lastLanguageCode: LanguageCode.EN_GB,
     });
-    const transcriptString = transcript.parts.join(" ");
 
-    function onTranscription(event: TranscriptResultStream) {
+    async function onTranscription(event: TranscriptResultStream) {
         if (event.TranscriptEvent === undefined) {
             console.error("Transcription error");
             console.error(event);
             return;
         }
+
         const transcriptResults = event.TranscriptEvent.Transcript?.Results;
         if (transcriptResults === undefined || transcriptResults.length === 0) {
             return;
@@ -42,23 +45,136 @@ function TranscriptionInterface() {
         if (alternatives === undefined || alternatives.length === 0) {
             return;
         }
-        const transcriptPart = alternatives[0].Transcript;
-        if (transcriptPart === undefined) {
+        const transcriptPartText = alternatives[0].Transcript;
+        if (transcriptPartText === undefined) {
             return;
         }
+        const languageCode = transcriptResult.LanguageCode ?? LanguageCode.EN_GB;
+        const language = getLanguage(languageCode);
+        const resultId = transcriptResult.ResultId ?? "";
 
-        setTranscript(previousTranscriptParts => {
-            const newTranscriptParts = [...previousTranscriptParts.parts];
+        let otherLanguage: Language;
+        if (language === ENGLISH) {
+            otherLanguage = targetLanguageRef.current!;
+        } else {
+            otherLanguage = ENGLISH;
+        }
+
+        const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
+
+        setTranscript(previousTranscript => {
+            const newTranscriptParts = [...previousTranscript.parts];
             if (newTranscriptParts.length === 0) {
-                newTranscriptParts.push(transcriptPart);
-            } else if (previousTranscriptParts.lastId === transcriptResult.ResultId) {
-                newTranscriptParts[newTranscriptParts.length - 1] = transcriptPart;
+                // No transcription yet
+                newTranscriptParts.push({
+                    text: transcriptPartText,
+                    language: language,
+                    lastResultId: resultId,
+                    lastCompleteIndex: 0,
+                    translatedText: translated,
+                    translatedLanguage: otherLanguage,
+                    lastCompleteTranslatedIndex: 0,
+                });
             } else {
-                newTranscriptParts.push(transcriptPart);
+                const lastIndex = newTranscriptParts.length - 1;
+                const lastPart = newTranscriptParts[lastIndex];
+                if (lastPart.lastResultId === resultId) {
+                    // In-progress transcription
+                    if (previousTranscript.lastLanguageCode === languageCode) {
+                        // Same language
+                        const lastCompleteText = lastPart.text.slice(0, lastPart.lastCompleteIndex);
+                        const lastCompleteTranslatedText = lastPart.translatedText.slice(0, lastPart.lastCompleteTranslatedIndex);
+                        newTranscriptParts[lastIndex] = {
+                            text: lastCompleteText + " " + transcriptPartText,
+                            language: language,
+                            lastResultId: resultId,
+                            lastCompleteIndex: lastPart.lastCompleteIndex,
+                            translatedText: lastCompleteTranslatedText + " " + translated,
+                            translatedLanguage: otherLanguage,
+                            lastCompleteTranslatedIndex: lastPart.lastCompleteTranslatedIndex,
+                        };
+                    } else {
+                        // Different language
+                        if (lastPart.lastCompleteIndex === 0) {
+                            // Merge transcript parts if previous transcript part is empty
+                            if (newTranscriptParts.length > 1) {
+                                newTranscriptParts.pop();
+                                const lastLastIndex = newTranscriptParts.length - 1;
+                                const lastLastPart = newTranscriptParts[lastLastIndex];
+                                newTranscriptParts[lastLastIndex] = {
+                                    text: lastLastPart.text + " " + transcriptPartText,
+                                    language: language,
+                                    lastResultId: resultId,
+                                    lastCompleteIndex: lastLastPart.lastCompleteIndex,
+                                    translatedText: lastLastPart.translatedText + " " + translated,
+                                    translatedLanguage: otherLanguage,
+                                    lastCompleteTranslatedIndex: lastLastPart.lastCompleteTranslatedIndex,
+                                };
+                            } else {
+                                newTranscriptParts[0] = {
+                                    text: transcriptPartText,
+                                    language: language,
+                                    lastResultId: resultId,
+                                    lastCompleteIndex: 0,
+                                    translatedText: translated,
+                                    translatedLanguage: otherLanguage,
+                                    lastCompleteTranslatedIndex: 0,
+                                };
+                            }
+                        } else {
+                            const lastCompleteText = lastPart.text.slice(0, lastPart.lastCompleteIndex);
+                            const lastCompleteTranslatedText = lastPart.translatedText.slice(0, lastPart.lastCompleteTranslatedIndex);
+                            newTranscriptParts[lastIndex] = {
+                                text: lastCompleteText,
+                                language: lastPart.language,
+                                lastResultId: lastPart.lastResultId,
+                                lastCompleteIndex: lastPart.lastCompleteIndex,
+                                translatedText: lastCompleteTranslatedText,
+                                translatedLanguage: lastPart.translatedLanguage,
+                                lastCompleteTranslatedIndex: lastPart.lastCompleteTranslatedIndex,
+                            };
+                            newTranscriptParts.push({
+                                text: transcriptPartText,
+                                language: language,
+                                lastResultId: resultId,
+                                lastCompleteIndex: 0,
+                                translatedText: translated,
+                                translatedLanguage: otherLanguage,
+                                lastCompleteTranslatedIndex: 0,
+                            });
+                        }
+                    }
+                } else {
+                    // New transcription
+                    if (previousTranscript.lastLanguageCode === languageCode) {
+                        // Same language
+                        newTranscriptParts[lastIndex] = {
+                            text: lastPart.text + " " + transcriptPartText,
+                            language: language,
+                            lastResultId: resultId,
+                            lastCompleteIndex: lastPart.text.length,
+                            translatedText: lastPart.translatedText + " " + translated,
+                            translatedLanguage: otherLanguage,
+                            lastCompleteTranslatedIndex: lastPart.translatedText.length,
+                        };
+                    } else {
+                        // Different language
+                        newTranscriptParts.push({
+                            text: transcriptPartText,
+                            language: language,
+                            lastResultId: resultId,
+                            lastCompleteIndex: 0,
+                            translatedText: translated,
+                            translatedLanguage: otherLanguage,
+                            lastCompleteTranslatedIndex: 0,
+                        });
+                    }
+                }
             }
+
             return {
                 parts: newTranscriptParts,
-                lastId: transcriptResult.ResultId || "",
+                lastLanguageCode: languageCode,
             };
         });
     }
@@ -92,14 +208,22 @@ function TranscriptionInterface() {
 
     async function toggleTranslation() {
         if (speechTranscriber.current === null) {
-            return;
+            throw new Error("SpeechTranscriber is not initialized");
+        }
+        if (targetLanguage === null) {
+            throw new Error("Target language is not set");
         }
         setIsTranslating(!isTranslating);
         if (!isTranslating) {
-            await speechTranscriber.current.start();
+            await speechTranscriber.current.start(targetLanguage.transcribeCode);
         } else {
             await speechTranscriber.current.stop();
         }
+    }
+
+    function setLanguage(language: Language) {
+        setTargetLanguage(language);
+        targetLanguageRef.current = language;
     }
 
     return (
@@ -109,10 +233,10 @@ function TranscriptionInterface() {
                 isTranslating={isTranslating}
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
-                onChangeTargetLanguage={setTargetLanguage}
-                transcript={transcriptString}
+                onChangeTargetLanguage={setLanguage}
+                transcript={transcript}
             />
-            <Transcript transcript={transcriptString}/>
+            <TranscriptBox transcript={transcript}/>
         </div>
     );
 }

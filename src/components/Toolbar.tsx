@@ -1,17 +1,18 @@
-import { ProfileIcon } from "../assets/icons";
-import { Moon, Sun, ZoomIn, ZoomOut } from "lucide-react";
-import { useTheme } from "../hooks/useTheme";
-import { useAuthenticator } from "@aws-amplify/ui-react";
+import {ChangeEvent} from "react";
+import {useAuthenticator} from "@aws-amplify/ui-react";
+import {Moon, Sun, ZoomIn, ZoomOut} from "lucide-react";
+import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
+import {ProfileIcon} from "../assets/icons";
 
 function Toolbar() {
-    const { signOut } = useAuthenticator();
-    const { theme, cycleTheme, textSize, setTextSize } = useTheme();   
-    const handleTextSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const {signOut} = useAuthenticator();
+    const {theme, cycleTheme, textSize, setTextSize} = useTheme();
+    const handleTextSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newSize = Number(e.target.value);
         setTextSize(newSize);
     };
-    
+
     return (
         <div className="navbar bg-base-100 shadow-md">
             <div className="navbar-start">
@@ -19,7 +20,7 @@ function Toolbar() {
                     Conversate.
                 </h1>
             </div>
-            
+
             <div className="navbar-end space-x-2">
                 {/* Text Size Slider */}
                 <div className="dropdown dropdown-end">
