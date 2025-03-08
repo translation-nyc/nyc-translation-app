@@ -1,5 +1,5 @@
 const VOLUME_THRESHOLD = 0.01;
-const MAX_SILENCE_DURATION_SECONDS = 2;
+const MAX_SILENCE_DURATION_SECONDS = 5;
 const MAX_BUFFER_SIZE = 10;
 
 class PcmProcessor extends AudioWorkletProcessor {
