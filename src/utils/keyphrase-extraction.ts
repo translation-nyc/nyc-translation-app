@@ -1,44 +1,81 @@
-import { ComprehendClient, DetectKeyPhrasesCommand } from "@aws-sdk/client-comprehend";
+// Lambda function (comprehend-keyphrases.ts)
+import { Comprehend, DetectKeyPhrasesRequest } from "@aws-sdk/client-comprehend";
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
 
-interface Config {
-  region: string;
-}
+// Initialize the Comprehend client
+const comprehend = new Comprehend({ region: "eu-west-2" });
 
-const config: Config = {
-  region: "us-west-2", // example region
-};
+// Interface for the response
+// interface KeyPhrase {
+//   Text: string;
+//   Score: number;
+//   BeginOffset: number;
+//   EndOffset: number;
+// }
 
-const client: ComprehendClient = new ComprehendClient(config);
+export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+  try {
+    // Parse the request body
+    const body = JSON.parse(event.body || '{}');
+    const { text, languageCode = 'en' } = body;
 
-interface DetectKeyPhrasesRequest {
-  Text: string;
-  LanguageCode: 'en' | 'es' | 'fr' | 'de' | 'it' | 'pt' | 'ar' | 'hi' | 'ja' | 'ko' | 'zh' | 'zh-TW';
-}
+    // Validate input
+    if (!text || !text.trim()) {
+      return {
+        statusCode: 400,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*", // For CORS
+          "Access-Control-Allow-Headers": "*"
+        },
+        body: JSON.stringify({ error: "Text cannot be empty" })
+      };
+    }
 
-const input: DetectKeyPhrasesRequest = {
-  Text: "STRING_VALUE",
-  LanguageCode: "en",
-};
+    // Set up the Comprehend request
+    const params: DetectKeyPhrasesRequest = {
+      Text: text,
+      LanguageCode: languageCode
+    };
 
-const command: DetectKeyPhrasesCommand = new DetectKeyPhrasesCommand(input);
+    // Make the API call to Comprehend
+    const response = await comprehend.detectKeyPhrases(params);
 
-async function detectKeyPhrases(): Promise<void> {
-  const response = await client.send(command);
-  
-  interface KeyPhrase {
-    Score: number;
-    Text: string;
-    BeginOffset: number;
-    EndOffset: number;
+    // Format the response
+    const keyPhrases = (response.KeyPhrases || []).map(kp => ({
+      Text: kp.Text || '',
+      Score: kp.Score || 0,
+      BeginOffset: kp.BeginOffset || 0,
+      EndOffset: kp.EndOffset || 0
+    }));
+
+    // Return successful response
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*"
+      },
+      body: JSON.stringify({ keyPhrases })
+    };
+  } catch (error) {
+    console.error("Error processing request:", error);
+    
+    // Return error response
+    return {
+      statusCode: 500,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*"
+      },
+      body: JSON.stringify({ 
+        error: "Failed to detect key phrases",
+        message: (error as Error).message
+      })
+    };
   }
-
-  interface DetectKeyPhrasesResponse {
-    KeyPhrases: KeyPhrase[];
-  }
-  
-  const result: DetectKeyPhrasesResponse = response as DetectKeyPhrasesResponse;
-
-  console.log(result.KeyPhrases);
-}
-
-detectKeyPhrases();
+};
+export const detectSentiment = async (text: string) => {
+};
