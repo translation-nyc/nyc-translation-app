@@ -9,13 +9,9 @@ import Alert from "./Alert";
 function Toolbar() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const {theme, cycleTheme, textSize, setTextSize} = useTheme();
-    
-    // Alert states
     const [showSignInAlert, setShowSignInAlert] = useState(false);
-    const [showSignOutAlert, setShowSignOutAlert] = useState(false);
 
     useEffect(() => {
-        // Check authentication status when component mounts
         checkAuthStatus();
     }, []);
 
@@ -49,7 +45,6 @@ function Toolbar() {
         try {
             await signOut();
             setIsAuthenticated(false);
-            setShowSignOutAlert(true);
         } catch (error) {
             console.error("Error signing out:", error);
         }
@@ -130,11 +125,6 @@ function Toolbar() {
                 onDismiss={() => setShowSignInAlert(false)} 
             />
             
-            <Alert 
-                message="Successfully signed out!" 
-                isVisible={showSignOutAlert} 
-                onDismiss={() => setShowSignOutAlert(false)} 
-            />
         </>
     );
 }
