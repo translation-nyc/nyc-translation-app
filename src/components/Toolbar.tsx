@@ -1,16 +1,26 @@
 import {ChangeEvent, useEffect, useState} from "react";
-import {Moon, Sun, ZoomIn, ZoomOut} from "lucide-react";
+import {Moon, Sun, ZoomIn, ZoomOut, Contrast, Palette, Sparkles, Coffee, CircleUser} from "lucide-react";
 import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
 import {signInWithRedirect, signOut, getCurrentUser} from "aws-amplify/auth";
 import Alert from "./Alert";
 
+// Define available themes with their icons
+const themeOptions = [
+    {name: "light", label: "Light", icon: <Sun className="w-4 h-4 text-yellow-500" />},
+    {name: "dark", label: "Dark", icon: <Moon className="w-4 h-4 text-blue-200" />},
+    {name: "cupcake", label: "Cupcake", icon: <Coffee className="w-4 h-4 text-pink-300" />},
+    {name: "cyberpunk", label: "Cyberpunk", icon: <Sparkles className="w-4 h-4 text-purple-400" />},
+    {name: "corporate", label: "Corporate", icon: <CircleUser className="w-4 h-4 text-blue-400" />},
+    {name: "forest", label: "Forest", icon: <Contrast className="w-4 h-4 text-green-600" />},
+    {name: "aqua", label: "Aqua", icon: <Palette className="w-4 h-4 text-cyan-500" />},
+];
+
 function Toolbar() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const {theme, cycleTheme, textSize, setTextSize} = useTheme();
+    const {theme, setTheme, textSize, setTextSize} = useTheme();
     const [showSignInAlert, setShowSignInAlert] = useState(false);
-    // Add local state to track slider value during movement
     const [tempTextSize, setTempTextSize] = useState(textSize);
     const [isDragging, setIsDragging] = useState(false);
 
@@ -44,7 +54,7 @@ function Toolbar() {
     const handleSignIn = async () => {
         try {
             await signInWithRedirect({
-                provider: { custom: "MicrosoftEntraIDSAML" },
+                provider: {custom: "MicrosoftEntraIDSAML"},
             });
         } catch (error) {
             console.error("Error signing in:", error);
@@ -72,13 +82,16 @@ function Toolbar() {
         setIsDragging(false);
     };
 
+    // Handle theme selection
+    const handleThemeChange = (newTheme: string) => {
+        setTheme(newTheme);
+    };
+
     return (
         <>
             <div className="navbar bg-base-100 shadow-md">
                 <div className="navbar-start">
-                    <h1 className="normal-case text-3xl font-bold">
-                        Conversate.
-                    </h1>
+                    <h1 className="normal-case text-3xl font-bold">Conversate.</h1>
                 </div>
 
                 <div className="navbar-end space-x-2">
@@ -104,17 +117,28 @@ function Toolbar() {
                         </div>
                     </div>
 
-                    {/* Theme Toggle */}
-                    <button 
-                        className="btn btn-ghost btn-circle" 
-                        onClick={cycleTheme}
-                    >
-                        {theme === "light" ? (
-                            <Sun className="w-5 h-5 text-yellow-500" />
-                        ) : (
-                            <Moon className="w-5 h-5 text-blue-200" />
-                        )}
-                    </button>
+                    {/* Theme Dropdown */}
+                    <div className="dropdown dropdown-end">
+                        <label tabIndex={0} className="btn btn-ghost btn-circle">
+                            <Palette className="w-5 h-5" />
+                        </label>
+                        <ul 
+                            tabIndex={0} 
+                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-1"
+                        >
+                            {themeOptions.map((option) => (
+                                <li key={option.name}>
+                                    <a 
+                                        className={theme === option.name ? 'active font-bold' : ''}
+                                        onClick={() => handleThemeChange(option.name)}
+                                    >
+                                        {option.icon}
+                                        {option.label}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
 
                     {/* Help Modal Button */}
                     <Help/>
@@ -146,7 +170,6 @@ function Toolbar() {
                 isVisible={showSignInAlert} 
                 onDismiss={() => setShowSignInAlert(false)} 
             />
-            
         </>
     );
 }
