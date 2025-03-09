@@ -10,10 +10,20 @@ function Toolbar() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const {theme, cycleTheme, textSize, setTextSize} = useTheme();
     const [showSignInAlert, setShowSignInAlert] = useState(false);
+    // Add local state to track slider value during movement
+    const [tempTextSize, setTempTextSize] = useState(textSize);
+    const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
         checkAuthStatus();
     }, []);
+
+    // Keep tempTextSize in sync with textSize when not dragging
+    useEffect(() => {
+        if (!isDragging) {
+            setTempTextSize(textSize);
+        }
+    }, [textSize, isDragging]);
 
     const checkAuthStatus = async () => {
         try {
@@ -50,9 +60,16 @@ function Toolbar() {
         }
     };
 
+    // Update only the temporary size during drag
     const handleTextSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
         const newSize = Number(e.target.value);
-        setTextSize(newSize);
+        setTempTextSize(newSize);
+    };
+
+    // Apply the text size only when slider is released
+    const applyTextSize = () => {
+        setTextSize(tempTextSize);
+        setIsDragging(false);
     };
 
     return (
@@ -69,15 +86,20 @@ function Toolbar() {
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost">
                             <ZoomOut className="w-5 h-5" />
-                            <input 
-                                type="range" 
-                                min={14}
-                                max={36} 
-                                step={4}
-                                value={textSize} 
-                                onChange={handleTextSizeChange}
-                                className="range range-xs range-primary w-32" 
-                            />
+                            <div className="tooltip tooltip-primary tooltip-bottom" data-tip={`${isDragging ? tempTextSize : textSize}px`}>
+                                <input 
+                                    type="range" 
+                                    min={6}
+                                    max={26} 
+                                    step={1}
+                                    value={isDragging ? tempTextSize : textSize}
+                                    onChange={handleTextSizeChange}
+                                    onMouseDown={() => setIsDragging(true)}
+                                    onMouseUp={applyTextSize}
+                                    onMouseLeave={isDragging ? applyTextSize : undefined}
+                                    className="range range-xs range-primary w-32" 
+                                />
+                            </div>
                             <ZoomIn className="w-5 h-5" />
                         </div>
                     </div>
@@ -97,7 +119,7 @@ function Toolbar() {
                     {/* Help Modal Button */}
                     <Help/>
 
-                    {/* Authentication Button */}
+                    {/* Log In or Sign Out Button */}
                     {isAuthenticated ? (
                         <button 
                             className="btn btn-error" 
