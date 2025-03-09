@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { jsPDF } from "jspdf";
+import {getCurrentUser} from "aws-amplify/auth";
 
 interface TranscriptModalProps {
     transcription: string;
@@ -52,7 +53,10 @@ function TranscriptModal(props: TranscriptModalProps) {
     }
 
     const emailTranscript = async () => {
-        const email = "ggmihaylov@yahoo.co.uk"; // Replace with the actual recipient's email
+        
+        const user = await getCurrentUser();
+        const email = user.signInDetails?.loginId
+        // const email = "ggmihaylov@yahoo.co.uk"; // Replace with the actual recipient's email
 
         try {
             const base64PDF = getBase64();
