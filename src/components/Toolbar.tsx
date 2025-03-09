@@ -168,7 +168,8 @@ function Toolbar() {
             <Alert 
                 message="Successfully signed in!" 
                 isVisible={showSignInAlert} 
-                onDismiss={() => setShowSignInAlert(false)} 
+                onDismiss={() => setShowSignInAlert(false)}
+                autoDismissTime={3000} 
             />
         </>
     );

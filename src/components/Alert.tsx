@@ -1,13 +1,35 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
 interface AlertProps {
     message: string;
     isVisible: boolean;
     onDismiss: () => void;
+    autoDismissTime?: number; 
 }
 
-const Alert: React.FC<AlertProps> = ({ message, isVisible, onDismiss }) => {
+const Alert: React.FC<AlertProps> = ({ 
+    message, 
+    isVisible, 
+    onDismiss, 
+    autoDismissTime = 30000
+}) => {
+    useEffect(() => {
+        let dismissTimer: NodeJS.Timeout;
+        
+        if (isVisible && autoDismissTime > 0) {
+            dismissTimer = setTimeout(() => {
+                onDismiss();
+            }, autoDismissTime);
+        }
+        
+        return () => {
+            if (dismissTimer) {
+                clearTimeout(dismissTimer);
+            }
+        };
+    }, [isVisible, onDismiss, autoDismissTime]);
+
     if (!isVisible) return null;
 
     return (
