@@ -14,7 +14,7 @@ function Toolbar() {
     };
 
     return (
-        <div className="navbar bg-base-100 shadow-md">
+        <div className="navbar bg-base-100 shadow-md p-4">
             <div className="navbar-start">
                 <h1 className="normal-case text-3xl font-bold">
                     Conversate.
