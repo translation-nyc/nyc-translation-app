@@ -1,10 +1,12 @@
 import {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
+import {VoiceId} from "@aws-sdk/client-polly";
 import type {Language} from "./types.ts";
 
 export const ENGLISH: Language = {
     name: "English",
     transcribeCode: LanguageCode.EN_GB,
     translateCode: "en",
+    ttsVoice: VoiceId.Emma,
 };
 
 export const Languages: Language[] = [
@@ -13,21 +15,25 @@ export const Languages: Language[] = [
         name: "French",
         transcribeCode: LanguageCode.FR_FR,
         translateCode: "fr",
+        ttsVoice: VoiceId.Celine,
     },
     {
         name: "Spanish",
         transcribeCode: LanguageCode.ES_ES,
         translateCode: "es",
+        ttsVoice: VoiceId.Lucia,
     },
     {
         name: "Arabic",
         transcribeCode: LanguageCode.AR_SA,
         translateCode: "ar",
+        ttsVoice: VoiceId.Zeina,
     },
     {
         name: "Chinese",
         transcribeCode: LanguageCode.ZH_CN,
         translateCode: "zh",
+        ttsVoice: VoiceId.Zhiyu,
     },
 ];
 
