@@ -14,7 +14,6 @@ Amplify.configure({
         Cognito: {
             userPoolId: 'eu-west-2_8YnuTx4Co',
             userPoolClientId: '1v5l3bj1jjpuvtj3qttb98aseb',
-            identityPoolId: 'eu-west-2:d829239f-fb6f-4627-bdba-a32d5d1f71eb'
         }
     },
     Predictions: outputs.custom.Predictions,
