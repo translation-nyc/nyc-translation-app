@@ -1,10 +1,12 @@
-import type {Language, Transcript} from "../utils/types.ts";
+import type {VoiceId} from "@aws-sdk/client-polly";
 import {HiMiniSpeakerWave} from "react-icons/hi2";
-import {ENGLISH} from "../utils/languages.ts";
+import type {Transcript, TtsVoice} from "../utils/types.ts";
+import {Languages} from "../utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
 
 export interface TranscriptProps {
     transcript: Transcript;
+    selectedVoices: Record<string, TtsVoice>;
 }
 
 function TranscriptBox(props: TranscriptProps) {
@@ -13,7 +15,7 @@ function TranscriptBox(props: TranscriptProps) {
             {props.transcript.parts.map((part, index) => {
                 let showPlayIconFirst: boolean;
                 let showPlayIconSecond: boolean;
-                if (part.language === ENGLISH) {
+                if (part.language === Languages.ENGLISH) {
                     showPlayIconFirst = false;
                     showPlayIconSecond = true;
                 } else {
@@ -25,7 +27,7 @@ function TranscriptBox(props: TranscriptProps) {
                         <div className="flex flex-row">
                             <PlayTtsButton
                                 text={part.text}
-                                language={part.language}
+                                voice={props.selectedVoices[part.language.name].id}
                                 visible={showPlayIconFirst}
                             />
                             <p className="mb-0">
@@ -35,7 +37,7 @@ function TranscriptBox(props: TranscriptProps) {
                         <div className="flex flex-row">
                             <PlayTtsButton
                                 text={part.translatedText}
-                                language={part.translatedLanguage}
+                                voice={props.selectedVoices[part.translatedLanguage.name].id}
                                 visible={showPlayIconSecond}
                             />
                             <p className="text-gray-400">
@@ -51,13 +53,13 @@ function TranscriptBox(props: TranscriptProps) {
 
 interface PlayTtsButtonProps {
     text: string;
-    language: Language;
+    voice: VoiceId;
     visible: boolean;
 }
 
 function PlayTtsButton(props: PlayTtsButtonProps) {
     async function playTts() {
-        await textToSpeech(props.text, props.language.ttsVoice);
+        await textToSpeech(props.text, props.voice);
     }
 
     return (

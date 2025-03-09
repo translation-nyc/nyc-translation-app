@@ -5,7 +5,12 @@ export interface Language {
     name: string;
     transcribeCode: LanguageCode;
     translateCode: string;
-    ttsVoice: VoiceId;
+    ttsVoices: TtsVoice[];
+}
+
+export interface TtsVoice {
+    id: VoiceId;
+    name?: string;
 }
 
 export interface TranscriptPart {

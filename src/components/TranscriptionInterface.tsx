@@ -8,8 +8,8 @@ import {
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
-import type {Language, Transcript} from "../utils/types.ts";
-import {ENGLISH, getLanguage} from "../utils/languages.ts";
+import type {Language, Transcript, TtsVoice} from "../utils/types.ts";
+import {Languages} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";
@@ -23,6 +23,13 @@ function TranscriptionInterface() {
 
     const [targetLanguage, setTargetLanguage] = useState<Language | null>(null);
     const targetLanguageRef = useRef<Language | null>(null);
+
+    const [selectedVoices, setSelectedVoices] = useState<Record<string, TtsVoice>>(
+        Languages.ALL.reduce(
+            (accumulator, language) => ({...accumulator, [language.name]: language.ttsVoices[0]}),
+            {},
+        )
+    );
 
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
@@ -51,15 +58,15 @@ function TranscriptionInterface() {
             return;
         }
         const languageCode = transcriptResult.LanguageCode ?? LanguageCode.EN_GB;
-        const language = getLanguage(languageCode);
+        const language = Languages.get(languageCode);
         const resultId = transcriptResult.ResultId ?? "";
 
         const currentTargetLanguage = targetLanguageRef.current!;
         let otherLanguage: Language;
-        if (language === ENGLISH) {
+        if (language === Languages.ENGLISH) {
             otherLanguage = currentTargetLanguage;
         } else {
-            otherLanguage = ENGLISH;
+            otherLanguage = Languages.ENGLISH;
         }
 
         const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
@@ -217,6 +224,14 @@ function TranscriptionInterface() {
         targetLanguageRef.current = language;
     }
 
+    function setVoice(voiceId: string) {
+        setSelectedVoices(previousSelectedVoices => {
+            const newSelectedVoices = {...previousSelectedVoices};
+            newSelectedVoices[targetLanguage!.name] = targetLanguage!.ttsVoices.find(voice => voice.id === voiceId)!;
+            return newSelectedVoices;
+        });
+    }
+
     return (
         <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4">
             <Controls
@@ -225,9 +240,15 @@ function TranscriptionInterface() {
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
                 onChangeTargetLanguage={setLanguage}
+                voices={targetLanguage?.ttsVoices ?? []}
+                selectedVoices={selectedVoices}
+                onChangeVoice={setVoice}
                 transcript={transcript}
             />
-            <TranscriptBox transcript={transcript}/>
+            <TranscriptBox
+                transcript={transcript}
+                selectedVoices={selectedVoices}
+            />
         </div>
     );
 }
