@@ -37,6 +37,8 @@ function TranscriptionInterface() {
         lastTargetLanguageCode: null,
     });
 
+    const [ttsPlaying, setTtsPlaying] = useState(false);
+
     async function onTranscription(event: TranscriptResultStream) {
         if (event.TranscriptEvent === undefined) {
             console.error("Transcription error");
@@ -232,6 +234,11 @@ function TranscriptionInterface() {
         });
     }
 
+    function onTtsPlaying(playing: boolean) {
+        setTtsPlaying(playing);
+        speechTranscriber.current?.setMuted(playing);
+    }
+
     return (
         <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4">
             <Controls
@@ -248,6 +255,8 @@ function TranscriptionInterface() {
             <TranscriptBox
                 transcript={transcript}
                 selectedVoices={selectedVoices}
+                ttsPlaying={ttsPlaying}
+                onTtsPlaying={onTtsPlaying}
             />
         </div>
     );

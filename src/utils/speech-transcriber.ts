@@ -20,10 +20,10 @@ export class SpeechTranscriber {
     private readonly transcribeClient: TranscribeStreamingClient;
     private readonly onTranscription: (event: TranscriptResultStream) => void;
 
-    private audioContext: AudioContext | undefined;
-    private audioWorkletNode: AudioWorkletNode | undefined;
-    private mediaStream: MediaStream | undefined;
-    private audioSource: MediaStreamAudioSourceNode | undefined;
+    private audioContext?: AudioContext;
+    private audioWorkletNode?: AudioWorkletNode;
+    private mediaStream?: MediaStream;
+    private audioSource?: MediaStreamAudioSourceNode;
 
     private stopped: boolean = false;
 
@@ -90,11 +90,19 @@ export class SpeechTranscriber {
         }
     }
 
+    setMuted(muted: boolean) {
+        this.mediaStream?.getTracks().forEach(track => track.enabled = !muted);
+    }
+
     async stop() {
         this.stopped = true;
         this.audioWorkletNode?.disconnect();
+        this.audioWorkletNode = undefined;
         this.audioSource?.disconnect();
+        this.audioSource = undefined;
         await this.audioContext?.close();
+        this.audioContext = undefined;
         this.mediaStream?.getTracks().forEach(track => track.stop());
+        this.mediaStream = undefined;
     }
 }
