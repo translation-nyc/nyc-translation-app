@@ -21,4 +21,5 @@ export interface TranscriptPart {
 export interface Transcript {
     parts: TranscriptPart[];
     lastLanguageCode: LanguageCode;
+    lastTargetLanguageCode: LanguageCode | null;
 }

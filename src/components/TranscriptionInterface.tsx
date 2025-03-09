@@ -27,6 +27,7 @@ function TranscriptionInterface() {
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
         lastLanguageCode: LanguageCode.EN_GB,
+        lastTargetLanguageCode: null,
     });
 
     async function onTranscription(event: TranscriptResultStream) {
@@ -53,9 +54,10 @@ function TranscriptionInterface() {
         const language = getLanguage(languageCode);
         const resultId = transcriptResult.ResultId ?? "";
 
+        const currentTargetLanguage = targetLanguageRef.current!;
         let otherLanguage: Language;
         if (language === ENGLISH) {
-            otherLanguage = targetLanguageRef.current!;
+            otherLanguage = currentTargetLanguage;
         } else {
             otherLanguage = ENGLISH;
         }
@@ -64,8 +66,10 @@ function TranscriptionInterface() {
 
         setTranscript(previousTranscript => {
             const newTranscriptParts = [...previousTranscript.parts];
-            if (newTranscriptParts.length === 0) {
-                // No transcription yet
+            if (newTranscriptParts.length === 0
+                || previousTranscript.lastLanguageCode !== languageCode
+                || previousTranscript.lastTargetLanguageCode !== currentTargetLanguage.transcribeCode
+            ) {
                 newTranscriptParts.push({
                     text: transcriptPartText,
                     language: language,
@@ -145,36 +149,23 @@ function TranscriptionInterface() {
                         }
                     }
                 } else {
-                    // New transcription
-                    if (previousTranscript.lastLanguageCode === languageCode) {
-                        // Same language
-                        newTranscriptParts[lastIndex] = {
-                            text: lastPart.text + " " + transcriptPartText,
-                            language: language,
-                            lastResultId: resultId,
-                            lastCompleteIndex: lastPart.text.length,
-                            translatedText: lastPart.translatedText + " " + translated,
-                            translatedLanguage: otherLanguage,
-                            lastCompleteTranslatedIndex: lastPart.translatedText.length,
-                        };
-                    } else {
-                        // Different language
-                        newTranscriptParts.push({
-                            text: transcriptPartText,
-                            language: language,
-                            lastResultId: resultId,
-                            lastCompleteIndex: 0,
-                            translatedText: translated,
-                            translatedLanguage: otherLanguage,
-                            lastCompleteTranslatedIndex: 0,
-                        });
-                    }
+                    // New transcription in the same language
+                    newTranscriptParts[lastIndex] = {
+                        text: lastPart.text + " " + transcriptPartText,
+                        language: language,
+                        lastResultId: resultId,
+                        lastCompleteIndex: lastPart.text.length,
+                        translatedText: lastPart.translatedText + " " + translated,
+                        translatedLanguage: otherLanguage,
+                        lastCompleteTranslatedIndex: lastPart.translatedText.length,
+                    };
                 }
             }
 
             return {
                 parts: newTranscriptParts,
                 lastLanguageCode: languageCode,
+                lastTargetLanguageCode: currentTargetLanguage.transcribeCode,
             };
         });
     }
