@@ -15,8 +15,8 @@ export interface TranscriptProps {
 
 function TranscriptBox(props: TranscriptProps) {
     return (
-        <div className="flex-1 bg-base-100 rounded-lg shadow-lg p-4 overflow-hidden">
-            <div className="flex justify-between">
+        <div className="flex flex-1 justify-between bg-base-100 rounded-lg shadow-lg p-4 overflow-hidden">
+            <div>
                 {props.transcript.parts.map((part, index) => {
                     let showPlayIconFirst: boolean;
                     let showPlayIconSecond: boolean;
@@ -56,10 +56,10 @@ function TranscriptBox(props: TranscriptProps) {
                         </div>
                     );
                 })}
-                <BsMicMuteFill
-                    className={`transition duration-300 text-red-600 ${props.ttsPlaying ? "" : "opacity-0"}`}
-                />
             </div>
+            <BsMicMuteFill
+                className={`transition duration-300 text-red-600 ${props.ttsPlaying ? "" : "opacity-0"}`}
+            />
         </div>
     );
 }
