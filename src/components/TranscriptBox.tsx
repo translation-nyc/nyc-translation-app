@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useRef, useState} from "react";
 import type {VoiceId} from "@aws-sdk/client-polly";
 import {BsMicMuteFill} from "react-icons/bs";
 import {HiMiniSpeakerWave} from "react-icons/hi2";
@@ -15,7 +15,7 @@ export interface TranscriptProps {
 
 function TranscriptBox(props: TranscriptProps) {
     return (
-        <div className="flex-1 bg-base-100 rounded-lg shadow-lg overflow-hidden p-4">
+        <div className="flex-1 bg-base-100 rounded-lg shadow-lg p-4 overflow-hidden">
             <div className="flex justify-between">
                 {props.transcript.parts.map((part, index) => {
                     let showPlayIconFirst: boolean;
@@ -57,7 +57,8 @@ function TranscriptBox(props: TranscriptProps) {
                     );
                 })}
                 <BsMicMuteFill
-                    className={`transition duration-300 text-red-600 ${props.ttsPlaying ? "" : "opacity-0"}`}/>
+                    className={`transition duration-300 text-red-600 ${props.ttsPlaying ? "" : "opacity-0"}`}
+                />
             </div>
         </div>
     );
@@ -73,33 +74,45 @@ interface PlayTtsButtonProps {
 
 function PlayTtsButton(props: PlayTtsButtonProps) {
     const [isPlaying, setIsPlaying] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    async function playTts() {
-        if (isPlaying || props.anyPlaying) {
+    async function toggleTts() {
+        if (isPlaying) {
+            audioRef.current?.pause();
+            audioRef.current = null;
+            setIsPlaying(false);
+            props.onPlaying(false);
+            return;
+        }
+        if (props.anyPlaying) {
             return;
         }
         setIsPlaying(true);
         props.onPlaying(true);
-        await textToSpeech(props.text, props.voice);
-        setIsPlaying(false);
-        props.onPlaying(false);
+        const audio = await textToSpeech(props.text, props.voice);
+        audio.onended = () => {
+            audioRef.current = null;
+            setIsPlaying(false);
+            props.onPlaying(false);
+        };
+        audioRef.current = audio;
     }
 
-    let className = "mr-2 transition duration-200 ";
+    let className: string;
     if (!props.visible) {
-        className += "invisible";
+        className = "invisible";
     } else if (isPlaying) {
-        className += "text-green-600 cursor-not-allowed";
+        className = "text-green-600 cursor-pointer hover:text-green-700";
     } else if (props.anyPlaying) {
-        className += "opacity-50 cursor-not-allowed";
+        className = "opacity-50 cursor-not-allowed";
     } else {
-        className += "hover:text-gray-500 cursor-pointer";
+        className = "hover:text-gray-500 cursor-pointer";
     }
 
     return (
         <HiMiniSpeakerWave
-            className={className}
-            onClick={playTts}
+            className={`mr-2 transition duration-200 ${className}`}
+            onClick={toggleTts}
         />
     );
 }

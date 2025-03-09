@@ -1,7 +1,7 @@
 import {Predictions} from "@aws-amplify/predictions";
 import type {VoiceId} from "@aws-sdk/client-polly";
 
-export async function textToSpeech(text: string, voice: VoiceId) {
+export async function textToSpeech(text: string, voice: VoiceId): Promise<HTMLAudioElement> {
     const speech = await Predictions.convert({
         textToSpeech: {
             source: {
@@ -16,9 +16,6 @@ export async function textToSpeech(text: string, voice: VoiceId) {
     });
     const audioURL = URL.createObjectURL(audioBlob);
     const audio = new Audio(audioURL);
-    const finished = new Promise<void>(resolve => {
-        audio.onended = () => resolve();
-    });
     await audio.play();
-    return finished;
+    return audio;
 }
