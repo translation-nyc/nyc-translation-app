@@ -58,7 +58,7 @@ function TranscriptBox(props: TranscriptProps) {
                 })}
             </div>
             <BsMicMuteFill
-                className={`transition duration-300 text-red-600 ${props.ttsPlaying ? "" : "opacity-0"}`}
+                className={`shrink-0 ml-2 transition duration-300 text-red-600 ${props.ttsPlaying ? "" : "opacity-0"}`}
             />
         </div>
     );
@@ -111,7 +111,7 @@ function PlayTtsButton(props: PlayTtsButtonProps) {
 
     return (
         <HiMiniSpeakerWave
-            className={`mr-2 transition duration-200 ${className}`}
+            className={`mr-2 shrink-0 transition duration-200 ${className}`}
             onClick={toggleTts}
         />
     );
