@@ -1,7 +1,6 @@
 import {useState} from "react";
-import type {Language, Transcript} from "../utils/types.ts";
-import {ENGLISH, Languages} from "../utils/languages.ts";
-import {textToSpeech} from "../utils/text-to-speech.ts";
+import type {Language, Transcript, TtsVoice} from "../utils/types.ts";
+import {Languages} from "../utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import TranscriptModal from "./TranscriptModal.tsx";
 
@@ -11,6 +10,9 @@ export interface ControlsProps {
     onToggleTranslation: () => void;
     targetLanguage: Language | null;
     onChangeTargetLanguage: (language: Language) => void;
+    voices: TtsVoice[],
+    selectedVoices: Record<string, TtsVoice>;
+    onChangeVoice: (voiceId: string) => void;
     transcript: Transcript;
 }
 
@@ -18,17 +20,39 @@ function Controls(props: ControlsProps) {
     return (
         <div className="w-full md:w-72 bg-base-100 rounded-lg shadow-lg p-6">
             <div className="space-y-6">
-                <ToggleTranslationButton {...props}/>
-                <LanguageSelector {...props}/>
-                <AutoPunctuationSwitch/>
-                <TextToSpeechButton {...props}/>
-                <ReviewButton {...props}/>
+                <ToggleTranslationButton
+                    isLoading={props.isLoading}
+                    isTranslating={props.isTranslating}
+                    onToggleTranslation={props.onToggleTranslation}
+                    targetLanguage={props.targetLanguage}
+                />
+                <LanguageSelector
+                    isTranslating={props.isTranslating}
+                    targetLanguage={props.targetLanguage}
+                    onChangeTargetLanguage={props.onChangeTargetLanguage}
+                />
+                <VoiceSelector
+                    targetLanguage={props.targetLanguage}
+                    voices={props.voices}
+                    selectedVoices={props.selectedVoices}
+                    onChangeVoice={props.onChangeVoice}
+                />
+                <ReviewButton
+                    transcript={props.transcript}
+                />
             </div>
         </div>
     );
 }
 
-function ToggleTranslationButton(props: ControlsProps) {
+interface ToggleTranslationButtonProps {
+    isLoading: boolean;
+    isTranslating: boolean;
+    onToggleTranslation: () => void;
+    targetLanguage: Language | null;
+}
+
+function ToggleTranslationButton(props: ToggleTranslationButtonProps) {
     return (
         <div className="flex justify-center">
             <button
@@ -62,8 +86,14 @@ function ToggleTranslationButton(props: ControlsProps) {
     );
 }
 
-function LanguageSelector(props: ControlsProps) {
-    const languagesNoEnglish = Languages.filter(language => language !== ENGLISH);
+interface LanguageSelectorProps {
+    isTranslating: boolean;
+    targetLanguage: Language | null;
+    onChangeTargetLanguage: (language: Language) => void;
+}
+
+function LanguageSelector(props: LanguageSelectorProps) {
+    const languagesNoEnglish = Languages.ALL.filter(language => language !== Languages.ENGLISH);
 
     return (
         <div className="space-y-2">
@@ -96,47 +126,49 @@ function LanguageSelector(props: ControlsProps) {
     );
 }
 
-function AutoPunctuationSwitch() {
-    const [isChecked, setIsChecked] = useState(false);
-
-    return (
-        <div className="form-control">
-            <label className="label cursor-pointer justify-start gap-2">
-                <input
-                    type="checkbox"
-                    className="toggle toggle-primary"
-                    checked={isChecked}
-                    onChange={e => setIsChecked(e.target.checked)}
-                />
-                <span className="label-text">
-                    Auto-punctuation
-                </span>
-            </label>
-        </div>
-    );
+interface VoiceSelectorProps {
+    targetLanguage: Language | null;
+    voices: TtsVoice[],
+    selectedVoices: Record<string, TtsVoice | undefined>;
+    onChangeVoice: (voiceId: string) => void;
 }
 
-function TextToSpeechButton(props: ControlsProps) {
-    async function playTranscript() {
-        const transcriptString = props.transcript.parts
-            .map(part => part.text)
-            .join(" ");
-        await textToSpeech(transcriptString);
-    }
+function VoiceSelector(props: VoiceSelectorProps) {
+    const selectedVoice = props.selectedVoices[props.targetLanguage?.name ?? ""];
 
     return (
-        <div>
-            <button
-                className="btn btn-primary w-full"
-                onClick={playTranscript}
+        <div className="space-y-2">
+            <div>
+                <h3 className="font-bold text-lg">
+                    Voice
+                </h3>
+            </div>
+
+            <select
+                className="select select-bordered w-full"
+                onChange={e => props.onChangeVoice(e.target.value)}
+                value={selectedVoice?.id}
+                disabled={props.targetLanguage === null}
             >
-                Play Transcription
-            </button>
+                {props.voices.map((voice, index) =>
+                    <option key={index} value={voice.id}>
+                        {voice.name ?? voice.id}
+                    </option>
+                )}
+            </select>
+
+            <div>
+                The currently selected voice is: {(selectedVoice?.name ?? selectedVoice?.id) ?? "none"}
+            </div>
         </div>
     );
 }
 
-function ReviewButton(props: ControlsProps) {
+interface ReviewButtonProps {
+    transcript: Transcript;
+}
+
+function ReviewButton(props: ReviewButtonProps) {
     const transcript = props.transcript.parts.map(part =>
         part.text + "\n" + part.translatedText
     ).join("\n\n");

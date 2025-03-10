@@ -8,8 +8,8 @@ import {
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
-import type {Language, Transcript} from "../utils/types.ts";
-import {ENGLISH, getLanguage} from "../utils/languages.ts";
+import type {Language, Transcript, TtsVoice} from "../utils/types.ts";
+import {Languages} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";
@@ -24,10 +24,20 @@ function TranscriptionInterface() {
     const [targetLanguage, setTargetLanguage] = useState<Language | null>(null);
     const targetLanguageRef = useRef<Language | null>(null);
 
+    const [selectedVoices, setSelectedVoices] = useState<Record<string, TtsVoice>>(
+        Languages.ALL.reduce(
+            (accumulator, language) => ({...accumulator, [language.name]: language.ttsVoices[0]}),
+            {},
+        )
+    );
+
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
         lastLanguageCode: LanguageCode.EN_GB,
+        lastTargetLanguageCode: null,
     });
+
+    const [ttsPlaying, setTtsPlaying] = useState(false);
 
     async function onTranscription(event: TranscriptResultStream) {
         if (event.TranscriptEvent === undefined) {
@@ -50,22 +60,25 @@ function TranscriptionInterface() {
             return;
         }
         const languageCode = transcriptResult.LanguageCode ?? LanguageCode.EN_GB;
-        const language = getLanguage(languageCode);
+        const language = Languages.get(languageCode);
         const resultId = transcriptResult.ResultId ?? "";
 
+        const currentTargetLanguage = targetLanguageRef.current!;
         let otherLanguage: Language;
-        if (language === ENGLISH) {
-            otherLanguage = targetLanguageRef.current!;
+        if (language === Languages.ENGLISH) {
+            otherLanguage = currentTargetLanguage;
         } else {
-            otherLanguage = ENGLISH;
+            otherLanguage = Languages.ENGLISH;
         }
 
         const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
 
         setTranscript(previousTranscript => {
             const newTranscriptParts = [...previousTranscript.parts];
-            if (newTranscriptParts.length === 0) {
-                // No transcription yet
+            if (newTranscriptParts.length === 0
+                || previousTranscript.lastLanguageCode !== languageCode
+                || previousTranscript.lastTargetLanguageCode !== currentTargetLanguage.transcribeCode
+            ) {
                 newTranscriptParts.push({
                     text: transcriptPartText,
                     language: language,
@@ -145,36 +158,23 @@ function TranscriptionInterface() {
                         }
                     }
                 } else {
-                    // New transcription
-                    if (previousTranscript.lastLanguageCode === languageCode) {
-                        // Same language
-                        newTranscriptParts[lastIndex] = {
-                            text: lastPart.text + " " + transcriptPartText,
-                            language: language,
-                            lastResultId: resultId,
-                            lastCompleteIndex: lastPart.text.length,
-                            translatedText: lastPart.translatedText + " " + translated,
-                            translatedLanguage: otherLanguage,
-                            lastCompleteTranslatedIndex: lastPart.translatedText.length,
-                        };
-                    } else {
-                        // Different language
-                        newTranscriptParts.push({
-                            text: transcriptPartText,
-                            language: language,
-                            lastResultId: resultId,
-                            lastCompleteIndex: 0,
-                            translatedText: translated,
-                            translatedLanguage: otherLanguage,
-                            lastCompleteTranslatedIndex: 0,
-                        });
-                    }
+                    // New transcription in the same language
+                    newTranscriptParts[lastIndex] = {
+                        text: lastPart.text + " " + transcriptPartText,
+                        language: language,
+                        lastResultId: resultId,
+                        lastCompleteIndex: lastPart.text.length,
+                        translatedText: lastPart.translatedText + " " + translated,
+                        translatedLanguage: otherLanguage,
+                        lastCompleteTranslatedIndex: lastPart.translatedText.length,
+                    };
                 }
             }
 
             return {
                 parts: newTranscriptParts,
                 lastLanguageCode: languageCode,
+                lastTargetLanguageCode: currentTargetLanguage.transcribeCode,
             };
         });
     }
@@ -226,6 +226,19 @@ function TranscriptionInterface() {
         targetLanguageRef.current = language;
     }
 
+    function setVoice(voiceId: string) {
+        setSelectedVoices(previousSelectedVoices => {
+            const newSelectedVoices = {...previousSelectedVoices};
+            newSelectedVoices[targetLanguage!.name] = targetLanguage!.ttsVoices.find(voice => voice.id === voiceId)!;
+            return newSelectedVoices;
+        });
+    }
+
+    function onTtsPlaying(playing: boolean) {
+        setTtsPlaying(playing);
+        speechTranscriber.current?.setMuted(playing);
+    }
+
     return (
         <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4">
             <Controls
@@ -234,9 +247,18 @@ function TranscriptionInterface() {
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
                 onChangeTargetLanguage={setLanguage}
+                voices={targetLanguage?.ttsVoices ?? []}
+                selectedVoices={selectedVoices}
+                onChangeVoice={setVoice}
                 transcript={transcript}
             />
-            <TranscriptBox transcript={transcript}/>
+            <TranscriptBox
+                transcript={transcript}
+                isTranslating={isTranslating}
+                selectedVoices={selectedVoices}
+                ttsPlaying={ttsPlaying}
+                onTtsPlaying={onTtsPlaying}
+            />
         </div>
     );
 }
