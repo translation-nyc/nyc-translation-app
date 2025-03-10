@@ -1,8 +1,8 @@
 import { defineAuth } from '@aws-amplify/backend';
 
 /**
- * Define and configure your auth resource to use the existing user pool
- * @see https://docs.amplify.aws/gen2/build-a-backend/auth/import/
+ * Define and configure your auth resource
+ * @see https://docs.amplify.aws/gen2/build-a-backend/auth
  */
 
 export const auth = defineAuth({
@@ -21,11 +21,11 @@ export const auth = defineAuth({
             },
             callbackUrls: [
                 'http://localhost:5173/', 
-                'https://conversateapp.com/',
+                'https://conversateapp.com/'
             ],
             logoutUrls: [
                 'http://localhost:5173/',
-                'https://conversateapp.com/',
+                'https://conversateapp.com/'
             ]
         },
     },
