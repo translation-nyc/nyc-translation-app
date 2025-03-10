@@ -1,10 +1,13 @@
 import {useEffect, useState} from 'react';
 
+// Type for available themes
+type ThemeName = 'light' | 'dark' | 'cupcake' | 'cyberpunk' | 'corporate' | 'forest' | 'aqua';
+
 export function useTheme() {
-    const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const [theme, setThemeState] = useState<ThemeName>(() => {
         // Check local storage or default to light theme
         const savedTheme = localStorage.getItem('app-theme');
-        return savedTheme === 'dark' ? 'dark' : 'light';
+        return (savedTheme as ThemeName) || 'light';
     });
 
     const [textSize, setTextSize] = useState<number>(() => {
@@ -13,10 +16,9 @@ export function useTheme() {
         return savedTextSize ? Number(savedTextSize) : 16;
     });
 
-    // Cycle through themes
-    const cycleTheme = () => {
-        const newTheme = theme === 'light' ? 'dark' : 'light';
-        setTheme(newTheme);
+    // Set theme and persist to local storage
+    const setTheme = (newTheme: string) => {
+        setThemeState(newTheme as ThemeName);
         localStorage.setItem('app-theme', newTheme);
     };
 
@@ -26,7 +28,6 @@ export function useTheme() {
         localStorage.setItem('app-text-size', size.toString());
         
         // Set the base font size on the html element
-        // This will allow everything sized in rem to scale proportionally
         document.documentElement.style.fontSize = `${size}px`;
         
         // Also keep the CSS variable for backward compatibility
@@ -39,14 +40,13 @@ export function useTheme() {
 
     // Apply theme and initial text size
     useEffect(() => {
-        document.body.setAttribute('data-theme', theme);
-        // Ensure text size is applied on initial render
+        document.documentElement.setAttribute('data-theme', theme);
         updateTextSize(textSize);
     }, [theme, textSize]);
 
     return {
         theme, 
-        cycleTheme, 
+        setTheme,
         textSize, 
         setTextSize: updateTextSize
     };
