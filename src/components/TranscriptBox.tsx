@@ -8,6 +8,7 @@ import {textToSpeech} from "../utils/text-to-speech.ts";
 
 export interface TranscriptProps {
     transcript: Transcript;
+    isTranslating: boolean;
     selectedVoices: Record<string, TtsVoice>;
     ttsPlaying: boolean;
     onTtsPlaying: (playing: boolean) => void;
@@ -58,7 +59,7 @@ function TranscriptBox(props: TranscriptProps) {
                 })}
             </div>
             <BsMicMuteFill
-                className={`shrink-0 ml-2 transition duration-300 text-red-600 ${props.ttsPlaying ? "" : "opacity-0"}`}
+                className={`shrink-0 ml-2 transition duration-300 text-red-600 ${props.ttsPlaying && props.isTranslating ? "" : "opacity-0"}`}
             />
         </div>
     );

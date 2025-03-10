@@ -254,6 +254,7 @@ function TranscriptionInterface() {
             />
             <TranscriptBox
                 transcript={transcript}
+                isTranslating={isTranslating}
                 selectedVoices={selectedVoices}
                 ttsPlaying={ttsPlaying}
                 onTtsPlaying={onTtsPlaying}
