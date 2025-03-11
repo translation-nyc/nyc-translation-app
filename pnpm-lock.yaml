@@ -15,6 +15,8 @@ importers:
         specifier: ^6.5.5
         version: 6.9.1(@aws-amplify/core@6.9.3)(@types/react-dom@18.3.5(@types/react@18.3.18))(@types/react@18.3.18)(aws-amplify@6.12.3)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(xstate@4.38.3)
       '@aws-sdk/client-lambda':
+        specifier: ^3.758.0
+        version: 3.758.0
       '@aws-sdk/client-polly':
         specifier: ^3.758.0
         version: 3.758.0
