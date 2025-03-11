@@ -1,5 +1,6 @@
 import {
     type AudioStream,
+    BadRequestException,
     LanguageCode,
     MediaEncoding,
     StartStreamTranscriptionCommand,
@@ -12,15 +13,17 @@ import {
 import {AsyncBlockingQueue} from "./async-blocking-queue.ts";
 import pcmProcessorUrl from "./pcm-processor.ts?worker&url";
 
+const TARGET_SAMPLE_RATE = 16000;
+
 export class SpeechTranscriber {
 
     private readonly transcribeClient: TranscribeStreamingClient;
     private readonly onTranscription: (event: TranscriptResultStream) => void;
 
-    private audioContext: AudioContext | undefined;
-    private audioWorkletNode: AudioWorkletNode | undefined;
-    private mediaStream: MediaStream | undefined;
-    private audioSource: MediaStreamAudioSourceNode | undefined;
+    private audioContext?: AudioContext;
+    private audioWorkletNode?: AudioWorkletNode;
+    private mediaStream?: MediaStream;
+    private audioSource?: MediaStreamAudioSourceNode;
 
     private stopped: boolean = false;
 
@@ -29,7 +32,7 @@ export class SpeechTranscriber {
         this.onTranscription = onTranscription;
     }
 
-    async start() {
+    async start(language: LanguageCode) {
         this.stopped = false;
         this.audioContext = new AudioContext();
         const audioQueue = new AsyncBlockingQueue<ArrayBuffer>();
@@ -44,17 +47,21 @@ export class SpeechTranscriber {
 
         await audioWorkletSetup;
         this.audioWorkletNode = new AudioWorkletNode(this.audioContext, "pcm-processor");
-        this.audioWorkletNode.port.onmessage = (event: MessageEvent<ArrayBuffer>) => {
+        this.audioWorkletNode.port.postMessage(TARGET_SAMPLE_RATE);
+        this.audioWorkletNode.port.onmessage = event => {
             audioQueue.enqueue(event.data);
         };
 
         this.audioSource = this.audioContext.createMediaStreamSource(this.mediaStream);
         this.audioSource.connect(this.audioWorkletNode);
 
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
         const params: StartStreamTranscriptionCommandInput = {
-            LanguageCode: LanguageCode.EN_GB,
+            IdentifyMultipleLanguages: true,
+            LanguageOptions: LanguageCode.EN_GB + "," + language,
             MediaEncoding: MediaEncoding.PCM,
-            MediaSampleRateHertz: this.audioContext.sampleRate,
+            MediaSampleRateHertz: Math.min(this.audioContext.sampleRate, TARGET_SAMPLE_RATE),
             AudioStream: (async function* (): AsyncGenerator<AudioStream.AudioEventMember> {
                 for await (const data of audioQueue) {
                     yield {
@@ -62,23 +69,40 @@ export class SpeechTranscriber {
                             AudioChunk: new Uint8Array(data),
                         },
                     };
+                    if (self.stopped) break;
                 }
             })(),
         };
 
         const command = new StartStreamTranscriptionCommand(params);
-        const response = await this.transcribeClient.send(command);
-        for await (const event of response.TranscriptResultStream!) {
-            this.onTranscription(event);
-            if (this.stopped) break;
+        while (!this.stopped) {
+            try {
+                const response = await this.transcribeClient.send(command);
+                for await (const event of response.TranscriptResultStream!) {
+                    this.onTranscription(event);
+                    if (this.stopped) break;
+                }
+            } catch (e) {
+                if (!(e instanceof BadRequestException)) {
+                    console.error(e);
+                }
+            }
         }
+    }
+
+    setMuted(muted: boolean) {
+        this.mediaStream?.getTracks().forEach(track => track.enabled = !muted);
     }
 
     async stop() {
         this.stopped = true;
         this.audioWorkletNode?.disconnect();
+        this.audioWorkletNode = undefined;
         this.audioSource?.disconnect();
+        this.audioSource = undefined;
         await this.audioContext?.close();
+        this.audioContext = undefined;
         this.mediaStream?.getTracks().forEach(track => track.stop());
+        this.mediaStream = undefined;
     }
 }

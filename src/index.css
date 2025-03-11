@@ -1,12 +1,43 @@
 @import "tailwindcss";
+@tailwind utilities;
+@plugin "daisyui" {
+    themes: all;
+}
+
+:root {
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --scale-factor: 1;
+}
 
 body {
     margin: 0;
     background: cornflowerblue;
     display: flex;
-    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
     height: 100vh;
     width: 100vw;
     justify-content: center;
     align-items: center;
+}
+
+#root {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Scale spacing based on font size */
+.p-2 { padding: 0.5rem; }
+.p-4 { padding: 1rem; }
+.p-6 { padding: 1.5rem; }
+
+.m-2 { margin: 0.5rem; }
+.m-4 { margin: 1rem; }
+.m-6 { margin: 1.5rem; }
+
+.gap-2 { gap: 0.5rem; }
+.gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
+
+.btn, .card, .modal, .input, .select, .textarea {
+    font-size: inherit;
 }
