@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { jsPDF } from "jspdf";
+import { client } from "../main";
 
 interface TranscriptModalProps {
     transcription: string;
@@ -48,7 +49,6 @@ function TranscriptModal(props: TranscriptModalProps) {
         const dataUri = doc.output('datauristring');
         const base64PDF = dataUri.split(",")[1];
         return base64PDF
-        // console.log(base64PDF)
     }
 
     const emailTranscript = async () => {
@@ -57,15 +57,12 @@ function TranscriptModal(props: TranscriptModalProps) {
         try {
             const base64PDF = getBase64();
 
-            await fetch('https://6b8a5sx46e.execute-api.eu-west-2.amazonaws.com/emailTranscript', {
-                mode: "no-cors",
-                method: 'POST',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: email,
-                    pdf: base64PDF,
-                }),
-            });
+            const g = await client.queries.review({
+                email: email,
+                pdf: base64PDF
+            })
+
+            console.log(g.data)
             
         } catch (error) {
             console.error('Error sending email:', error);
