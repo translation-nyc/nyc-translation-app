@@ -3,7 +3,8 @@ import {Moon, Sun, ZoomIn, ZoomOut, Contrast, Palette, Sparkles, Coffee, CircleU
 import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
-import {signInWithRedirect, signOut, getCurrentUser} from "aws-amplify/auth";
+import {signInWithRedirect, signOut, fetchAuthSession, getCurrentUser} from "aws-amplify/auth";
+import {Hub} from "aws-amplify/utils";
 import Alert from "./Alert";
 
 // Define available themes with their icons
@@ -21,11 +22,37 @@ function Toolbar() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const {theme, setTheme, textSize, setTextSize} = useTheme();
     const [showSignInAlert, setShowSignInAlert] = useState(false);
+    const [showSignOutAlert, setShowSignOutAlert] = useState(false);
     const [tempTextSize, setTempTextSize] = useState(textSize);
     const [isDragging, setIsDragging] = useState(false);
+    const [signingOut, setSigningOut] = useState(false);
 
     useEffect(() => {
         checkAuthStatus();
+
+        Hub.listen('auth', ({ payload }) => {
+            switch (payload.event) {
+                case 'signedIn':
+                    console.log('user have been signedIn successfully.');
+                    break;
+                case 'signedOut':
+                    console.log('user have been signedOut successfully.');
+                    break;
+                case 'tokenRefresh':
+                    console.log('auth tokens have been refreshed.');
+                    break;
+                case 'tokenRefresh_failure':
+                    console.log('failure while refreshing auth tokens.');
+                    break;
+                case 'signInWithRedirect':
+                    console.log('signInWithRedirect API has successfully been resolved.');
+                    break;
+                case 'signInWithRedirect_failure':
+                    console.log('failure while trying to resolve signInWithRedirect API.');
+                    break;
+            }
+          });
+
     }, []);
 
     // Keep tempTextSize in sync with textSize when not dragging
@@ -37,24 +64,31 @@ function Toolbar() {
 
     const checkAuthStatus = async () => {
         try {
+            console.log("Checking auth status...");
             const user = await getCurrentUser();
             const hasUser = !!user;
 
             if (hasUser && !isAuthenticated && document.readyState === 'complete') {
                 setShowSignInAlert(true);
             }
-
-            setIsAuthenticated(hasUser);
+            
+            const session = await fetchAuthSession();
+            const hasValidSession = !!session?.tokens?.idToken || !!session?.credentials?.accessKeyId;
+            
+            console.log("Has valid session:", hasValidSession);
+            setIsAuthenticated(hasValidSession);
         } catch (error) {
-            console.log('Not authenticated');
+            console.log("Not authenticated:", error);
             setIsAuthenticated(false);
         }
     };
+    
 
     const handleSignIn = async () => {
-        try {
+        try {           
+            console.log("Initiating sign in with Microsoft Entra ID...");
             await signInWithRedirect({
-                provider: {custom: "MicrosoftEntraIDSAML"},
+                provider: {custom: "MicrosoftEntraID"},
             });
         } catch (error) {
             console.error("Error signing in:", error);
@@ -63,12 +97,19 @@ function Toolbar() {
 
     const handleSignOut = async () => {
         try {
+            console.log("Signing out...");
+            
+            sessionStorage.clear();
+            localStorage.clear();
+            
             await signOut();
+
             setIsAuthenticated(false);
         } catch (error) {
             console.error("Error signing out:", error);
         }
     };
+    
 
     // Update only the temporary size during drag
     const handleTextSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -150,9 +191,10 @@ function Toolbar() {
                         <button
                             className="btn btn-error"
                             onClick={handleSignOut}
+                            disabled={signingOut}
                         >
                             <ProfileIcon className="mr-2 h-4 w-4"/>
-                            Sign Out
+                            {signingOut ? 'Signing Out...' : 'Sign Out'}
                         </button>
                     ) : (
                         <button
@@ -172,6 +214,14 @@ function Toolbar() {
                 isVisible={showSignInAlert}
                 onDismiss={() => setShowSignInAlert(false)}
                 autoDismissTime={3000}
+            />
+            
+            <Alert
+                message="Successfully signed out!"
+                isVisible={showSignOutAlert}
+                onDismiss={() => setShowSignOutAlert(false)}
+                autoDismissTime={3000}
+                type="success"
             />
         </>
     );
