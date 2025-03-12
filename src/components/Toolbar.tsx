@@ -43,7 +43,7 @@ function Toolbar() {
             if (hasUser && !isAuthenticated && document.readyState === 'complete') {
                 setShowSignInAlert(true);
             }
-            
+
             setIsAuthenticated(hasUser);
         } catch (error) {
             console.log('Not authenticated');
@@ -89,46 +89,48 @@ function Toolbar() {
 
     return (
         <>
-            <div className="navbar bg-base-100 shadow-md">
+            <div className="navbar bg-base-100 shadow-md p-4">
                 <div className="navbar-start">
-                    <h1 className="normal-case text-3xl font-bold">Conversate.</h1>
+                    <h1 className="normal-case text-3xl font-bold">
+                        Conversate.
+                    </h1>
                 </div>
 
                 <div className="navbar-end space-x-2">
                     {/* Text Size Slider */}
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost">
-                            <ZoomOut className="w-5 h-5" />
+                            <ZoomOut className="w-5 h-5"/>
                             <div className="tooltip tooltip-primary tooltip-bottom" data-tip={`${isDragging ? tempTextSize : textSize}px`}>
-                                <input 
-                                    type="range" 
+                                <input
+                                    type="range"
                                     min={6}
-                                    max={26} 
+                                    max={26}
                                     step={1}
                                     value={isDragging ? tempTextSize : textSize}
                                     onChange={handleTextSizeChange}
                                     onMouseDown={() => setIsDragging(true)}
                                     onMouseUp={applyTextSize}
                                     onMouseLeave={isDragging ? applyTextSize : undefined}
-                                    className="range range-xs range-primary w-32" 
+                                    className="range range-xs range-primary w-32"
                                 />
                             </div>
-                            <ZoomIn className="w-5 h-5" />
+                            <ZoomIn className="w-5 h-5"/>
                         </div>
                     </div>
 
                     {/* Theme Dropdown */}
                     <div className="dropdown dropdown-end">
                         <label tabIndex={0} className="btn btn-ghost btn-circle">
-                            <Palette className="w-5 h-5" />
+                            <Palette className="w-5 h-5"/>
                         </label>
-                        <ul 
-                            tabIndex={0} 
+                        <ul
+                            tabIndex={0}
                             className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-1"
                         >
                             {themeOptions.map((option) => (
                                 <li key={option.name}>
-                                    <a 
+                                    <a
                                         className={theme === option.name ? 'active font-bold' : ''}
                                         onClick={() => handleThemeChange(option.name)}
                                     >
@@ -145,31 +147,31 @@ function Toolbar() {
 
                     {/* Log In or Sign Out Button */}
                     {isAuthenticated ? (
-                        <button 
-                            className="btn btn-error" 
+                        <button
+                            className="btn btn-error"
                             onClick={handleSignOut}
                         >
-                            <ProfileIcon className="mr-2 h-4 w-4" />
+                            <ProfileIcon className="mr-2 h-4 w-4"/>
                             Sign Out
                         </button>
                     ) : (
-                        <button 
-                            className="btn btn-primary" 
+                        <button
+                            className="btn btn-primary"
                             onClick={handleSignIn}
                         >
-                            <ProfileIcon className="mr-2 h-4 w-4" />
+                            <ProfileIcon className="mr-2 h-4 w-4"/>
                             Log In
                         </button>
                     )}
                 </div>
             </div>
-            
+
             {/* Alerts */}
-            <Alert 
-                message="Successfully signed in!" 
-                isVisible={showSignInAlert} 
+            <Alert
+                message="Successfully signed in!"
+                isVisible={showSignInAlert}
                 onDismiss={() => setShowSignInAlert(false)}
-                autoDismissTime={3000} 
+                autoDismissTime={3000}
             />
         </>
     );

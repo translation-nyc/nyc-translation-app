@@ -1,5 +1,8 @@
-import {useState} from "react";
-import {jsPDF} from "jspdf";
+import { useState } from "react";
+import { jsPDF } from "jspdf";
+import { client } from "../main";
+
+import {getCurrentUser} from "aws-amplify/auth";
 
 interface TranscriptModalProps {
     transcription: string;
@@ -49,21 +52,20 @@ function TranscriptModal(props: TranscriptModalProps) {
     };
 
     const emailTranscript = async () => {
-        const email = "ggmihaylov@yahoo.co.uk"; // Replace with the actual recipient's email
+        
+        const user = await getCurrentUser();
+        const email = user.signInDetails?.loginId
 
         try {
             const base64PDF = getBase64();
 
-            await fetch('https://6b8a5sx46e.execute-api.eu-west-2.amazonaws.com/emailTranscript', {
-                mode: "no-cors",
-                method: 'POST',
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    email: email,
-                    pdf: base64PDF,
-                }),
-            });
+            const g = await client.queries.review({
+                email: email,
+                pdf: base64PDF
+            })
 
+            console.log(g.data)
+            
         } catch (error) {
             console.error('Error sending email:', error);
             alert(error);
