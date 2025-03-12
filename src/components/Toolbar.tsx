@@ -118,17 +118,20 @@ function Toolbar() {
                     <div className="dropdown dropdown-end">
                         <div tabIndex={0} role="button" className="btn btn-ghost">
                             <ZoomOut className="w-5 h-5"/>
-                            <div className="tooltip tooltip-primary tooltip-bottom" data-tip={`${isDragging ? tempTextSize : textSize}px`}>
+                            <div 
+                                className="tooltip tooltip-primary tooltip-bottom" 
+                                data-tip={`${tempTextSize}px`}
+                            >
                                 <input
                                     type="range"
                                     min={6}
                                     max={26}
                                     step={1}
-                                    value={isDragging ? tempTextSize : textSize}
+                                    value={tempTextSize}
                                     onChange={handleTextSizeChange}
                                     onMouseDown={() => setIsDragging(true)}
                                     onMouseUp={applyTextSize}
-                                    onMouseLeave={isDragging ? applyTextSize : undefined}
+                                    onMouseLeave={applyTextSize}
                                     className="range range-xs range-primary w-32"
                                 />
                             </div>
