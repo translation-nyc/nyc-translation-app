@@ -3,11 +3,7 @@ import {Moon, Sun, ZoomIn, ZoomOut, Contrast, Palette, Sparkles, Coffee, CircleU
 import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
-import {
-  signInWithRedirect,
-  signOut,
-  getCurrentUser
-} from "aws-amplify/auth";
+import {signInWithRedirect, signOut,getCurrentUser} from "aws-amplify/auth";
 import Alert from "./Alert";
 
 // Define available themes with their icons
@@ -80,8 +76,11 @@ function Toolbar() {
 
     const handleSignOut = async () => {
         try {
-            await signOut();
+            await signOut({ global: true });
             setIsAuthenticated(false);
+
+            localStorage.clear();
+            sessionStorage.clear();
         } catch (error) {
             console.error("Error signing out:", error);
         }
