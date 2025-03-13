@@ -18,12 +18,14 @@ export const auth = defineAuth({
                 },
             ],
             callbackUrls: [
-                'http://localhost:5173/', 
-                'https://conversateapp.com/'
+                'https://conversateapp.com/', 
+                'https://www.conversateapp.com/',
+                'http://localhost:5173/'
             ],
             logoutUrls: [
-                'http://localhost:5173/',
-                'https://conversateapp.com/'
+                'https://conversateapp.com/',
+                'https://www.conversateapp.com/',
+                'http://localhost:5173/'
             ]
         },
     },
