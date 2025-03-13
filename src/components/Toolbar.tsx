@@ -3,7 +3,7 @@ import {Moon, Sun, ZoomIn, ZoomOut, Contrast, Palette, Sparkles, Coffee, CircleU
 import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
-import {signInWithRedirect, signOut, getCurrentUser} from "aws-amplify/auth";
+import {signInWithRedirect, signOut,getCurrentUser} from "aws-amplify/auth";
 import Alert from "./Alert";
 
 // Define available themes with their icons
@@ -25,6 +25,20 @@ function Toolbar() {
     const [isDragging, setIsDragging] = useState(false);
 
     useEffect(() => {
+        const handleRedirect = async () => {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const code = urlParams.get('code');
+                
+                if (code) {
+                    await checkAuthStatus();
+                }
+            } catch (error) {
+                console.error("Error handling redirect:", error);
+            }
+        };
+        
+        handleRedirect();
         checkAuthStatus();
     }, []);
 
@@ -46,7 +60,6 @@ function Toolbar() {
 
             setIsAuthenticated(hasUser);
         } catch (error) {
-            console.log('Not authenticated');
             setIsAuthenticated(false);
         }
     };
@@ -54,7 +67,7 @@ function Toolbar() {
     const handleSignIn = async () => {
         try {
             await signInWithRedirect({
-                provider: {custom: "MicrosoftEntraIDSAML"},
+                provider: {custom: "MicrosoftEntraID"},
             });
         } catch (error) {
             console.error("Error signing in:", error);
@@ -63,8 +76,11 @@ function Toolbar() {
 
     const handleSignOut = async () => {
         try {
-            await signOut();
+            await signOut({ global: true });
             setIsAuthenticated(false);
+
+            localStorage.clear();
+            sessionStorage.clear();
         } catch (error) {
             console.error("Error signing out:", error);
         }
@@ -104,8 +120,8 @@ function Toolbar() {
                             <div className="tooltip tooltip-primary tooltip-bottom" data-tip={`${isDragging ? tempTextSize : textSize}px`}>
                                 <input
                                     type="range"
-                                    min={6}
-                                    max={26}
+                                    min={10}
+                                    max={24}
                                     step={1}
                                     value={isDragging ? tempTextSize : textSize}
                                     onChange={handleTextSizeChange}
@@ -166,7 +182,7 @@ function Toolbar() {
                 </div>
             </div>
 
-            {/* Alerts */}
+            {/* Success Alert */}
             <Alert
                 message="Successfully signed in!"
                 isVisible={showSignInAlert}
