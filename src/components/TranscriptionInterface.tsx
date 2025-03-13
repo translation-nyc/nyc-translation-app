@@ -14,6 +14,7 @@ import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";
 import {translate} from "../utils/translation.ts";
+import { detectKeyPhrases } from "../utils/keyphrase-extraction.ts";
 
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
@@ -72,6 +73,9 @@ function TranscriptionInterface() {
         }
 
         const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
+        const keyphrases = await detectKeyPhrases(translated, otherLanguage.translateCode);
+        console.log(keyphrases);
+
 
         setTranscript(previousTranscript => {
             const newTranscriptParts = [...previousTranscript.parts];
