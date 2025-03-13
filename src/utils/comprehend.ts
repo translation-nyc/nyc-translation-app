@@ -5,9 +5,10 @@ import {Lambda} from '@aws-sdk/client-lambda'
  * Detect key phrases in the given text using Lambda function
  * @param text - Input text to analyze
  * @param languageCode - Language code for the text (default: 'en')
+ * @param fName - The name of the lambda function that will execute the associated comprehend function 
  * @returns Promise resolving to an array of key phrases
  */
-export const comprehend = async (fName: string ,text: string, languageCode: string = 'en') => {
+export const comprehend = async (fName: string ,text: string, languageCode: string = 'en'): Promise<string[]> => {
   // Validate input
   if (!text.trim()) {
     throw new Error('Text cannot be empty');
