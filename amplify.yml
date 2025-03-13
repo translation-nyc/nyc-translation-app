@@ -22,10 +22,3 @@ frontend:
         paths:
             - .pnpm-store/**/*
             - node_modules/**/*
-    customHeaders:
-        - pattern: '/.well-known/*'
-          headers:
-            - key: 'Cache-Control'
-              value: 'no-cache'
-            - key: 'Content-Type'
-              value: 'application/json'
