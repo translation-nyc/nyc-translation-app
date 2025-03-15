@@ -1,9 +1,9 @@
-import {ChangeEvent, useEffect, useState} from "react";
-import {Moon, Sun, ZoomIn, ZoomOut, Contrast, Palette, Sparkles, Coffee, CircleUser} from "lucide-react";
+import {useEffect, useState} from "react";
+import {Moon, Sun, ZoomIn, ZoomOut, Contrast, Palette, Sparkles, Coffee, CircleUser, Menu} from "lucide-react";
 import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
-import {signInWithRedirect, signOut,getCurrentUser} from "aws-amplify/auth";
+import {signInWithRedirect, signOut, getCurrentUser} from "aws-amplify/auth";
 import Alert from "./Alert";
 
 // Define available themes with their icons
@@ -21,8 +21,24 @@ function Toolbar() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const {theme, setTheme, textSize, setTextSize} = useTheme();
     const [showSignInAlert, setShowSignInAlert] = useState(false);
-    const [tempTextSize, setTempTextSize] = useState(textSize);
-    const [isDragging, setIsDragging] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [isMobileView, setIsMobileView] = useState(false);
+
+    // Check screen size and set mobile view state
+    useEffect(() => {
+        const checkScreenSize = () => {
+            setIsMobileView(window.innerWidth < 640); // Use sm breakpoint (640px)
+        };
+        
+        // Check on mount
+        checkScreenSize();
+        
+        // Add resize listener
+        window.addEventListener('resize', checkScreenSize);
+        
+        // Clean up
+        return () => window.removeEventListener('resize', checkScreenSize);
+    }, []);
 
     useEffect(() => {
         const handleRedirect = async () => {
@@ -41,13 +57,6 @@ function Toolbar() {
         handleRedirect();
         checkAuthStatus();
     }, []);
-
-    // Keep tempTextSize in sync with textSize when not dragging
-    useEffect(() => {
-        if (!isDragging) {
-            setTempTextSize(textSize);
-        }
-    }, [textSize, isDragging]);
 
     const checkAuthStatus = async () => {
         try {
@@ -86,22 +95,171 @@ function Toolbar() {
         }
     };
 
-    // Update only the temporary size during drag
-    const handleTextSizeChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const newSize = Number(e.target.value);
-        setTempTextSize(newSize);
-    };
-
-    // Apply the text size only when slider is released
-    const applyTextSize = () => {
-        setTextSize(tempTextSize);
-        setIsDragging(false);
-    };
-
     // Handle theme selection
     const handleThemeChange = (newTheme: string) => {
         setTheme(newTheme);
     };
+
+    // Function to increase text size by clicking on the ZoomIn icon
+    const increaseTextSize = () => {
+        const newSize = Math.min(24, textSize + 1);
+        setTextSize(newSize);
+    };
+
+    // Function to decrease text size by clicking on the ZoomOut icon
+    const decreaseTextSize = () => {
+        const newSize = Math.max(10, textSize - 1);
+        setTextSize(newSize);
+    };
+
+    // Toggle mobile menu
+    const toggleMobileMenu = () => {
+        setMobileMenuOpen(!mobileMenuOpen);
+    };
+
+    // Desktop toolbar component
+    const DesktopToolbar = () => (
+        <div className="navbar-end flex space-x-2">
+            {/* Text Size Controls with Tooltip */}
+            <div className="dropdown dropdown-end flex items-center">
+                <div className="tooltip tooltip-primary tooltip-bottom" data-tip={`Text Size`}>
+                    <div className="flex items-center gap-2 btn btn-ghost">
+                        <button 
+                            className="btn btn-ghost btn-sm p-1" 
+                            onClick={decreaseTextSize}
+                        >
+                            <ZoomOut className="w-5 h-5" />
+                        </button>
+                        
+                        <span className="text-sm">{textSize}px</span>
+                        
+                        <button 
+                            className="btn btn-ghost btn-sm p-1" 
+                            onClick={increaseTextSize}
+                        >
+                            <ZoomIn className="w-5 h-5" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Theme Dropdown */}
+            <div className="dropdown dropdown-end">
+                <label tabIndex={0} className="btn btn-ghost btn-circle">
+                    <Palette className="w-5 h-5"/>
+                </label>
+                <ul
+                    tabIndex={0}
+                    className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-1"
+                >
+                    {themeOptions.map((option) => (
+                        <li key={option.name}>
+                            <a
+                                className={theme === option.name ? 'active font-bold' : ''}
+                                onClick={() => handleThemeChange(option.name)}
+                            >
+                                {option.icon}
+                                {option.label}
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            {/* Help Modal Button */}
+            <Help/>
+
+            {/* Log In or Sign Out Button */}
+            {isAuthenticated ? (
+                <button
+                    className="btn btn-error"
+                    onClick={handleSignOut}
+                >
+                    <ProfileIcon className="mr-2 h-4 w-4"/>
+                    Sign Out
+                </button>
+            ) : (
+                <button
+                    className="btn btn-primary"
+                    onClick={handleSignIn}
+                >
+                    <ProfileIcon className="mr-2 h-4 w-4"/>
+                    Log In
+                </button>
+            )}
+        </div>
+    );
+
+    // Mobile toolbar component
+    const MobileToolbarButton = () => (
+        <div className="navbar-end">
+            <button className="btn btn-ghost" onClick={toggleMobileMenu}>
+                <Menu className="w-6 h-6" />
+            </button>
+        </div>
+    );
+
+    // Mobile menu component with buttons for text size
+    const MobileMenu = () => (
+        <div className="bg-base-100 shadow-md p-4 flex flex-col gap-4">
+            {/* Text Size Controls for Mobile */}
+            <div className="flex items-center justify-between">
+                <span>Text Size</span>
+                <div className="flex items-center">
+                    <button className="btn btn-ghost btn-sm" onClick={decreaseTextSize}>
+                        <ZoomOut className="w-4 h-4" />
+                    </button>
+                    <span className="mx-2">{textSize}px</span>
+                    <button className="btn btn-ghost btn-sm" onClick={increaseTextSize}>
+                        <ZoomIn className="w-4 h-4" />
+                    </button>
+                </div>
+            </div>
+
+            {/* Theme Selection for Mobile */}
+            <div className="flex flex-col gap-2">
+                <span>Theme</span>
+                <div className="grid grid-cols-3 gap-2">
+                    {themeOptions.map((option) => (
+                        <button
+                            key={option.name}
+                            className={`btn btn-sm ${theme === option.name ? 'btn-primary' : 'btn-ghost'}`}
+                            onClick={() => handleThemeChange(option.name)}
+                        >
+                            {option.icon}
+                            <span className="text-xs">{option.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Help Button for Mobile */}
+            <div className="flex justify-center">
+                <Help />
+            </div>
+
+            {/* Auth Button for Mobile */}
+            <div className="flex justify-center">
+                {isAuthenticated ? (
+                    <button
+                        className="btn btn-error w-full"
+                        onClick={handleSignOut}
+                    >
+                        <ProfileIcon className="mr-2 h-4 w-4"/>
+                        Sign Out
+                    </button>
+                ) : (
+                    <button
+                        className="btn btn-primary w-full"
+                        onClick={handleSignIn}
+                    >
+                        <ProfileIcon className="mr-2 h-4 w-4"/>
+                        Log In
+                    </button>
+                )}
+            </div>
+        </div>
+    );
 
     return (
         <>
@@ -112,75 +270,12 @@ function Toolbar() {
                     </h1>
                 </div>
 
-                <div className="navbar-end space-x-2">
-                    {/* Text Size Slider */}
-                    <div className="dropdown dropdown-end">
-                        <div tabIndex={0} role="button" className="btn btn-ghost">
-                            <ZoomOut className="w-5 h-5"/>
-                            <div className="tooltip tooltip-primary tooltip-bottom" data-tip={`${isDragging ? tempTextSize : textSize}px`}>
-                                <input
-                                    type="range"
-                                    min={10}
-                                    max={24}
-                                    step={1}
-                                    value={isDragging ? tempTextSize : textSize}
-                                    onChange={handleTextSizeChange}
-                                    onMouseDown={() => setIsDragging(true)}
-                                    onMouseUp={applyTextSize}
-                                    onMouseLeave={isDragging ? applyTextSize : undefined}
-                                    className="range range-xs range-primary w-32"
-                                />
-                            </div>
-                            <ZoomIn className="w-5 h-5"/>
-                        </div>
-                    </div>
-
-                    {/* Theme Dropdown */}
-                    <div className="dropdown dropdown-end">
-                        <label tabIndex={0} className="btn btn-ghost btn-circle">
-                            <Palette className="w-5 h-5"/>
-                        </label>
-                        <ul
-                            tabIndex={0}
-                            className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 mt-1"
-                        >
-                            {themeOptions.map((option) => (
-                                <li key={option.name}>
-                                    <a
-                                        className={theme === option.name ? 'active font-bold' : ''}
-                                        onClick={() => handleThemeChange(option.name)}
-                                    >
-                                        {option.icon}
-                                        {option.label}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Help Modal Button */}
-                    <Help/>
-
-                    {/* Log In or Sign Out Button */}
-                    {isAuthenticated ? (
-                        <button
-                            className="btn btn-error"
-                            onClick={handleSignOut}
-                        >
-                            <ProfileIcon className="mr-2 h-4 w-4"/>
-                            Sign Out
-                        </button>
-                    ) : (
-                        <button
-                            className="btn btn-primary"
-                            onClick={handleSignIn}
-                        >
-                            <ProfileIcon className="mr-2 h-4 w-4"/>
-                            Log In
-                        </button>
-                    )}
-                </div>
+                {/* Render either mobile or desktop toolbar based on screen size */}
+                {isMobileView ? <MobileToolbarButton /> : <DesktopToolbar />}
             </div>
+
+            {/* Mobile menu dropdown - only appears when mobileMenuOpen is true AND in mobile view */}
+            {mobileMenuOpen && isMobileView && <MobileMenu />}
 
             {/* Success Alert */}
             <Alert
