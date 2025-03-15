@@ -70,7 +70,7 @@ function TranscriptBox(props: TranscriptProps) {
                         </div>
                     </div>
                 </div>
-                <div className="absolute top-2 right-2">
+                <div className="absolute top-2 right-2 pointer-events-none">
                     <BsMicMuteFill
                         className={`transition duration-300 text-red-600 ${props.ttsPlaying && props.isTranslating ? "" : "opacity-0"}`}
                     />
