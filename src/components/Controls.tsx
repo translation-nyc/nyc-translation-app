@@ -19,27 +19,29 @@ export interface ControlsProps {
 function Controls(props: ControlsProps) {
     return (
         <div className="w-full md:w-72 bg-base-100 rounded-lg shadow-lg p-6">
-            <div className="space-y-6">
-                <ToggleTranslationButton
-                    isLoading={props.isLoading}
-                    isTranslating={props.isTranslating}
-                    onToggleTranslation={props.onToggleTranslation}
-                    targetLanguage={props.targetLanguage}
-                />
-                <LanguageSelector
-                    isTranslating={props.isTranslating}
-                    targetLanguage={props.targetLanguage}
-                    onChangeTargetLanguage={props.onChangeTargetLanguage}
-                />
-                <VoiceSelector
-                    targetLanguage={props.targetLanguage}
-                    voices={props.voices}
-                    selectedVoices={props.selectedVoices}
-                    onChangeVoice={props.onChangeVoice}
-                />
-                <ReviewButton
-                    transcript={props.transcript}
-                />
+            <div className="max-h-40 md:h-0 min-h-full overflow-auto">
+                <div className="space-y-6">
+                    <ToggleTranslationButton
+                        isLoading={props.isLoading}
+                        isTranslating={props.isTranslating}
+                        onToggleTranslation={props.onToggleTranslation}
+                        targetLanguage={props.targetLanguage}
+                    />
+                    <LanguageSelector
+                        isTranslating={props.isTranslating}
+                        targetLanguage={props.targetLanguage}
+                        onChangeTargetLanguage={props.onChangeTargetLanguage}
+                    />
+                    <VoiceSelector
+                        targetLanguage={props.targetLanguage}
+                        voices={props.voices}
+                        selectedVoices={props.selectedVoices}
+                        onChangeVoice={props.onChangeVoice}
+                    />
+                    <ReviewButton
+                        transcript={props.transcript}
+                    />
+                </div>
             </div>
         </div>
     );
