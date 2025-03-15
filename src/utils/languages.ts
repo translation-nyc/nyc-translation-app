@@ -5,8 +5,8 @@ import type {Language} from "./types.ts";
 // noinspection JSUnusedGlobalSymbols
 export class Languages {
 
-    static ALL: Language[] = [];
-    private static allByCode: Record<string, Language> = {};
+    static readonly ALL: Language[] = [];
+    private static readonly allByCode: Record<string, Language> = {};
 
     static get(code: string): Language {
         const language = this.allByCode[code];
