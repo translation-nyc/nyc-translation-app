@@ -244,7 +244,7 @@ function TranscriptionInterface() {
     }
 
     return (
-        <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4">
+        <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4 overflow-auto">
             <Controls
                 isLoading={isLoading}
                 isTranslating={isTranslating}

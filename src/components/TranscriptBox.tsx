@@ -16,51 +16,66 @@ export interface TranscriptProps {
 
 function TranscriptBox(props: TranscriptProps) {
     return (
-        <div className="flex flex-1 justify-between bg-base-100 rounded-lg shadow-lg p-4 overflow-hidden">
-            <div>
-                {props.transcript.parts.map((part, index) => {
-                    let showPlayIconFirst: boolean;
-                    let showPlayIconSecond: boolean;
-                    if (part.language === Languages.ENGLISH) {
-                        showPlayIconFirst = false;
-                        showPlayIconSecond = true;
-                    } else {
-                        showPlayIconFirst = true;
-                        showPlayIconSecond = false;
-                    }
-                    return (
-                        <div key={index} className="mb-4">
-                            <div className="flex flex-row">
-                                <PlayTtsButton
-                                    text={part.text}
-                                    voice={props.selectedVoices[part.language.name].id}
-                                    anyPlaying={props.ttsPlaying}
-                                    onPlaying={props.onTtsPlaying}
-                                    visible={showPlayIconFirst}
-                                />
-                                <p className="mb-0">
-                                    {part.text}
-                                </p>
-                            </div>
-                            <div className="flex flex-row">
-                                <PlayTtsButton
-                                    text={part.translatedText}
-                                    voice={props.selectedVoices[part.translatedLanguage.name].id}
-                                    anyPlaying={props.ttsPlaying}
-                                    onPlaying={props.onTtsPlaying}
-                                    visible={showPlayIconSecond}
-                                />
-                                <p className="text-gray-400">
-                                    {part.translatedText}
-                                </p>
-                            </div>
+        <div className="flex-1 bg-base-100 rounded-lg shadow-lg p-4">
+            <div className="w-full h-full relative">
+                <div className="w-full h-full absolute top-0 left-0">
+                    <div className="max-h-96 md:h-0 min-h-full overflow-auto">
+                        <div className="mr-4">
+                            {props.transcript.parts.map((part, index) => {
+                                let className: string | undefined;
+                                if (index === props.transcript.parts.length - 1) {
+                                    className = undefined;
+                                } else {
+                                    className = "mb-4";
+                                }
+
+                                let showPlayIconFirst: boolean;
+                                let showPlayIconSecond: boolean;
+                                if (part.language === Languages.ENGLISH) {
+                                    showPlayIconFirst = false;
+                                    showPlayIconSecond = true;
+                                } else {
+                                    showPlayIconFirst = true;
+                                    showPlayIconSecond = false;
+                                }
+                                return (
+                                    <div key={index} className={className}>
+                                        <div className="flex flex-row">
+                                            <PlayTtsButton
+                                                text={part.text}
+                                                voice={props.selectedVoices[part.language.name].id}
+                                                anyPlaying={props.ttsPlaying}
+                                                onPlaying={props.onTtsPlaying}
+                                                visible={showPlayIconFirst}
+                                            />
+                                            <p className="mb-0">
+                                                {part.text}
+                                            </p>
+                                        </div>
+                                        <div className="flex flex-row">
+                                            <PlayTtsButton
+                                                text={part.translatedText}
+                                                voice={props.selectedVoices[part.translatedLanguage.name].id}
+                                                anyPlaying={props.ttsPlaying}
+                                                onPlaying={props.onTtsPlaying}
+                                                visible={showPlayIconSecond}
+                                            />
+                                            <p className="text-gray-400">
+                                                {part.translatedText}
+                                            </p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
-                    );
-                })}
+                    </div>
+                </div>
+                <div className="absolute top-2 right-2">
+                    <BsMicMuteFill
+                        className={`transition duration-300 text-red-600 ${props.ttsPlaying && props.isTranslating ? "" : "opacity-0"}`}
+                    />
+                </div>
             </div>
-            <BsMicMuteFill
-                className={`shrink-0 ml-2 transition duration-300 text-red-600 ${props.ttsPlaying && props.isTranslating ? "" : "opacity-0"}`}
-            />
         </div>
     );
 }
