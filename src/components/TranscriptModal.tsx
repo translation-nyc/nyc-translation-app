@@ -2,15 +2,20 @@ import { useState } from "react";
 import { jsPDF } from "jspdf";
 import { client } from "../main";
 import {getCurrentUser} from "aws-amplify/auth";
-
+import type {Language} from "../utils/types.ts";
 
 interface TranscriptModalProps {
     transcription: string;
+    targetLanguage: Language | null;
     closeModal: () => void;
 }
 
 function TranscriptModal(props: TranscriptModalProps) {
     const [comments, setComments] = useState<{ text: string; index: number }[]>([]);
+
+    const font =  props.targetLanguage?.name === "Arabic" ? "notoArabic" 
+    : props.targetLanguage?.name === "Chinese" ? "notoChinese" 
+    : "Helvetica";
 
     const addComment = (index: number) => {
         const commentText = prompt("Enter your comment");
@@ -22,7 +27,6 @@ function TranscriptModal(props: TranscriptModalProps) {
     const generatePDF = () => {
         const doc = new jsPDF();
 
-        // Add title
         doc.setFontSize(16);
         doc.text("Transcription with Comments", 10, 10);
 
@@ -34,6 +38,7 @@ function TranscriptModal(props: TranscriptModalProps) {
             fullTranscription += text + ' ';
         });
 
+        doc.setFont(font)
         doc.setFontSize(12);
         doc.text(fullTranscription.trim(), 10, 20);
         
