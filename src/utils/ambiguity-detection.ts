@@ -37,6 +37,6 @@ export const detectAmbiguity = async (transcript: TranscriptPart[]) => {
 
 }
 
-function split_at_index(value:string, index:number) {
-    return value.substring(0, index) + "*" + value.substring(index);
-}
+// function split_at_index(value:string, index:number) {
+//     return value.substring(0, index) + "*" + value.substring(index);
+// }
