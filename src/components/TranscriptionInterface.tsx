@@ -14,7 +14,7 @@ import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";
 import {translate} from "../utils/translation.ts";
-import { comprehend } from "../utils/comprehend.ts";
+import { detectAmbiguity } from "../utils/ambiguity-detection.ts";
 
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
@@ -73,8 +73,7 @@ function TranscriptionInterface() {
         }
 
         const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
-        const keyphrases = await comprehend('comprehendKeyPhrases', translated, otherLanguage.translateCode);
-        console.log(keyphrases);
+        
 
 
         setTranscript(previousTranscript => {
@@ -242,7 +241,7 @@ function TranscriptionInterface() {
         setTtsPlaying(playing);
         speechTranscriber.current?.setMuted(playing);
     }
-
+    detectAmbiguity(transcript.parts);
     return (
         <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4 overflow-auto">
             <Controls
