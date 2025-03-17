@@ -1,5 +1,10 @@
 import { Amplify, fetchAuthSession } from '@aws-amplify/core';
-import {Lambda} from '@aws-sdk/client-lambda'
+import {Lambda} from '@aws-sdk/client-lambda';
+
+export interface KeyPhrase {
+  text: string,
+  beginOffset: number
+}
 
 /**
  * Detect key phrases in the given text using Lambda function
@@ -8,7 +13,7 @@ import {Lambda} from '@aws-sdk/client-lambda'
  * @param fName - The name of the lambda function that will execute the associated comprehend function 
  * @returns Promise resolving to an array of key phrases
  */
-export const comprehend = async (fName: string ,text: string, languageCode: string = 'en'): Promise<string[]> => {
+export const comprehend = async (fName: string ,text: string, languageCode: string = 'en'): Promise<KeyPhrase[]> => {
   // Validate input
   if (!text.trim()) {
     throw new Error('Text cannot be empty');
