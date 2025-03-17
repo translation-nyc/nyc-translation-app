@@ -2,8 +2,8 @@ import { Amplify, fetchAuthSession } from '@aws-amplify/core';
 import {Lambda} from '@aws-sdk/client-lambda';
 
 export interface KeyPhrase {
-  text: string,
-  beginOffset: number
+  Text: string,
+  BeginOffset: number
 }
 
 /**

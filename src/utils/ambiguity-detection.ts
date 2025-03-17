@@ -7,25 +7,26 @@ export interface Phrase {
     offset: number,
     alternateDefintion: string
 }
-const ambiguousWords: Phrase[] = [];
+const ambiguousWords: Set<Phrase> = new Set();
 
 export const detectAmbiguity = async (transcript: TranscriptPart[]) => {
     for (const part of transcript) {
         const translateKP = await comprehend('comprehendKeyPhrases', part.translatedText, part.translatedLanguage.translateCode);
         const translateKPSet = [];
         for (const phrase of translateKP) {
-            translateKPSet.push(phrase.text)
+            translateKPSet.push(phrase.Text)
         }
         console.log(translateKPSet);
+        console.log(translateKP);
 
         for (const tPhrase of translateKP) {
-            const phrase = tPhrase.text;
+            const phrase = tPhrase.Text;
             const backOrignalPhrase = await translate(phrase, part.translatedLanguage.translateCode, part.language.translateCode);
             const backTranslatedPhrase = await translate(backOrignalPhrase, part.language.translateCode, part.translatedLanguage.translateCode);
             if (!translateKPSet.includes(backTranslatedPhrase)) {
-                ambiguousWords.push({
+                ambiguousWords.add({
                     text: phrase,
-                    offset: tPhrase.beginOffset,
+                    offset: tPhrase.BeginOffset,
                     alternateDefintion: backTranslatedPhrase
                 });
             }
