@@ -40,6 +40,7 @@ function Controls(props: ControlsProps) {
                     />
                     <ReviewButton
                         transcript={props.transcript}
+                        targetLanguage={props.targetLanguage}
                     />
                 </div>
             </div>
@@ -168,6 +169,7 @@ function VoiceSelector(props: VoiceSelectorProps) {
 
 interface ReviewButtonProps {
     transcript: Transcript;
+    targetLanguage: Language | null;
 }
 
 function ReviewButton(props: ReviewButtonProps) {
@@ -192,7 +194,7 @@ function ReviewButton(props: ReviewButtonProps) {
             </div>
 
             {isModalOpen && (
-                <TranscriptModal transcription={transcript} closeModal={closeModal}/>
+                <TranscriptModal transcription={transcript} targetLanguage={props.targetLanguage} closeModal={closeModal}/>
             )}
         </>
     );
