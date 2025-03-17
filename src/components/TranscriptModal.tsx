@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { jsPDF } from "jspdf";
 import { client } from "../main";
-import {getCurrentUser} from "aws-amplify/auth";
+import { fetchUserAttributes } from "aws-amplify/auth";
 import type {Language} from "../utils/types.ts";
 
 interface TranscriptModalProps {
@@ -57,8 +57,8 @@ function TranscriptModal(props: TranscriptModalProps) {
     };
 
     const emailTranscript = async () => {
-        const user = await getCurrentUser();
-        const email = user.signInDetails?.loginId;
+        const user = await fetchUserAttributes();
+        const email = user.email
 
         try {
             const base64PDF = getBase64();
