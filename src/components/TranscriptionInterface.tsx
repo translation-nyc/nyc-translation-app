@@ -42,7 +42,7 @@ function TranscriptionInterface() {
     async function onTranscription(event: TranscriptResultStream) {
         if (event.TranscriptEvent === undefined) {
             console.error("Transcription error");
-            console.error(event);
+            console.error(JSON.stringify(event));
             return;
         }
 
@@ -75,8 +75,10 @@ function TranscriptionInterface() {
 
         setTranscript(previousTranscript => {
             const newTranscriptParts = [...previousTranscript.parts];
+            const lastIndex = newTranscriptParts.length - 1;
+            const lastPart = newTranscriptParts[lastIndex];
             if (newTranscriptParts.length === 0
-                || previousTranscript.lastLanguageCode !== languageCode
+                || previousTranscript.lastLanguageCode !== languageCode && lastPart.lastResultId !== resultId
                 || previousTranscript.lastTargetLanguageCode !== currentTargetLanguage.transcribeCode
             ) {
                 newTranscriptParts.push({
