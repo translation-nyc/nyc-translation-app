@@ -5,9 +5,11 @@ import {HiMiniSpeakerWave} from "react-icons/hi2";
 import type {Transcript, TtsVoice} from "../utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
+import { Phrase } from "../utils/ambiguity-detection.ts";
 
 export interface TranscriptProps {
     transcript: Transcript;
+    ambiguousWords: Phrase[];
     isTranslating: boolean;
     selectedVoices: Record<string, TtsVoice>;
     ttsPlaying: boolean;
@@ -38,6 +40,12 @@ function TranscriptBox(props: TranscriptProps) {
                                     showPlayIconFirst = true;
                                     showPlayIconSecond = false;
                                 }
+                                const ambiguity = addAmbiguityInformation(props.ambiguousWords, part.translatedText).split('*');
+                                const ambiguousWordMap = new Map();
+                                ambiguity.forEach((word, index) => {
+                                    ambiguousWordMap.set(index, word);
+                                });
+                                console.log(ambiguousWordMap);
                                 return (
                                     <div key={index} className={className}>
                                         <div className="flex flex-row">
@@ -60,9 +68,14 @@ function TranscriptBox(props: TranscriptProps) {
                                                 onPlaying={props.onTtsPlaying}
                                                 visible={showPlayIconSecond}
                                             />
-                                            <p className="text-gray-400">
-                                                {part.translatedText}
-                                            </p>
+                                            {ambiguity.map((amb) => {
+                                                console.log(ambiguity.indexOf(amb));
+                                                return (
+                                                <p key={index} className={ambiguity.indexOf(amb) == 0 ? "text-blue-500" : "text-gray-400"}>
+                                                    {amb}
+                                                </p>)
+                                            })}
+                                            
                                         </div>
                                     </div>
                                 );
@@ -131,6 +144,17 @@ function PlayTtsButton(props: PlayTtsButtonProps) {
             onClick={toggleTts}
         />
     );
+}
+
+function addAmbiguityInformation(phrases: Phrase[], text: string): string {
+    let finalText = text;
+    for (const phrase of phrases) {
+        finalText = split_at_index(finalText, phrase.offset);
+    }
+    return finalText;
+}
+function split_at_index(value:string, index:number) {
+    return value.substring(0, index) + "*" + value.substring(index);
 }
 
 export default TranscriptBox;
