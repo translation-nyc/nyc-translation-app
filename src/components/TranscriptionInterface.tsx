@@ -8,7 +8,7 @@ import {
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
-import type {Language, Transcript, TtsVoice} from "../utils/types.ts";
+import type {Language, Transcript, TranscriptPart, TtsVoice} from "../utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
@@ -31,12 +31,12 @@ function TranscriptionInterface() {
             {},
         )
     );
-
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
         lastLanguageCode: LanguageCode.EN_GB,
         lastTargetLanguageCode: null,
     });
+
 
     const [ttsPlaying, setTtsPlaying] = useState(false);
 
@@ -73,7 +73,17 @@ function TranscriptionInterface() {
         }
 
         const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
-        
+        const tempPart : TranscriptPart = {
+            language: language,
+            lastCompleteIndex: 0,
+            lastCompleteTranslatedIndex: 0,
+            lastResultId: "",
+            text: transcriptPartText,
+            translatedLanguage: otherLanguage,
+            translatedText: translated,
+            ambiguousWords: []
+        };
+        const amb = await detectAmbiguity([tempPart]);
 
 
         setTranscript(previousTranscript => {
@@ -90,6 +100,7 @@ function TranscriptionInterface() {
                     translatedText: translated,
                     translatedLanguage: otherLanguage,
                     lastCompleteTranslatedIndex: 0,
+                    ambiguousWords: amb
                 });
             } else {
                 const lastIndex = newTranscriptParts.length - 1;
@@ -108,6 +119,7 @@ function TranscriptionInterface() {
                             translatedText: lastCompleteTranslatedText + " " + translated,
                             translatedLanguage: otherLanguage,
                             lastCompleteTranslatedIndex: lastPart.lastCompleteTranslatedIndex,
+                            ambiguousWords: amb
                         };
                     } else {
                         // Different language
@@ -125,6 +137,7 @@ function TranscriptionInterface() {
                                     translatedText: lastLastPart.translatedText + " " + translated,
                                     translatedLanguage: otherLanguage,
                                     lastCompleteTranslatedIndex: lastLastPart.lastCompleteTranslatedIndex,
+                                    ambiguousWords: amb
                                 };
                             } else {
                                 newTranscriptParts[0] = {
@@ -135,6 +148,7 @@ function TranscriptionInterface() {
                                     translatedText: translated,
                                     translatedLanguage: otherLanguage,
                                     lastCompleteTranslatedIndex: 0,
+                                    ambiguousWords: amb
                                 };
                             }
                         } else {
@@ -148,6 +162,7 @@ function TranscriptionInterface() {
                                 translatedText: lastCompleteTranslatedText,
                                 translatedLanguage: lastPart.translatedLanguage,
                                 lastCompleteTranslatedIndex: lastPart.lastCompleteTranslatedIndex,
+                                ambiguousWords: amb
                             };
                             newTranscriptParts.push({
                                 text: transcriptPartText,
@@ -157,6 +172,7 @@ function TranscriptionInterface() {
                                 translatedText: translated,
                                 translatedLanguage: otherLanguage,
                                 lastCompleteTranslatedIndex: 0,
+                                ambiguousWords: amb
                             });
                         }
                     }
@@ -170,15 +186,17 @@ function TranscriptionInterface() {
                         translatedText: lastPart.translatedText + " " + translated,
                         translatedLanguage: otherLanguage,
                         lastCompleteTranslatedIndex: lastPart.translatedText.length,
+                        ambiguousWords: amb
                     };
                 }
             }
-
+            
             return {
                 parts: newTranscriptParts,
                 lastLanguageCode: languageCode,
                 lastTargetLanguageCode: currentTargetLanguage.transcribeCode,
             };
+
         });
     }
 
@@ -201,8 +219,10 @@ function TranscriptionInterface() {
         const transcribeClient = new TranscribeStreamingClient(config);
         speechTranscriber.current = new SpeechTranscriber(transcribeClient, onTranscription);
         setIsLoading(false);
+        
     }
 
+    
     useEffect(() => {
         // noinspection JSIgnoredPromiseFromCall
         loadClient();
@@ -241,7 +261,7 @@ function TranscriptionInterface() {
         setTtsPlaying(playing);
         speechTranscriber.current?.setMuted(playing);
     }
-    detectAmbiguity(transcript.parts);
+
     return (
         <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4 overflow-auto">
             <Controls
