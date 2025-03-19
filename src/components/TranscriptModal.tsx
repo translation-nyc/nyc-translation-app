@@ -20,7 +20,7 @@ function TranscriptModal(props: TranscriptModalProps) {
     function addComment(index: number) {
         const commentText = prompt("Enter your comment");
         if (commentText) {
-            setComments([...comments, { text: commentText, index }]);
+            setComments([...comments, {text: commentText, index}]);
         }
     }
 
@@ -41,7 +41,7 @@ function TranscriptModal(props: TranscriptModalProps) {
         doc.setFont(font);
         doc.setFontSize(12);
         doc.text(fullTranscription.trim(), 10, 20);
-        
+
         return doc;
     }
 
@@ -74,7 +74,7 @@ function TranscriptModal(props: TranscriptModalProps) {
             });
 
             console.log(g.data);
-            
+
         } catch (error) {
             console.error("Error sending email:", error);
             alert(error);
