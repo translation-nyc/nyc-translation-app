@@ -19,8 +19,8 @@ export interface ControlsProps {
 
 function Controls(props: ControlsProps) {
     return (
-        <div className="w-full md:w-72 bg-base-100 rounded-lg shadow-lg p-6">
-            <div className="max-h-40 md:h-0 min-h-full overflow-auto">
+        <div className="w-full md:w-72 p-2 bg-base-100 rounded-lg shadow-lg">
+            <div className="max-h-40 md:h-0 min-h-full p-4 overflow-auto">
                 <div className="space-y-6">
                     <ToggleTranslationButton
                         isLoggedIn={props.isLoggedIn}
