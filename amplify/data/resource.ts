@@ -1,23 +1,23 @@
-import { type ClientSchema, a, defineData } from "@aws-amplify/backend"
-import { review } from "../functions/review/resource"
+import {a, type ClientSchema, defineData} from "@aws-amplify/backend";
+import {emailTranscript} from "../functions/emailTranscript/resource";
 
 const schema = a.schema({
-  review: a
-  .query()
-  .arguments({
-    email: a.string(),
-    pdf: a.string(),
-  })
-  .returns(a.string())
-  .handler(a.handler.function(review))
-  .authorization(allow => [allow.authenticated()]),
-})
+    emailTranscript: a
+        .query()
+        .arguments({
+            email: a.string().required(),
+            pdf: a.string().required(),
+        })
+        .returns(a.string().required())
+        .handler(a.handler.function(emailTranscript))
+        .authorization(allow => [allow.authenticated()]),
+});
 
-export type Schema = ClientSchema<typeof schema>
+export type Schema = ClientSchema<typeof schema>;
 
 export const data = defineData({
-  schema,
-  authorizationModes: {
-    defaultAuthorizationMode: "userPool",
-  },
-})
+    schema,
+    authorizationModes: {
+        defaultAuthorizationMode: "userPool",
+    },
+});
