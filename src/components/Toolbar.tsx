@@ -1,9 +1,9 @@
 import {useEffect, useState} from "react";
-import {Moon, Sun, ZoomIn, ZoomOut, Contrast, Palette, Sparkles, Coffee, CircleUser, Menu} from "lucide-react";
+import {CircleUser, Coffee, Contrast, Menu, Moon, Palette, Sparkles, Sun, ZoomIn, ZoomOut} from "lucide-react";
 import {useTheme} from "../hooks/useTheme";
 import Help from "./Help.tsx";
 import {ProfileIcon} from "../assets/icons";
-import {signInWithRedirect, signOut, getCurrentUser} from "aws-amplify/auth";
+import {getCurrentUser, signInWithRedirect, signOut} from "aws-amplify/auth";
 import Alert from "./Alert";
 
 // Define available themes with their icons
@@ -53,9 +53,12 @@ function Toolbar() {
                 console.error("Error handling redirect:", error);
             }
         };
-        
+
+        // noinspection JSIgnoredPromiseFromCall
         handleRedirect();
+        // noinspection JSIgnoredPromiseFromCall
         checkAuthStatus();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const checkAuthStatus = async () => {

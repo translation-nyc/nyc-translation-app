@@ -5,11 +5,10 @@ import {HiMiniSpeakerWave} from "react-icons/hi2";
 import type {Transcript, TtsVoice} from "../utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
-import { Phrase } from "../utils/ambiguity-detection.ts";
+import {Phrase} from "../utils/ambiguity-detection.ts";
 
 export interface TranscriptProps {
     transcript: Transcript;
-    ambiguousWords: Phrase[];
     isTranslating: boolean;
     selectedVoices: Record<string, TtsVoice>;
     ttsPlaying: boolean;
@@ -17,6 +16,7 @@ export interface TranscriptProps {
 }
 
 function TranscriptBox(props: TranscriptProps) {
+    console.log(props.transcript.parts.forEach(x=>x.ambiguousWords));
     return (
         <div className="flex-1 bg-base-100 rounded-lg shadow-lg p-4">
             <div className="w-full h-full relative">
@@ -40,7 +40,7 @@ function TranscriptBox(props: TranscriptProps) {
                                     showPlayIconFirst = true;
                                     showPlayIconSecond = false;
                                 }
-                                const ambiguity = addAmbiguityInformation(props.ambiguousWords, part.translatedText).split('*');
+                                const ambiguity = addAmbiguityInformation(part.ambiguousWords, part.translatedText).split('*');
                                 const ambiguousWordMap = new Map();
                                 ambiguity.forEach((word, index) => {
                                     ambiguousWordMap.set(index, word);
@@ -71,11 +71,11 @@ function TranscriptBox(props: TranscriptProps) {
                                             {ambiguity.map((amb) => {
                                                 console.log(ambiguity.indexOf(amb));
                                                 return (
-                                                <p key={index} className={ambiguity.indexOf(amb) == 0 ? "text-blue-500" : "text-gray-400"}>
+                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-blue-500" : "text-gray-400"}>
                                                     {amb}
-                                                </p>)
+                                                </p>);
                                             })}
-                                            
+
                                         </div>
                                     </div>
                                 );
@@ -147,10 +147,12 @@ function PlayTtsButton(props: PlayTtsButtonProps) {
 }
 
 function addAmbiguityInformation(phrases: Phrase[], text: string): string {
+    console.log(phrases);
     let finalText = text;
     for (const phrase of phrases) {
         finalText = split_at_index(finalText, phrase.offset);
     }
+    console.log(finalText);
     return finalText;
 }
 function split_at_index(value:string, index:number) {

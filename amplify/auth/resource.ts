@@ -1,4 +1,4 @@
-import { defineAuth, secret } from '@aws-amplify/backend';
+import {defineAuth, secret} from "@aws-amplify/backend";
 
 /**
  * Define and configure your auth resource
@@ -10,23 +10,25 @@ export const auth = defineAuth({
         externalProviders: {
             oidc: [
                 {
-                    name: 'MicrosoftEntraID',
-                    clientId: secret('MICROSOFT_ENTRA_ID_CLIENT_ID'),
-                    clientSecret: secret('MICROSOFT_ENTRA_ID_CLIENT_SECRET'),
-                    issuerUrl: 'https://login.microsoftonline.com/7fd93033-e7a0-483b-87b7-0796e1b212a8/v2.0',
-                    scopes: ['openid', 'email', 'profile'],
+                    name: "MicrosoftEntraID",
+                    clientId: secret("MICROSOFT_ENTRA_ID_CLIENT_ID"),
+                    clientSecret: secret("MICROSOFT_ENTRA_ID_CLIENT_SECRET"),
+                    issuerUrl: "https://login.microsoftonline.com/7fd93033-e7a0-483b-87b7-0796e1b212a8/v2.0",
+                    scopes: ["openid", "email", "profile"],
                 },
             ],
             callbackUrls: [
-                'https://conversateapp.com/', 
-                'https://www.conversateapp.com/',
-                'http://localhost:5173/'
+                "https://conversateapp.com",
+                "https://www.conversateapp.com",
+                "http://localhost:4173",
+                "http://localhost:5173",
             ],
             logoutUrls: [
-                'https://conversateapp.com/',
-                'https://www.conversateapp.com/',
-                'http://localhost:5173/'
-            ]
+                "https://conversateapp.com",
+                "https://www.conversateapp.com",
+                "http://localhost:4173",
+                "http://localhost:5173",
+            ],
         },
     },
 });

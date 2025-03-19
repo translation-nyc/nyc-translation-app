@@ -14,11 +14,13 @@ import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";
 import {translate} from "../utils/translation.ts";
+import {getCurrentUser} from "aws-amplify/auth";
 import { detectAmbiguity } from "../utils/ambiguity-detection.ts";
 
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
 
+    const [loggedIn, setLoggedIn] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isTranslating, setIsTranslating] = useState(false);
 
@@ -37,13 +39,80 @@ function TranscriptionInterface() {
         lastTargetLanguageCode: null,
     });
 
-
     const [ttsPlaying, setTtsPlaying] = useState(false);
+
+    async function loadClient() {
+        try {
+            await getCurrentUser();
+            setLoggedIn(true);
+        } catch {
+            setLoggedIn(false);
+            return;
+        }
+
+        const region = Amplify.getConfig()
+            .Predictions!
+            .convert!
+            .transcription!
+            .region!;
+        const authSession = await fetchAuthSession();
+        const credentials = authSession.credentials!;
+        const config: TranscribeStreamingClientConfig = {
+            region: region,
+            credentials: {
+                accessKeyId: credentials.accessKeyId,
+                secretAccessKey: credentials.secretAccessKey,
+                sessionToken: credentials.sessionToken,
+            },
+        };
+        const transcribeClient = new TranscribeStreamingClient(config);
+        speechTranscriber.current = new SpeechTranscriber(transcribeClient, onTranscription);
+        setIsLoading(false);
+    }
+
+    useEffect(() => {
+        // noinspection JSIgnoredPromiseFromCall
+        loadClient();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    async function toggleTranslation() {
+        if (speechTranscriber.current === null) {
+            throw new Error("SpeechTranscriber is not initialized");
+        }
+        if (targetLanguage === null) {
+            throw new Error("Target language is not set");
+        }
+        setIsTranslating(!isTranslating);
+        if (!isTranslating) {
+            await speechTranscriber.current.start(targetLanguage.transcribeCode);
+        } else {
+            await speechTranscriber.current.stop();
+        }
+    }
+
+    function setLanguage(language: Language) {
+        setTargetLanguage(language);
+        targetLanguageRef.current = language;
+    }
+
+    function setVoice(voiceId: string) {
+        setSelectedVoices(previousSelectedVoices => {
+            const newSelectedVoices = {...previousSelectedVoices};
+            newSelectedVoices[targetLanguage!.name] = targetLanguage!.ttsVoices.find(voice => voice.id === voiceId)!;
+            return newSelectedVoices;
+        });
+    }
+
+    function onTtsPlaying(playing: boolean) {
+        setTtsPlaying(playing);
+        speechTranscriber.current?.setMuted(playing);
+    }
 
     async function onTranscription(event: TranscriptResultStream) {
         if (event.TranscriptEvent === undefined) {
             console.error("Transcription error");
-            console.error(event);
+            console.error(JSON.stringify(event));
             return;
         }
 
@@ -88,8 +157,10 @@ function TranscriptionInterface() {
 
         setTranscript(previousTranscript => {
             const newTranscriptParts = [...previousTranscript.parts];
+            const lastIndex = newTranscriptParts.length - 1;
+            const lastPart = newTranscriptParts[lastIndex];
             if (newTranscriptParts.length === 0
-                || previousTranscript.lastLanguageCode !== languageCode
+                || previousTranscript.lastLanguageCode !== languageCode && lastPart.lastResultId !== resultId
                 || previousTranscript.lastTargetLanguageCode !== currentTargetLanguage.transcribeCode
             ) {
                 newTranscriptParts.push({
@@ -190,81 +261,19 @@ function TranscriptionInterface() {
                     };
                 }
             }
-            
+
             return {
                 parts: newTranscriptParts,
                 lastLanguageCode: languageCode,
                 lastTargetLanguageCode: currentTargetLanguage.transcribeCode,
             };
-
         });
-    }
-
-    async function loadClient() {
-        const region = Amplify.getConfig()
-            .Predictions!
-            .convert!
-            .transcription!
-            .region!;
-        const authSession = await fetchAuthSession();
-        const credentials = authSession.credentials!;
-        const config: TranscribeStreamingClientConfig = {
-            region: region,
-            credentials: {
-                accessKeyId: credentials.accessKeyId,
-                secretAccessKey: credentials.secretAccessKey,
-                sessionToken: credentials.sessionToken,
-            },
-        };
-        const transcribeClient = new TranscribeStreamingClient(config);
-        speechTranscriber.current = new SpeechTranscriber(transcribeClient, onTranscription);
-        setIsLoading(false);
-        
-    }
-
-    
-    useEffect(() => {
-        // noinspection JSIgnoredPromiseFromCall
-        loadClient();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    async function toggleTranslation() {
-        if (speechTranscriber.current === null) {
-            throw new Error("SpeechTranscriber is not initialized");
-        }
-        if (targetLanguage === null) {
-            throw new Error("Target language is not set");
-        }
-        setIsTranslating(!isTranslating);
-        if (!isTranslating) {
-            await speechTranscriber.current.start(targetLanguage.transcribeCode);
-        } else {
-            await speechTranscriber.current.stop();
-        }
-    }
-
-    function setLanguage(language: Language) {
-        setTargetLanguage(language);
-        targetLanguageRef.current = language;
-    }
-
-    function setVoice(voiceId: string) {
-        setSelectedVoices(previousSelectedVoices => {
-            const newSelectedVoices = {...previousSelectedVoices};
-            newSelectedVoices[targetLanguage!.name] = targetLanguage!.ttsVoices.find(voice => voice.id === voiceId)!;
-            return newSelectedVoices;
-        });
-    }
-
-    function onTtsPlaying(playing: boolean) {
-        setTtsPlaying(playing);
-        speechTranscriber.current?.setMuted(playing);
     }
 
     return (
         <div className="bg-base-200 flex-1 flex flex-col md:flex-row p-4 gap-4 overflow-auto">
             <Controls
+                isLoggedIn={loggedIn}
                 isLoading={isLoading}
                 isTranslating={isTranslating}
                 onToggleTranslation={toggleTranslation}

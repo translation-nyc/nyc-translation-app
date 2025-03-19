@@ -1,10 +1,11 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import type {Language, Transcript, TtsVoice} from "../utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import TranscriptModal from "./TranscriptModal.tsx";
 
 export interface ControlsProps {
+    isLoggedIn: boolean;
     isLoading: boolean;
     isTranslating: boolean;
     onToggleTranslation: () => void;
@@ -18,10 +19,11 @@ export interface ControlsProps {
 
 function Controls(props: ControlsProps) {
     return (
-        <div className="w-full md:w-72 bg-base-100 rounded-lg shadow-lg p-6">
-            <div className="max-h-40 md:h-0 min-h-full overflow-auto">
+        <div className="w-full md:w-72 p-2 bg-base-100 rounded-lg shadow-lg">
+            <div className="max-h-40 md:h-0 min-h-full p-4 overflow-auto">
                 <div className="space-y-6">
                     <ToggleTranslationButton
+                        isLoggedIn={props.isLoggedIn}
                         isLoading={props.isLoading}
                         isTranslating={props.isTranslating}
                         onToggleTranslation={props.onToggleTranslation}
@@ -49,6 +51,7 @@ function Controls(props: ControlsProps) {
 }
 
 interface ToggleTranslationButtonProps {
+    isLoggedIn: boolean;
     isLoading: boolean;
     isTranslating: boolean;
     onToggleTranslation: () => void;
@@ -60,11 +63,13 @@ function ToggleTranslationButton(props: ToggleTranslationButtonProps) {
         <div className="flex justify-center">
             <button
                 className={`btn w-full ${props.isTranslating ? "btn-error" : "btn-success"}`}
-                disabled={props.isLoading || props.targetLanguage === null}
+                disabled={!props.isLoggedIn || props.isLoading || props.targetLanguage === null}
                 onClick={props.onToggleTranslation}
             >
                 {(() => {
-                    if (props.isLoading) {
+                    if (!props.isLoggedIn) {
+                        return "Please login";
+                    } else if (props.isLoading) {
                         return "Loading...";
                     } else if (props.targetLanguage === null) {
                         return "Select a language";
@@ -178,23 +183,47 @@ function ReviewButton(props: ReviewButtonProps) {
     ).join("\n\n");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    async function loadFonts() {
+        await import("../fonts/noto-arabic-normal.ts");
+        await import("../fonts/noto-chinese-normal.ts");
+        setFontsLoaded(true);
+    }
+
+    useEffect(() => {
+        // noinspection JSIgnoredPromiseFromCall
+        loadFonts();
+    }, []);
+
+    function openModal() {
+        if (fontsLoaded && props.transcript.parts.length > 0) {
+            setIsModalOpen(true);
+        }
+    }
+
+    function closeModal() {
+        setIsModalOpen(false);
+    }
 
     return (
         <>
             <div>
                 <button
                     className="btn btn-primary w-full"
+                    disabled={!fontsLoaded || props.transcript.parts.length === 0}
                     onClick={openModal}
                 >
-                    Review
+                    {fontsLoaded ? "Review" : "Loading..."}
                 </button>
             </div>
 
             {isModalOpen && (
-                <TranscriptModal transcription={transcript} targetLanguage={props.targetLanguage} closeModal={closeModal}/>
+                <TranscriptModal
+                    transcription={transcript}
+                    targetLanguage={props.targetLanguage}
+                    closeModal={closeModal}
+                />
             )}
         </>
     );
