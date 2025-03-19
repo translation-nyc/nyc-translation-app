@@ -1,5 +1,5 @@
 import {a, type ClientSchema, defineData} from "@aws-amplify/backend";
-import {emailTranscript} from "../functions/emailTranscript/resource";
+import {emailTranscript} from "../functions/email-transcript/resource";
 
 const schema = a.schema({
     emailTranscript: a
