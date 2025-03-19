@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import type {Language, Transcript, TtsVoice} from "../utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
@@ -183,9 +183,21 @@ function ReviewButton(props: ReviewButtonProps) {
     ).join("\n\n");
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false);
+
+    async function loadFonts() {
+        await import("../fonts/noto-arabic-normal.ts");
+        await import("../fonts/noto-chinese-normal.ts");
+        setFontsLoaded(true);
+    }
+
+    useEffect(() => {
+        // noinspection JSIgnoredPromiseFromCall
+        loadFonts();
+    }, []);
 
     function openModal() {
-        if (props.transcript.parts.length > 0) {
+        if (fontsLoaded && props.transcript.parts.length > 0) {
             setIsModalOpen(true);
         }
     }
@@ -199,15 +211,19 @@ function ReviewButton(props: ReviewButtonProps) {
             <div>
                 <button
                     className="btn btn-primary w-full"
-                    disabled={props.transcript.parts.length === 0}
+                    disabled={!fontsLoaded || props.transcript.parts.length === 0}
                     onClick={openModal}
                 >
-                    Review
+                    {fontsLoaded ? "Review" : "Loading..."}
                 </button>
             </div>
 
             {isModalOpen && (
-                <TranscriptModal transcription={transcript} targetLanguage={props.targetLanguage} closeModal={closeModal}/>
+                <TranscriptModal
+                    transcription={transcript}
+                    targetLanguage={props.targetLanguage}
+                    closeModal={closeModal}
+                />
             )}
         </>
     );
