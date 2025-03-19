@@ -67,16 +67,13 @@ function TranscriptModal(props: TranscriptModalProps) {
 
         try {
             const base64PDF = getBase64();
-
-            const g = await client.queries.emailTranscript({
+            const response = await client.queries.emailTranscript({
                 email: email,
                 pdf: base64PDF,
             });
-
-            console.log(g.data);
-
+            console.log(response.data);
         } catch (error) {
-            console.error("Error sending email:", error);
+            console.error("Error sending email: ", error);
             alert(error);
         }
     }
