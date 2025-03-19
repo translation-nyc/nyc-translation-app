@@ -20,11 +20,13 @@ export const auth = defineAuth({
             callbackUrls: [
                 "https://conversateapp.com",
                 "https://www.conversateapp.com",
+                "http://localhost:4173",
                 "http://localhost:5173",
             ],
             logoutUrls: [
                 "https://conversateapp.com",
                 "https://www.conversateapp.com",
+                "http://localhost:4173",
                 "http://localhost:5173",
             ],
         },
