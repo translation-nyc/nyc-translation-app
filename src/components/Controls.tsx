@@ -5,6 +5,7 @@ import {PlayIcon, StopIcon} from "../assets/icons";
 import TranscriptModal from "./TranscriptModal.tsx";
 
 export interface ControlsProps {
+    isLoggedIn: boolean;
     isLoading: boolean;
     isTranslating: boolean;
     onToggleTranslation: () => void;
@@ -22,6 +23,7 @@ function Controls(props: ControlsProps) {
             <div className="max-h-40 md:h-0 min-h-full overflow-auto">
                 <div className="space-y-6">
                     <ToggleTranslationButton
+                        isLoggedIn={props.isLoggedIn}
                         isLoading={props.isLoading}
                         isTranslating={props.isTranslating}
                         onToggleTranslation={props.onToggleTranslation}
@@ -49,6 +51,7 @@ function Controls(props: ControlsProps) {
 }
 
 interface ToggleTranslationButtonProps {
+    isLoggedIn: boolean;
     isLoading: boolean;
     isTranslating: boolean;
     onToggleTranslation: () => void;
@@ -60,11 +63,13 @@ function ToggleTranslationButton(props: ToggleTranslationButtonProps) {
         <div className="flex justify-center">
             <button
                 className={`btn w-full ${props.isTranslating ? "btn-error" : "btn-success"}`}
-                disabled={props.isLoading || props.targetLanguage === null}
+                disabled={!props.isLoggedIn || props.isLoading || props.targetLanguage === null}
                 onClick={props.onToggleTranslation}
             >
                 {(() => {
-                    if (props.isLoading) {
+                    if (!props.isLoggedIn) {
+                        return "Please login";
+                    } else if (props.isLoading) {
                         return "Loading...";
                     } else if (props.targetLanguage === null) {
                         return "Select a language";
@@ -179,14 +184,22 @@ function ReviewButton(props: ReviewButtonProps) {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    function openModal() {
+        if (props.transcript.parts.length > 0) {
+            setIsModalOpen(true);
+        }
+    }
+
+    function closeModal() {
+        setIsModalOpen(false);
+    }
 
     return (
         <>
             <div>
                 <button
                     className="btn btn-primary w-full"
+                    disabled={props.transcript.parts.length === 0}
                     onClick={openModal}
                 >
                     Review
