@@ -188,6 +188,8 @@ function ReviewButton(props: ReviewButtonProps) {
     async function loadFonts() {
         await import("../fonts/noto-arabic-normal.ts");
         await import("../fonts/noto-chinese-normal.ts");
+        await import("../fonts/noto-japanese-normal.ts");
+        await import("../fonts/notoKorean-normal.ts");
         setFontsLoaded(true);
     }
 
@@ -223,6 +225,7 @@ function ReviewButton(props: ReviewButtonProps) {
                     transcription={transcript}
                     targetLanguage={props.targetLanguage}
                     closeModal={closeModal}
+                    transcript={props.transcript}
                 />
             )}
         </>
