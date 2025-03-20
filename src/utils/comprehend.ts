@@ -4,6 +4,7 @@ import {Lambda} from '@aws-sdk/client-lambda';
 export interface KeyPhrase {
   Text: string,
   BeginOffset: number
+  EndOffset: number,
 }
 
 /**
