@@ -57,8 +57,6 @@ function TranscriptBox(props: TranscriptProps) {
                                 part.ambiguousWords.forEach((amb) => {
                                     ambiguousWordMap.set(amb.text, amb.alternateDefintion);
                                 });
-
-                                console.log(ambiguousWordMap);
                                 return (
                                     <div key={index} className={className}>
                                         <div className="flex flex-row">
