@@ -1,46 +1,77 @@
-import {useState} from "react";
-import {jsPDF} from "jspdf";
-import {fetchUserAttributes} from "aws-amplify/auth";
-import {client} from "../main";
-import type {Language} from "../utils/types.ts";
+import { useState } from "react";
+import { jsPDF } from "jspdf";
+import { fetchUserAttributes } from "aws-amplify/auth";
+import { client } from "../main";
+import type { Language, Transcript } from "../utils/types.ts";
 
 interface TranscriptModalProps {
     transcription: string;
     targetLanguage: Language | null;
     closeModal: () => void;
+    transcript: Transcript
 }
 
 function TranscriptModal(props: TranscriptModalProps) {
-    const [comments, setComments] = useState<{ text: string; index: number }[]>([]);
+    const [comments, setComments] = useState<{ text: string; index: number; partIndex: number, isTranslated: boolean }[]>([]);
 
     const font = props.targetLanguage?.name === "Arabic"
         ? "notoArabic" : props.targetLanguage?.name === "Chinese"
-            ? "notoChinese" : "Helvetica";
+            ? "notoChinese" : props.targetLanguage?.name === "Russian"
+                ? "notoChinese" : props.targetLanguage?.name === "Japanese"
+                    ? "noto-japanese" : props.targetLanguage?.name === "Korean"
+                        ? "notoKorean" : "Helvetica";
 
-    function addComment(index: number) {
+    function addComment(index: number, partIndex: number, isTranslated: boolean) {
         const commentText = prompt("Enter your comment");
         if (commentText) {
-            setComments([...comments, {text: commentText, index}]);
+            setComments([...comments, { text: commentText, index, partIndex, isTranslated }]);
         }
     }
 
     function generatePDF() {
         const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth() - 20;
+        const pageHeight = doc.internal.pageSize.getHeight() - 20;
 
         doc.setFontSize(16);
         doc.text("Transcription with Comments", 10, 10);
 
         let fullTranscription = "";
 
-        transcriptionWords.forEach((word, index) => {
-            const comment = comments.find(comment => comment.index === index);
-            const text = comment ? `${word} [${comment.text}]` : word;
-            fullTranscription += text + " ";
-        });
+        props.transcript.parts.map((part, partIndex) => (
+            part.text.split(' ').forEach((word, index) => {
+                const comment = comments.find(comment => comment.index === index && comment.partIndex === partIndex && !comment.isTranslated);
+                const text = comment ? `${word} [${comment.text}]` : word
+                fullTranscription += text + ' ';
+            }),
+
+            fullTranscription += '\n',
+
+            part.translatedText.split(' ').forEach((word, index) => {
+                const comment = comments.find(comment => comment.index === index && comment.partIndex === partIndex && comment.isTranslated);
+                const text = comment ? `${word} [${comment.text}]` : word
+                fullTranscription += text + ' ';
+            }),
+
+            fullTranscription += '\n\n'
+
+        ));
 
         doc.setFont(font);
         doc.setFontSize(12);
-        doc.text(fullTranscription.trim(), 10, 20);
+
+        const lines = doc.splitTextToSize(fullTranscription.trim(), pageWidth)
+
+        let y = 20;
+
+        lines.forEach((line: string) => {
+            if (y + 10 > pageHeight) {
+                doc.addPage();
+                y = 10;
+            }
+            doc.text(line, 10, y);
+            y += 10;
+        });
 
         return doc;
     }
@@ -77,8 +108,6 @@ function TranscriptModal(props: TranscriptModalProps) {
             alert(error);
         }
     }
-
-    const transcriptionWords = props.transcription.split(" ");
 
     return (
         <div className="modal modal-open">
@@ -136,19 +165,36 @@ function TranscriptModal(props: TranscriptModalProps) {
                         </h3>
                         <div className="mt-2">
                             <div className="bg-base-200 p-4 rounded-md overflow-y-auto max-h-64">
-                                {transcriptionWords.map((word, index) => (
-                                    <span
-                                        key={index}
-                                        className="cursor-pointer"
-                                        onClick={() => addComment(index)}
-                                    >
-                                        {word}{" "}
-                                        {comments.filter(comment => comment.index === index).map((comment, commentIndex) => (
-                                            <span key={commentIndex} className="text-error italic">
-                                                [{comment.text}]{" "}
+                                {props.transcript.parts.map((part, partIndex) => (
+                                    <div key={partIndex} className="mb-2">
+                                        {part.text.split(' ').map((word, index) => (
+                                            <span
+                                                key={index}
+                                                className="cursor-pointer"
+                                                onClick={() => addComment(index, partIndex, false)}
+                                            >
+                                                {word}{' '}
+                                                {comments.filter(comment => comment.index === index && comment.partIndex === partIndex && !comment.isTranslated).map((comment, commentIndex) => (
+                                                    <span key={commentIndex} className="text-error italic">[{comment.text}] </span>
+                                                ))}
                                             </span>
                                         ))}
-                                    </span>
+
+                                        <div className="text-gray-400">
+                                            {part.translatedText.split(' ').map((word, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="cursor-pointer"
+                                                    onClick={() => addComment(index, partIndex, true)}
+                                                >
+                                                    {word}{' '}
+                                                    {comments.filter(comment => comment.index === index && comment.partIndex === partIndex && comment.isTranslated).map((comment, commentIndex) => (
+                                                        <span key={commentIndex} className="text-error italic">[{comment.text}] </span>
+                                                    ))}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         </div>
@@ -166,7 +212,7 @@ function TranscriptModal(props: TranscriptModalProps) {
                     </button>
                 </div>
             </div>
-            <div className="modal-backdrop" onClick={props.closeModal}/>
+            <div className="modal-backdrop" onClick={props.closeModal} />
         </div>
     );
 }
