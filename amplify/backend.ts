@@ -16,6 +16,7 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
             "transcribe:StartStreamTranscriptionWebSocket",
             "translate:TranslateText",
             "polly:SynthesizeSpeech",
+            "lambda:InvokeFunction"
         ],
         resources: ["*"],
     })
@@ -44,6 +45,10 @@ backend.addOutput({
                     proxy: false,
                     region: backend.auth.stack.region,
                 },
+                lambda: {
+                    proxy: false,
+                    region: backend.auth.stack.region,
+                }
             },
         },
     },

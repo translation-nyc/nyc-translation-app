@@ -1,5 +1,6 @@
 import type {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
 import type {VoiceId} from "@aws-sdk/client-polly";
+import {Phrase} from "./ambiguity-detection.ts";
 
 export interface Language {
     name: string;
@@ -20,6 +21,7 @@ export interface TranscriptPart {
     lastCompleteIndex: number;
     translatedText: string;
     translatedLanguage: Language;
+    ambiguousWords: Phrase[];
     lastCompleteTranslatedIndex: number;
 }
 

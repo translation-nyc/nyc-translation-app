@@ -5,6 +5,8 @@ import {HiMiniSpeakerWave} from "react-icons/hi2";
 import type {Transcript, TtsVoice} from "../utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
+import {Phrase} from "../utils/ambiguity-detection.ts";
+import {usePopup} from "./Popup.tsx";
 
 export interface TranscriptProps {
     transcript: Transcript;
@@ -15,6 +17,19 @@ export interface TranscriptProps {
 }
 
 function TranscriptBox(props: TranscriptProps) {
+    const { showPopup } = usePopup();
+
+    const showDisambiguationPopup = (e: React.MouseEvent, alternateDefintion:string) => {
+        showPopup(
+            <div>
+                <h3 className="card-title">Alternative Translation</h3>
+                <p className={'text-sm'}>This could also mean:</p>
+                <p>"{alternateDefintion}"</p>
+            </div>,
+            e.clientX,
+            e.clientY
+        );
+    };
     return (
         <div className="flex-1 bg-base-100 rounded-lg shadow-lg p-4">
             <div className="w-full h-full relative">
@@ -38,6 +53,11 @@ function TranscriptBox(props: TranscriptProps) {
                                     showPlayIconFirst = true;
                                     showPlayIconSecond = false;
                                 }
+                                const ambiguity = addAmbiguityInformation(part.ambiguousWords, part.translatedText).split('*');
+                                const ambiguousWordMap = new Map();
+                                part.ambiguousWords.forEach((amb) => {
+                                    ambiguousWordMap.set(amb.text, amb.alternateDefintion);
+                                });
                                 return (
                                     <div key={index} className={className}>
                                         <div className="flex flex-row">
@@ -60,9 +80,16 @@ function TranscriptBox(props: TranscriptProps) {
                                                 onPlaying={props.onTtsPlaying}
                                                 visible={showPlayIconSecond}
                                             />
-                                            <p className="text-gray-400">
-                                                {part.translatedText}
-                                            </p>
+                                            {ambiguity.map((amb) => {
+                                                const ambText = amb.replace('(', '').replace(')', '');
+                                                const ambAlternateDefintion = ambiguousWordMap.get(ambText);
+                                                return (
+                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-accent" : "text-gray-400"} onClick={(e) => showDisambiguationPopup(e, ambAlternateDefintion)}>
+                                                    {amb}
+
+                                                </p>);
+                                            })}
+
                                         </div>
                                     </div>
                                 );
@@ -131,6 +158,23 @@ function PlayTtsButton(props: PlayTtsButtonProps) {
             onClick={toggleTts}
         />
     );
+}
+
+function addAmbiguityInformation(phrases: Phrase[], text: string): string {
+    let finalText = text;
+    for (const phrase of phrases) {
+        const index = text.indexOf(phrase.text);
+        const temp = split_at_index(finalText, index, false);
+        finalText = split_at_index(temp, index + phrase.text.length + 2, true);
+    }
+    return finalText;
+}
+function split_at_index(value:string, index:number, end:boolean) {
+    if (end){
+        return value.substring(0, index) + ")*" + value.substring(index);
+    }else{
+        return value.substring(0, index) + "*(" + value.substring(index);
+    }
 }
 
 export default TranscriptBox;

@@ -8,13 +8,14 @@ import {
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
-import type {Language, Transcript, TtsVoice} from "../utils/types.ts";
+import type {Language, Transcript, TranscriptPart, TtsVoice} from "../utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";
 import {translate} from "../utils/translation.ts";
 import {getCurrentUser} from "aws-amplify/auth";
+import {detectAmbiguity, Phrase} from "../utils/ambiguity-detection.ts";
 
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
@@ -32,7 +33,6 @@ function TranscriptionInterface() {
             {},
         )
     );
-
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
         lastLanguageCode: LanguageCode.EN_GB,
@@ -142,6 +142,18 @@ function TranscriptionInterface() {
         }
 
         const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
+        const tempPart:TranscriptPart = {
+            ambiguousWords: [],
+            language: language,
+            lastCompleteIndex: 0,
+            lastCompleteTranslatedIndex: 0,
+            lastResultId: "",
+            text: "",
+            translatedLanguage: otherLanguage,
+            translatedText: translated
+        };
+        const ambiguity:Phrase[] = await detectAmbiguity([tempPart]);
+
 
         setTranscript(previousTranscript => {
             const newTranscriptParts = [...previousTranscript.parts];
@@ -159,6 +171,7 @@ function TranscriptionInterface() {
                     translatedText: translated,
                     translatedLanguage: otherLanguage,
                     lastCompleteTranslatedIndex: 0,
+                    ambiguousWords: ambiguity
                 });
             } else {
                 const lastIndex = newTranscriptParts.length - 1;
@@ -169,6 +182,7 @@ function TranscriptionInterface() {
                         // Same language
                         const lastCompleteText = lastPart.text.slice(0, lastPart.lastCompleteIndex);
                         const lastCompleteTranslatedText = lastPart.translatedText.slice(0, lastPart.lastCompleteTranslatedIndex);
+
                         newTranscriptParts[lastIndex] = {
                             text: lastCompleteText + " " + transcriptPartText,
                             language: language,
@@ -177,6 +191,7 @@ function TranscriptionInterface() {
                             translatedText: lastCompleteTranslatedText + " " + translated,
                             translatedLanguage: otherLanguage,
                             lastCompleteTranslatedIndex: lastPart.lastCompleteTranslatedIndex,
+                            ambiguousWords: lastPart.ambiguousWords,
                         };
                     } else {
                         // Different language
@@ -194,6 +209,7 @@ function TranscriptionInterface() {
                                     translatedText: lastLastPart.translatedText + " " + translated,
                                     translatedLanguage: otherLanguage,
                                     lastCompleteTranslatedIndex: lastLastPart.lastCompleteTranslatedIndex,
+                                    ambiguousWords: lastPart.ambiguousWords
                                 };
                             } else {
                                 newTranscriptParts[0] = {
@@ -204,6 +220,7 @@ function TranscriptionInterface() {
                                     translatedText: translated,
                                     translatedLanguage: otherLanguage,
                                     lastCompleteTranslatedIndex: 0,
+                                    ambiguousWords: ambiguity
                                 };
                             }
                         } else {
@@ -217,6 +234,7 @@ function TranscriptionInterface() {
                                 translatedText: lastCompleteTranslatedText,
                                 translatedLanguage: lastPart.translatedLanguage,
                                 lastCompleteTranslatedIndex: lastPart.lastCompleteTranslatedIndex,
+                                ambiguousWords: lastPart.ambiguousWords,
                             };
                             newTranscriptParts.push({
                                 text: transcriptPartText,
@@ -226,6 +244,7 @@ function TranscriptionInterface() {
                                 translatedText: translated,
                                 translatedLanguage: otherLanguage,
                                 lastCompleteTranslatedIndex: 0,
+                                ambiguousWords: ambiguity
                             });
                         }
                     }
@@ -239,6 +258,7 @@ function TranscriptionInterface() {
                         translatedText: lastPart.translatedText + " " + translated,
                         translatedLanguage: otherLanguage,
                         lastCompleteTranslatedIndex: lastPart.translatedText.length,
+                        ambiguousWords: lastPart.ambiguousWords.concat(ambiguity),
                     };
                 }
             }
