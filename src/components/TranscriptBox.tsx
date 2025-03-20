@@ -22,7 +22,7 @@ function TranscriptBox(props: TranscriptProps) {
     const showDisambiguationPopup = (e: React.MouseEvent, alternateDefintion:string) => {
         showPopup(
             <div>
-                <h3 className="card-title">Alternate Definition</h3>
+                <h3 className="card-title">Alternative Translation</h3>
                 <p className={'text-sm'}>This could also mean:</p>
                 <p>"{alternateDefintion}"</p>
             </div>,
