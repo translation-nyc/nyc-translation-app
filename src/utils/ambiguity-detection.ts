@@ -4,7 +4,8 @@ import { TranscriptPart } from "./types";
 
 export interface Phrase {
     text: string,
-    offset: number,
+    beginOffset: number,
+    endOffset: number,
     alternateDefintion: string
 }
 
@@ -25,12 +26,13 @@ export const detectAmbiguity = async (transcript: TranscriptPart[]) => {
             if (!translateKPSet.includes(backTranslatedPhrase.toLowerCase())) {
                 const ambiguousWord: Phrase = {
                     text: phrase,
-                    offset: tPhrase.BeginOffset,
+                    beginOffset: tPhrase.BeginOffset,
+                    endOffset: tPhrase.EndOffset,
                     alternateDefintion: backTranslatedPhrase
                 };
                 let exists = false;
                 for (const amb of ambiguousWords) {
-                    if(amb.text === ambiguousWord.text && amb.offset === ambiguousWord.offset) {
+                    if(amb.text === ambiguousWord.text && amb.beginOffset === ambiguousWord.beginOffset) {
                         exists = true;
                     }
                 }
