@@ -6,6 +6,7 @@ import type {Transcript, TtsVoice} from "../utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
 import {Phrase} from "../utils/ambiguity-detection.ts";
+import {usePopup} from "./Popup.tsx";
 
 export interface TranscriptProps {
     transcript: Transcript;
@@ -16,7 +17,19 @@ export interface TranscriptProps {
 }
 
 function TranscriptBox(props: TranscriptProps) {
-    console.log(props.transcript.parts.forEach(x=>x.ambiguousWords));
+    const { showPopup } = usePopup();
+
+    const handleButtonClick = (e: React.MouseEvent, alternateDefintion:string) => {
+        console.log(alternateDefintion);
+        showPopup(
+            <div>
+                <h3 className="">Alternate Definition</h3>
+                <p>This could also mean: {alternateDefintion}</p>
+            </div>,
+            e.clientX,
+            e.clientY
+        );
+    };
     return (
         <div className="flex-1 bg-base-100 rounded-lg shadow-lg p-4">
             <div className="w-full h-full relative">
@@ -42,9 +55,10 @@ function TranscriptBox(props: TranscriptProps) {
                                 }
                                 const ambiguity = addAmbiguityInformation(part.ambiguousWords, part.translatedText).split('*');
                                 const ambiguousWordMap = new Map();
-                                ambiguity.forEach((word, index) => {
-                                    ambiguousWordMap.set(index, word);
+                                part.ambiguousWords.forEach((amb) => {
+                                    ambiguousWordMap.set(amb.text, amb.alternateDefintion);
                                 });
+
                                 console.log(ambiguousWordMap);
                                 return (
                                     <div key={index} className={className}>
@@ -69,10 +83,13 @@ function TranscriptBox(props: TranscriptProps) {
                                                 visible={showPlayIconSecond}
                                             />
                                             {ambiguity.map((amb) => {
-                                                console.log(ambiguity.indexOf(amb));
+                                                const ambText = amb.replace('(', '').replace(')', '');
+                                                const ambAlternateDefintion = ambiguousWordMap.get(ambText);
+                                                console.log(ambText);
                                                 return (
-                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-blue-500" : "text-gray-400"}>
+                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-blue-500" : "text-gray-400"} onClick={(e) => handleButtonClick(e, ambAlternateDefintion)}>
                                                     {amb}
+
                                                 </p>);
                                             })}
 
@@ -150,13 +167,19 @@ function addAmbiguityInformation(phrases: Phrase[], text: string): string {
     console.log(phrases);
     let finalText = text;
     for (const phrase of phrases) {
-        finalText = split_at_index(finalText, phrase.offset);
+        const index = text.indexOf(phrase.text);
+        const temp = split_at_index(finalText, index, false);
+        finalText = split_at_index(temp, index + phrase.text.length + 2, true);
     }
     console.log(finalText);
     return finalText;
 }
-function split_at_index(value:string, index:number) {
-    return value.substring(0, index) + "*" + value.substring(index);
+function split_at_index(value:string, index:number, end:boolean) {
+    if (end){
+        return value.substring(0, index) + ")*" + value.substring(index);
+    }else{
+        return value.substring(0, index) + "*(" + value.substring(index);
+    }
 }
 
 export default TranscriptBox;

@@ -15,7 +15,7 @@ import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";
 import {translate} from "../utils/translation.ts";
 import {getCurrentUser} from "aws-amplify/auth";
-import { detectAmbiguity } from "../utils/ambiguity-detection.ts";
+import {detectAmbiguity, Phrase} from "../utils/ambiguity-detection.ts";
 
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
@@ -142,17 +142,17 @@ function TranscriptionInterface() {
         }
 
         const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
-        const tempPart : TranscriptPart = {
+        const tempPart:TranscriptPart = {
+            ambiguousWords: [],
             language: language,
             lastCompleteIndex: 0,
             lastCompleteTranslatedIndex: 0,
             lastResultId: "",
-            text: transcriptPartText,
+            text: "",
             translatedLanguage: otherLanguage,
-            translatedText: translated,
-            ambiguousWords: []
+            translatedText: translated
         };
-        const amb = await detectAmbiguity([tempPart]);
+        const amb:Phrase[] = await detectAmbiguity([tempPart]);
 
 
         setTranscript(previousTranscript => {
@@ -182,6 +182,7 @@ function TranscriptionInterface() {
                         // Same language
                         const lastCompleteText = lastPart.text.slice(0, lastPart.lastCompleteIndex);
                         const lastCompleteTranslatedText = lastPart.translatedText.slice(0, lastPart.lastCompleteTranslatedIndex);
+
                         newTranscriptParts[lastIndex] = {
                             text: lastCompleteText + " " + transcriptPartText,
                             language: language,
@@ -190,7 +191,7 @@ function TranscriptionInterface() {
                             translatedText: lastCompleteTranslatedText + " " + translated,
                             translatedLanguage: otherLanguage,
                             lastCompleteTranslatedIndex: lastPart.lastCompleteTranslatedIndex,
-                            ambiguousWords: amb
+                            ambiguousWords: lastPart.ambiguousWords,
                         };
                     } else {
                         // Different language
@@ -208,7 +209,7 @@ function TranscriptionInterface() {
                                     translatedText: lastLastPart.translatedText + " " + translated,
                                     translatedLanguage: otherLanguage,
                                     lastCompleteTranslatedIndex: lastLastPart.lastCompleteTranslatedIndex,
-                                    ambiguousWords: amb
+                                    ambiguousWords: lastPart.ambiguousWords
                                 };
                             } else {
                                 newTranscriptParts[0] = {
@@ -233,7 +234,7 @@ function TranscriptionInterface() {
                                 translatedText: lastCompleteTranslatedText,
                                 translatedLanguage: lastPart.translatedLanguage,
                                 lastCompleteTranslatedIndex: lastPart.lastCompleteTranslatedIndex,
-                                ambiguousWords: amb
+                                ambiguousWords: lastPart.ambiguousWords,
                             };
                             newTranscriptParts.push({
                                 text: transcriptPartText,
@@ -249,6 +250,12 @@ function TranscriptionInterface() {
                     }
                 } else {
                     // New transcription in the same language
+                    // const lastPartAmbiguousWords: Phrase[] = lastPart.ambiguousWords;
+                    // let sameLanguageAmb = amb.map(x=>{
+                    //     x.offset = x.offset + lastPart.translatedText.length;
+                    //     return x;
+                    // });
+                    //sameLanguageAmb = sameLanguageAmb.concat(lastPartAmbiguousWords);
                     newTranscriptParts[lastIndex] = {
                         text: lastPart.text + " " + transcriptPartText,
                         language: language,
@@ -257,7 +264,7 @@ function TranscriptionInterface() {
                         translatedText: lastPart.translatedText + " " + translated,
                         translatedLanguage: otherLanguage,
                         lastCompleteTranslatedIndex: lastPart.translatedText.length,
-                        ambiguousWords: amb
+                        ambiguousWords: lastPart.ambiguousWords.concat(amb),
                     };
                 }
             }
