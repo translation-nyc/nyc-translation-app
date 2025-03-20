@@ -152,7 +152,7 @@ function TranscriptionInterface() {
             translatedLanguage: otherLanguage,
             translatedText: translated
         };
-        const amb:Phrase[] = await detectAmbiguity([tempPart]);
+        const ambiguity:Phrase[] = await detectAmbiguity([tempPart]);
 
 
         setTranscript(previousTranscript => {
@@ -171,7 +171,7 @@ function TranscriptionInterface() {
                     translatedText: translated,
                     translatedLanguage: otherLanguage,
                     lastCompleteTranslatedIndex: 0,
-                    ambiguousWords: amb
+                    ambiguousWords: ambiguity
                 });
             } else {
                 const lastIndex = newTranscriptParts.length - 1;
@@ -220,7 +220,7 @@ function TranscriptionInterface() {
                                     translatedText: translated,
                                     translatedLanguage: otherLanguage,
                                     lastCompleteTranslatedIndex: 0,
-                                    ambiguousWords: amb
+                                    ambiguousWords: ambiguity
                                 };
                             }
                         } else {
@@ -244,18 +244,12 @@ function TranscriptionInterface() {
                                 translatedText: translated,
                                 translatedLanguage: otherLanguage,
                                 lastCompleteTranslatedIndex: 0,
-                                ambiguousWords: amb
+                                ambiguousWords: ambiguity
                             });
                         }
                     }
                 } else {
                     // New transcription in the same language
-                    // const lastPartAmbiguousWords: Phrase[] = lastPart.ambiguousWords;
-                    // let sameLanguageAmb = amb.map(x=>{
-                    //     x.offset = x.offset + lastPart.translatedText.length;
-                    //     return x;
-                    // });
-                    //sameLanguageAmb = sameLanguageAmb.concat(lastPartAmbiguousWords);
                     newTranscriptParts[lastIndex] = {
                         text: lastPart.text + " " + transcriptPartText,
                         language: language,
@@ -264,7 +258,7 @@ function TranscriptionInterface() {
                         translatedText: lastPart.translatedText + " " + translated,
                         translatedLanguage: otherLanguage,
                         lastCompleteTranslatedIndex: lastPart.translatedText.length,
-                        ambiguousWords: lastPart.ambiguousWords.concat(amb),
+                        ambiguousWords: lastPart.ambiguousWords.concat(ambiguity),
                     };
                 }
             }

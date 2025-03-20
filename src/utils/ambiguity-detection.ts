@@ -42,7 +42,6 @@ export const detectAmbiguity = async (transcript: TranscriptPart[]) => {
             }
         }
     }
-    console.log(ambiguousWords);
     return ambiguousWords;
 
 };

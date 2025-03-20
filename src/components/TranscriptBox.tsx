@@ -19,8 +19,7 @@ export interface TranscriptProps {
 function TranscriptBox(props: TranscriptProps) {
     const { showPopup } = usePopup();
 
-    const handleButtonClick = (e: React.MouseEvent, alternateDefintion:string) => {
-        console.log(alternateDefintion);
+    const showDisambiguationPopup = (e: React.MouseEvent, alternateDefintion:string) => {
         showPopup(
             <div>
                 <h3 className="">Alternate Definition</h3>
@@ -85,9 +84,8 @@ function TranscriptBox(props: TranscriptProps) {
                                             {ambiguity.map((amb) => {
                                                 const ambText = amb.replace('(', '').replace(')', '');
                                                 const ambAlternateDefintion = ambiguousWordMap.get(ambText);
-                                                console.log(ambText);
                                                 return (
-                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-blue-500" : "text-gray-400"} onClick={(e) => handleButtonClick(e, ambAlternateDefintion)}>
+                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-blue-500" : "text-gray-400"} onClick={(e) => showDisambiguationPopup(e, ambAlternateDefintion)}>
                                                     {amb}
 
                                                 </p>);
@@ -164,14 +162,12 @@ function PlayTtsButton(props: PlayTtsButtonProps) {
 }
 
 function addAmbiguityInformation(phrases: Phrase[], text: string): string {
-    console.log(phrases);
     let finalText = text;
     for (const phrase of phrases) {
         const index = text.indexOf(phrase.text);
         const temp = split_at_index(finalText, index, false);
         finalText = split_at_index(temp, index + phrase.text.length + 2, true);
     }
-    console.log(finalText);
     return finalText;
 }
 function split_at_index(value:string, index:number, end:boolean) {
