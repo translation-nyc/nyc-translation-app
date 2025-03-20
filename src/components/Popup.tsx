@@ -57,7 +57,7 @@ export const PopupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             {popupState.isVisible && (
                 <div
                     ref={popupRef}
-                    className="fixed bg-white border border-gray-200 rounded shadow-md p-4 z-50"
+                    className="fixed border bg-accent border-gray-400 rounded shadow-md p-4 z-50 card"
                     style={{
                         left: `${popupState.position.x}px`,
                         top: `${popupState.position.y}px`,

@@ -22,8 +22,9 @@ function TranscriptBox(props: TranscriptProps) {
     const showDisambiguationPopup = (e: React.MouseEvent, alternateDefintion:string) => {
         showPopup(
             <div>
-                <h3 className="">Alternate Definition</h3>
-                <p>This could also mean: {alternateDefintion}</p>
+                <h3 className="card-title">Alternate Definition</h3>
+                <p className={'text-sm'}>This could also mean:</p>
+                <p>"{alternateDefintion}"</p>
             </div>,
             e.clientX,
             e.clientY
@@ -83,7 +84,7 @@ function TranscriptBox(props: TranscriptProps) {
                                                 const ambText = amb.replace('(', '').replace(')', '');
                                                 const ambAlternateDefintion = ambiguousWordMap.get(ambText);
                                                 return (
-                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-blue-500" : "text-gray-400"} onClick={(e) => showDisambiguationPopup(e, ambAlternateDefintion)}>
+                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-accent" : "text-gray-400"} onClick={(e) => showDisambiguationPopup(e, ambAlternateDefintion)}>
                                                     {amb}
 
                                                 </p>);
