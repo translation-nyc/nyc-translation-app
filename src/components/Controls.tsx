@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import type {Language, Transcript, TtsVoice} from "../../amplify/utils/types.ts";
-import {Languages} from "../utils/languages.ts";
+import type {Font, Language, Transcript, TtsVoice} from "../../amplify/utils/types.ts";
+import {Languages} from "../../amplify/utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import TranscriptModal from "./TranscriptModal.tsx";
 
@@ -184,12 +184,20 @@ function ReviewButton(props: ReviewButtonProps) {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fontsLoaded, setFontsLoaded] = useState(false);
+    const [fonts, setFonts] = useState<Record<string, Font>>({});
 
     async function loadFonts() {
-        await import("../../amplify/fonts/noto-arabic-normal");
-        await import("../../amplify/fonts/noto-chinese-normal");
-        await import("../../amplify/fonts/noto-japanese-normal");
-        await import("../../amplify/fonts/noto-korean-normal");
+        const {notoArabic} = await import("../../amplify/fonts/noto-arabic-normal");
+        const {notoChinese} = await import("../../amplify/fonts/noto-chinese-normal");
+        const {notoJapanese} = await import("../../amplify/fonts/noto-japanese-normal");
+        const {notoKorean} = await import("../../amplify/fonts/noto-korean-normal");
+        const newFonts = {
+            notoArabic,
+            notoChinese,
+            notoJapanese,
+            notoKorean,
+        };
+        setFonts(newFonts);
         setFontsLoaded(true);
     }
 
@@ -221,9 +229,9 @@ function ReviewButton(props: ReviewButtonProps) {
             {isModalOpen && (
                 <TranscriptModal
                     transcription={transcript}
-                    targetLanguage={props.targetLanguage}
                     closeModal={closeModal}
                     transcript={props.transcript}
+                    fonts={fonts}
                 />
             )}
         </>

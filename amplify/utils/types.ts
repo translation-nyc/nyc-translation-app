@@ -48,3 +48,8 @@ export interface Phrase {
     endOffset: number;
     alternateDefinition: string;
 }
+
+export interface Font {
+    name: string;
+    base64: string;
+}

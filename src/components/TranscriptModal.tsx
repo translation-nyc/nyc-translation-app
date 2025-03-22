@@ -1,39 +1,19 @@
 import {useState} from "react";
 import {jsPDF} from "jspdf";
 import {client} from "../main";
-import type {BaseTranscriptPart, Language, Transcript, TranscriptComment} from "../../amplify/utils/types.ts";
+import type {BaseTranscriptPart, Font, Transcript, TranscriptComment} from "../../amplify/utils/types.ts";
 import {createPdf} from "../../amplify/utils/transcript-pdf.ts";
+import {Languages} from "../../amplify/utils/languages.ts";
 
 export interface TranscriptModalProps {
     transcription: string;
-    targetLanguage: Language | null;
     closeModal: () => void;
     transcript: Transcript;
+    fonts: Record<string, Font>;
 }
 
 function TranscriptModal(props: TranscriptModalProps) {
     const [comments, setComments] = useState<TranscriptComment[]>([]);
-
-    let font = "";
-    switch (props.targetLanguage?.name) {
-        case "Arabic":
-            font = "noto-arabic";
-            break;
-        case "Chinese":
-            font = "noto-chinese";
-            break;
-        case "Russian":
-            font = "noto-chinese";
-            break;
-        case "Japanese":
-            font = "noto-japanese";
-            break;
-        case "Korean":
-            font = "noto-korean";
-            break;
-        default:
-            font = "Helvetica";
-    }
 
     function addComment(index: number, partIndex: number, isTranslated: boolean) {
         const commentText = prompt("Enter your comment");
@@ -42,7 +22,23 @@ function TranscriptModal(props: TranscriptModalProps) {
         }
     }
 
-    function generatePdf(): jsPDF {
+    async function generatePdf(): Promise<jsPDF> {
+        const languageCode = props.transcript.lastTargetLanguageCode;
+        let font: Font | undefined;
+        if (languageCode === Languages.ARABIC.transcribeCode) {
+            font = props.fonts.notoArabic;
+        } else if (languageCode === Languages.CHINESE.transcribeCode
+            || languageCode === Languages.RUSSIAN.transcribeCode
+        ) {
+            font = props.fonts.notoChinese;
+        } else if (languageCode === Languages.JAPANESE.transcribeCode) {
+            font = props.fonts.notoJapanese;
+        } else if (languageCode === Languages.KOREAN.transcribeCode) {
+            font = props.fonts.notoKorean;
+        } else {
+            font = undefined;
+        }
+
         return createPdf(
             props.transcript.parts,
             comments,
@@ -50,8 +46,8 @@ function TranscriptModal(props: TranscriptModalProps) {
         );
     }
 
-    function downloadPDF() {
-        const pdf = generatePdf();
+    async function downloadPDF() {
+        const pdf = await generatePdf();
         pdf.save("transcript.pdf");
     }
 
@@ -64,7 +60,7 @@ function TranscriptModal(props: TranscriptModalProps) {
             const response = await client.queries.emailTranscript({
                 transcriptParts: JSON.stringify(transcriptParts),
                 comments: JSON.stringify(comments),
-                font: font,
+                languageCode: props.transcript.lastTargetLanguageCode ?? "",
             });
             console.log(response.data);
         } catch (error) {

@@ -7,7 +7,7 @@ const schema = a.schema({
         .arguments({
             transcriptParts: a.json().required(),
             comments: a.json().required(),
-            font: a.string().required(),
+            languageCode: a.string().required(),
         })
         .returns(a.json().required())
         .handler(a.handler.function(emailTranscript))

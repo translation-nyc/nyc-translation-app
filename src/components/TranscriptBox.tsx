@@ -3,7 +3,7 @@ import type {VoiceId} from "@aws-sdk/client-polly";
 import {BsMicMuteFill} from "react-icons/bs";
 import {HiMiniSpeakerWave} from "react-icons/hi2";
 import type {Phrase, Transcript, TtsVoice} from "../../amplify/utils/types.ts";
-import {Languages} from "../utils/languages.ts";
+import {Languages} from "../../amplify/utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
 import {usePopup} from "./Popup.tsx";
 

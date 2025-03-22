@@ -9,7 +9,7 @@ import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
 import type {Language, Transcript, TranscriptPart, TtsVoice} from "../../amplify/utils/types.ts";
-import {Languages} from "../utils/languages.ts";
+import {Languages} from "../../amplify/utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";

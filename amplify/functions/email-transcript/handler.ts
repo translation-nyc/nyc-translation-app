@@ -2,12 +2,13 @@ import {CognitoIdentityProvider} from "@aws-sdk/client-cognito-identity-provider
 import {SendRawEmailCommand, SES} from "@aws-sdk/client-ses";
 import {createTransport} from "nodemailer";
 import type {Schema} from "../../data/resource";
-import type {BaseTranscriptPart, TranscriptComment} from "../../utils/types";
+import type {BaseTranscriptPart, Font, TranscriptComment} from "../../utils/types";
+import {Languages} from "../../utils/languages";
 import {createPdf} from "../../utils/transcript-pdf";
-import "../../fonts/noto-arabic-normal";
-import "../../fonts/noto-chinese-normal";
-import "../../fonts/noto-japanese-normal";
-import "../../fonts/noto-korean-normal";
+import {notoArabic} from "../../fonts/noto-arabic-normal";
+import {notoChinese} from "../../fonts/noto-chinese-normal";
+import {notoJapanese} from "../../fonts/noto-japanese-normal";
+import {notoKorean} from "../../fonts/noto-korean-normal";
 
 const cognito = new CognitoIdentityProvider();
 const emailTransporter = createTransport({
@@ -38,7 +39,26 @@ export const handler: Schema["emailTranscript"]["functionHandler"] = async (even
         }
         const transcriptParts = event.arguments.transcriptParts as BaseTranscriptPart[];
         const comments = event.arguments.comments as TranscriptComment[];
-        const font = event.arguments.font;
+        const languageCode = event.arguments.languageCode;
+
+        let font: Font | undefined;
+        switch (languageCode) {
+            case Languages.ARABIC.transcribeCode:
+                font = notoArabic;
+                break;
+            case Languages.CHINESE.transcribeCode:
+            case Languages.RUSSIAN.transcribeCode:
+                font = notoChinese;
+                break;
+            case Languages.JAPANESE.transcribeCode:
+                font = notoJapanese;
+                break;
+            case Languages.KOREAN.transcribeCode:
+                font = notoKorean;
+                break;
+            default:
+                font = undefined;
+        }
 
         const pdf = createPdf(transcriptParts, comments, font);
         const pdfBase64 = pdf.output("datauristring").split(",")[1];

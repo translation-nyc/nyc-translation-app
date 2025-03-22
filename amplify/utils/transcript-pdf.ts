@@ -1,10 +1,10 @@
 import {jsPDF} from "jspdf";
-import type {BaseTranscriptPart, TranscriptComment} from "./types";
+import type {BaseTranscriptPart, Font, TranscriptComment} from "./types";
 
 export function createPdf(
     transcriptParts: BaseTranscriptPart[],
     comments: TranscriptComment[],
-    font: string,
+    font?: Font,
 ): jsPDF {
     const pdf = new jsPDF();
     const pageWidth = pdf.internal.pageSize.getWidth() - 20;
@@ -40,7 +40,13 @@ export function createPdf(
         fullTranscription += "\n\n";
     });
 
-    pdf.setFont(font);
+    if (font !== undefined) {
+        const filename = `${font.name}.ttf`;
+        pdf.addFileToVFS(filename, font.base64);
+        pdf.addFont(filename, font.name, "normal");
+        pdf.setFont(font.name);
+    }
+
     pdf.setFontSize(12);
 
     const lines = pdf.splitTextToSize(fullTranscription.trim(), pageWidth) as string[];
