@@ -1,25 +1,45 @@
-import { useState } from "react";
-import { jsPDF } from "jspdf";
-import { fetchUserAttributes } from "aws-amplify/auth";
-import { client } from "../main";
-import type { Language, Transcript } from "../utils/types.ts";
+import {useState} from "react";
+import {jsPDF} from "jspdf";
+import {client} from "../main";
+import type {Language, Transcript} from "../utils/types.ts";
 
-interface TranscriptModalProps {
+export interface TranscriptModalProps {
     transcription: string;
     targetLanguage: Language | null;
     closeModal: () => void;
-    transcript: Transcript
+    transcript: Transcript;
+}
+
+interface Comment {
+    text: string;
+    index: number;
+    partIndex: number;
+    isTranslated: boolean;
 }
 
 function TranscriptModal(props: TranscriptModalProps) {
-    const [comments, setComments] = useState<{ text: string; index: number; partIndex: number, isTranslated: boolean }[]>([]);
+    const [comments, setComments] = useState<Comment[]>([]);
 
-    const font = props.targetLanguage?.name === "Arabic"
-        ? "notoArabic" : props.targetLanguage?.name === "Chinese"
-            ? "notoChinese" : props.targetLanguage?.name === "Russian"
-                ? "notoChinese" : props.targetLanguage?.name === "Japanese"
-                    ? "noto-japanese" : props.targetLanguage?.name === "Korean"
-                        ? "notoKorean" : "Helvetica";
+    let font = "";
+    switch (props.targetLanguage?.name) {
+        case "Arabic":
+            font = "notoArabic";
+            break;
+        case "Chinese":
+            font = "notoChinese";
+            break;
+        case "Russian":
+            font = "notoChinese";
+            break;
+        case "Japanese":
+            font = "noto-japanese";
+            break;
+        case "Korean":
+            font = "notoKorean";
+            break;
+        default:
+            font = "Helvetica";
+    }
 
     function addComment(index: number, partIndex: number, isTranslated: boolean) {
         const commentText = prompt("Enter your comment");
@@ -34,33 +54,41 @@ function TranscriptModal(props: TranscriptModalProps) {
         const pageHeight = doc.internal.pageSize.getHeight() - 20;
 
         doc.setFontSize(16);
-        doc.text("Transcription with Comments", 10, 10);
+        doc.text("Transcript with comments", 10, 10);
 
         let fullTranscription = "";
+        const parts = props.transcript.parts;
+        for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            part.text.split(" ").forEach((word, index) => {
+                const comment = comments.find(comment =>
+                    comment.index === index
+                    && comment.partIndex === i
+                    && !comment.isTranslated
+                );
+                const text = comment ? `${word} [${comment.text}]` : word;
+                fullTranscription += text + " ";
+            });
 
-        props.transcript.parts.map((part, partIndex) => (
-            part.text.split(' ').forEach((word, index) => {
-                const comment = comments.find(comment => comment.index === index && comment.partIndex === partIndex && !comment.isTranslated);
-                const text = comment ? `${word} [${comment.text}]` : word
-                fullTranscription += text + ' ';
-            }),
+            fullTranscription += "\n";
 
-            fullTranscription += '\n',
+            part.translatedText.split(" ").forEach((word, index) => {
+                const comment = comments.find(comment =>
+                    comment.index === index
+                    && comment.partIndex === i
+                    && comment.isTranslated
+                );
+                const text = comment ? `${word} [${comment.text}]` : word;
+                fullTranscription += text + " ";
+            });
 
-            part.translatedText.split(' ').forEach((word, index) => {
-                const comment = comments.find(comment => comment.index === index && comment.partIndex === partIndex && comment.isTranslated);
-                const text = comment ? `${word} [${comment.text}]` : word
-                fullTranscription += text + ' ';
-            }),
-
-            fullTranscription += '\n\n'
-
-        ));
+            fullTranscription += "\n\n";
+        }
 
         doc.setFont(font);
         doc.setFontSize(12);
 
-        const lines = doc.splitTextToSize(fullTranscription.trim(), pageWidth)
+        const lines = doc.splitTextToSize(fullTranscription.trim(), pageWidth);
 
         let y = 20;
 
@@ -88,18 +116,9 @@ function TranscriptModal(props: TranscriptModalProps) {
     }
 
     async function emailTranscript() {
-        const user = await fetchUserAttributes();
-        const email = user.email;
-        if (email === undefined) {
-            console.error("User email is undefined");
-            alert("No email found");
-            return;
-        }
-
         try {
             const base64PDF = getBase64();
             const response = await client.queries.emailTranscript({
-                email: email,
                 pdf: base64PDF,
             });
             console.log(response.data);
@@ -167,29 +186,41 @@ function TranscriptModal(props: TranscriptModalProps) {
                             <div className="bg-base-200 p-4 rounded-md overflow-y-auto max-h-64">
                                 {props.transcript.parts.map((part, partIndex) => (
                                     <div key={partIndex} className="mb-2">
-                                        {part.text.split(' ').map((word, index) => (
+                                        {part.text.split(" ").map((word, index) => (
                                             <span
                                                 key={index}
                                                 className="cursor-pointer"
                                                 onClick={() => addComment(index, partIndex, false)}
                                             >
-                                                {word}{' '}
-                                                {comments.filter(comment => comment.index === index && comment.partIndex === partIndex && !comment.isTranslated).map((comment, commentIndex) => (
-                                                    <span key={commentIndex} className="text-error italic">[{comment.text}] </span>
+                                                {word}{" "}
+                                                {comments.filter(comment =>
+                                                    comment.index === index
+                                                    && comment.partIndex === partIndex
+                                                    && !comment.isTranslated
+                                                ).map((comment, commentIndex) => (
+                                                    <span key={commentIndex} className="text-error italic">
+                                                        [{comment.text}]{" "}
+                                                    </span>
                                                 ))}
                                             </span>
                                         ))}
 
                                         <div className="text-gray-400">
-                                            {part.translatedText.split(' ').map((word, index) => (
+                                            {part.translatedText.split(" ").map((word, index) => (
                                                 <span
                                                     key={index}
                                                     className="cursor-pointer"
                                                     onClick={() => addComment(index, partIndex, true)}
                                                 >
-                                                    {word}{' '}
-                                                    {comments.filter(comment => comment.index === index && comment.partIndex === partIndex && comment.isTranslated).map((comment, commentIndex) => (
-                                                        <span key={commentIndex} className="text-error italic">[{comment.text}] </span>
+                                                    {word}{" "}
+                                                    {comments.filter(comment =>
+                                                        comment.index === index
+                                                        && comment.partIndex === partIndex
+                                                        && comment.isTranslated
+                                                    ).map((comment, commentIndex) => (
+                                                        <span key={commentIndex} className="text-error italic">
+                                                            [{comment.text}]{" "}
+                                                        </span>
                                                     ))}
                                                 </span>
                                             ))}

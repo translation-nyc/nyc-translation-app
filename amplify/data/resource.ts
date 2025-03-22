@@ -5,7 +5,6 @@ const schema = a.schema({
     emailTranscript: a
         .query()
         .arguments({
-            email: a.string().required(),
             pdf: a.string().required(),
         })
         .returns(a.string().required())

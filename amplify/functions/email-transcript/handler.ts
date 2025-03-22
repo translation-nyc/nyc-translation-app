@@ -1,8 +1,10 @@
+import {CognitoIdentityProvider} from "@aws-sdk/client-cognito-identity-provider";
 import {SendRawEmailCommand, SES} from "@aws-sdk/client-ses";
 import {createTransport} from "nodemailer";
 import type {Schema} from "../../data/resource";
 
-const transporter = createTransport({
+const cognito = new CognitoIdentityProvider();
+const emailTransporter = createTransport({
     SES: {
         ses: new SES({
             region: process.env.AWS_REGION,
@@ -13,14 +15,27 @@ const transporter = createTransport({
     },
 });
 
+// noinspection JSUnusedGlobalSymbols
 export const handler: Schema["emailTranscript"]["functionHandler"] = async (event) => {
     try {
-        await transporter.sendMail({
+        const user = await cognito.getUser({
+            AccessToken: event.request.headers.authorization,
+        });
+        const email = user.UserAttributes
+            ?.find(attribute => attribute.Name === "email")
+            ?.Value;
+        if (email === undefined) {
+            return JSON.stringify({
+                status: "error",
+                error: "User does not have an email address",
+            });
+        }
+        await emailTransporter.sendMail({
             from: {
                 name: "Conversate",
                 address: "transcription@conversateapp.com",
             },
-            to: event.arguments.email,
+            to: email,
             subject: "Transcript",
             attachments: [
                 {
