@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
-import {CircleUser, Coffee, Contrast, Menu, Moon, Palette, Sparkles, Sun, ZoomIn, ZoomOut} from "lucide-react";
-import {useTheme} from "../hooks/useTheme";
-import Help from "./Help.tsx";
-import {ProfileIcon} from "../assets/icons";
 import {getCurrentUser, signInWithRedirect, signOut} from "aws-amplify/auth";
+import {CircleUser, Coffee, Contrast, Menu, Moon, Palette, Sparkles, Sun, ZoomIn, ZoomOut} from "lucide-react";
+import {useTheme} from "../hooks/use-theme";
+import {ProfileIcon} from "../assets/icons";
 import Alert from "./Alert";
+import Help from "./Help.tsx";
 
 // Define available themes with their icons
 const themeOptions = [
