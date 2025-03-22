@@ -2,6 +2,12 @@ import {CognitoIdentityProvider} from "@aws-sdk/client-cognito-identity-provider
 import {SendRawEmailCommand, SES} from "@aws-sdk/client-ses";
 import {createTransport} from "nodemailer";
 import type {Schema} from "../../data/resource";
+import type {BaseTranscriptPart, TranscriptComment} from "../../utils/types";
+import {createPdf} from "../../utils/transcript-pdf";
+import "../../fonts/noto-arabic-normal";
+import "../../fonts/noto-chinese-normal";
+import "../../fonts/noto-japanese-normal";
+import "../../fonts/noto-korean-normal";
 
 const cognito = new CognitoIdentityProvider();
 const emailTransporter = createTransport({
@@ -25,11 +31,18 @@ export const handler: Schema["emailTranscript"]["functionHandler"] = async (even
             ?.find(attribute => attribute.Name === "email")
             ?.Value;
         if (email === undefined) {
-            return JSON.stringify({
+            return {
                 status: "error",
                 error: "User does not have an email address",
-            });
+            };
         }
+        const transcriptParts = event.arguments.transcriptParts as BaseTranscriptPart[];
+        const comments = event.arguments.comments as TranscriptComment[];
+        const font = event.arguments.font;
+
+        const pdf = createPdf(transcriptParts, comments, font);
+        const pdfBase64 = pdf.output("datauristring").split(",")[1];
+
         await emailTransporter.sendMail({
             from: {
                 name: "Conversate",
@@ -40,17 +53,17 @@ export const handler: Schema["emailTranscript"]["functionHandler"] = async (even
             attachments: [
                 {
                     filename: "transcript.pdf",
-                    content: Buffer.from(event.arguments.pdf, "base64"),
+                    content: Buffer.from(pdfBase64, "base64"),
                 },
             ],
         });
-        return JSON.stringify({
+        return {
             status: "success",
-        });
+        };
     } catch (e) {
-        return JSON.stringify({
+        return {
             status: "error",
             error: e,
-        });
+        };
     }
 };

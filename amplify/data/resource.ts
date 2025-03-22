@@ -5,9 +5,11 @@ const schema = a.schema({
     emailTranscript: a
         .query()
         .arguments({
-            pdf: a.string().required(),
+            transcriptParts: a.json().required(),
+            comments: a.json().required(),
+            font: a.string().required(),
         })
-        .returns(a.string().required())
+        .returns(a.json().required())
         .handler(a.handler.function(emailTranscript))
         .authorization(allow => [allow.authenticated()]),
 });

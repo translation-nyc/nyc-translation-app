@@ -1,7 +1,8 @@
 import {useState} from "react";
 import {jsPDF} from "jspdf";
 import {client} from "../main";
-import type {Language, Transcript} from "../utils/types.ts";
+import type {BaseTranscriptPart, Language, Transcript, TranscriptComment} from "../../amplify/utils/types.ts";
+import {createPdf} from "../../amplify/utils/transcript-pdf.ts";
 
 export interface TranscriptModalProps {
     transcription: string;
@@ -10,15 +11,8 @@ export interface TranscriptModalProps {
     transcript: Transcript;
 }
 
-interface Comment {
-    text: string;
-    index: number;
-    partIndex: number;
-    isTranslated: boolean;
-}
-
 function TranscriptModal(props: TranscriptModalProps) {
-    const [comments, setComments] = useState<Comment[]>([]);
+    const [comments, setComments] = useState<TranscriptComment[]>([]);
 
     let font = "";
     switch (props.targetLanguage?.name) {
@@ -48,78 +42,29 @@ function TranscriptModal(props: TranscriptModalProps) {
         }
     }
 
-    function generatePDF() {
-        const doc = new jsPDF();
-        const pageWidth = doc.internal.pageSize.getWidth() - 20;
-        const pageHeight = doc.internal.pageSize.getHeight() - 20;
-
-        doc.setFontSize(16);
-        doc.text("Transcript with comments", 10, 10);
-
-        let fullTranscription = "";
-        const parts = props.transcript.parts;
-        for (let i = 0; i < parts.length; i++) {
-            const part = parts[i];
-            part.text.split(" ").forEach((word, index) => {
-                const comment = comments.find(comment =>
-                    comment.index === index
-                    && comment.partIndex === i
-                    && !comment.isTranslated
-                );
-                const text = comment ? `${word} [${comment.text}]` : word;
-                fullTranscription += text + " ";
-            });
-
-            fullTranscription += "\n";
-
-            part.translatedText.split(" ").forEach((word, index) => {
-                const comment = comments.find(comment =>
-                    comment.index === index
-                    && comment.partIndex === i
-                    && comment.isTranslated
-                );
-                const text = comment ? `${word} [${comment.text}]` : word;
-                fullTranscription += text + " ";
-            });
-
-            fullTranscription += "\n\n";
-        }
-
-        doc.setFont(font);
-        doc.setFontSize(12);
-
-        const lines = doc.splitTextToSize(fullTranscription.trim(), pageWidth);
-
-        let y = 20;
-
-        lines.forEach((line: string) => {
-            if (y + 10 > pageHeight) {
-                doc.addPage();
-                y = 10;
-            }
-            doc.text(line, 10, y);
-            y += 10;
-        });
-
-        return doc;
+    function generatePdf(): jsPDF {
+        return createPdf(
+            props.transcript.parts,
+            comments,
+            font,
+        );
     }
 
     function downloadPDF() {
-        const doc = generatePDF();
-        doc.save("transcript.pdf");
-    }
-
-    function getBase64() {
-        const doc = generatePDF();
-        const dataUri = doc.output("datauristring");
-        return dataUri.split(",")[1];
+        const pdf = generatePdf();
+        pdf.save("transcript.pdf");
     }
 
     async function emailTranscript() {
         try {
-            const base64PDF = getBase64();
+            const transcriptParts = props.transcript.parts.map(part => ({
+                text: part.text,
+                translatedText: part.translatedText,
+            } as BaseTranscriptPart));
             const response = await client.queries.emailTranscript({
-                pdf: base64PDF,
+                transcriptParts: JSON.stringify(transcriptParts),
+                comments: JSON.stringify(comments),
+                font: font,
             });
             console.log(response.data);
         } catch (error) {

@@ -1,19 +1,11 @@
-import { comprehend } from "./comprehend";
-import { translate } from "./translation";
-import { TranscriptPart } from "./types";
-
-export interface Phrase {
-    text: string,
-    beginOffset: number,
-    endOffset: number,
-    alternateDefintion: string
-}
-
+import {comprehend} from "./comprehend";
+import {translate} from "./translation";
+import type {Phrase, TranscriptPart} from "../../amplify/utils/types.ts";
 
 export const detectAmbiguity = async (transcript: TranscriptPart[]) => {
     const ambiguousWords: Phrase[] = [];
     for (const part of transcript) {
-        const translateKP = await comprehend('comprehendKeyPhrases', part.translatedText, part.translatedLanguage.translateCode);
+        const translateKP = await comprehend("comprehendKeyPhrases", part.translatedText, part.translatedLanguage.translateCode);
         const translateKPSet = [];
         for (const phrase of translateKP) {
             translateKPSet.push(phrase.Text.toLowerCase());
@@ -28,7 +20,7 @@ export const detectAmbiguity = async (transcript: TranscriptPart[]) => {
                     text: phrase,
                     beginOffset: tPhrase.BeginOffset,
                     endOffset: tPhrase.EndOffset,
-                    alternateDefintion: backTranslatedPhrase
+                    alternateDefinition: backTranslatedPhrase
                 };
                 let exists = false;
                 for (const amb of ambiguousWords) {

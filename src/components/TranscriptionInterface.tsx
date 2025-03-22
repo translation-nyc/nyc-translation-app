@@ -3,19 +3,19 @@ import {Amplify, fetchAuthSession} from "@aws-amplify/core";
 import {
     LanguageCode,
     TranscribeStreamingClient,
-    type TranscriptResultStream
+    type TranscriptResultStream,
 } from "@aws-sdk/client-transcribe-streaming";
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
-import type {Language, Transcript, TranscriptPart, TtsVoice} from "../utils/types.ts";
+import type {Language, Transcript, TranscriptPart, TtsVoice} from "../../amplify/utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {SpeechTranscriber} from "../utils/speech-transcriber.ts";
 import Controls from "./Controls.tsx";
 import TranscriptBox from "./TranscriptBox.tsx";
 import {translate} from "../utils/translation.ts";
 import {getCurrentUser} from "aws-amplify/auth";
-import {detectAmbiguity, Phrase} from "../utils/ambiguity-detection.ts";
+import {detectAmbiguity} from "../utils/ambiguity-detection.ts";
 
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
@@ -152,8 +152,7 @@ function TranscriptionInterface() {
             translatedLanguage: otherLanguage,
             translatedText: translated
         };
-        const ambiguity:Phrase[] = await detectAmbiguity([tempPart]);
-
+        const ambiguity = await detectAmbiguity([tempPart]);
 
         setTranscript(previousTranscript => {
             const newTranscriptParts = [...previousTranscript.parts];

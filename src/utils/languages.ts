@@ -1,6 +1,6 @@
 import {LanguageCode} from "@aws-sdk/client-transcribe-streaming";
 import {VoiceId} from "@aws-sdk/client-polly";
-import type {Language} from "./types.ts";
+import type {Language} from "../../amplify/utils/types.ts";
 
 // noinspection JSUnusedGlobalSymbols
 export class Languages {

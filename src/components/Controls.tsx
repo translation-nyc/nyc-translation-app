@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import type {Language, Transcript, TtsVoice} from "../utils/types.ts";
+import type {Language, Transcript, TtsVoice} from "../../amplify/utils/types.ts";
 import {Languages} from "../utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import TranscriptModal from "./TranscriptModal.tsx";
@@ -186,10 +186,10 @@ function ReviewButton(props: ReviewButtonProps) {
     const [fontsLoaded, setFontsLoaded] = useState(false);
 
     async function loadFonts() {
-        await import("../fonts/noto-arabic-normal.ts");
-        await import("../fonts/noto-chinese-normal.ts");
-        await import("../fonts/noto-japanese-normal.ts");
-        await import("../fonts/notoKorean-normal.ts");
+        await import("../../amplify/fonts/noto-arabic-normal");
+        await import("../../amplify/fonts/noto-chinese-normal");
+        await import("../../amplify/fonts/noto-japanese-normal");
+        await import("../../amplify/fonts/noto-korean-normal");
         setFontsLoaded(true);
     }
 
@@ -199,9 +199,7 @@ function ReviewButton(props: ReviewButtonProps) {
     }, []);
 
     function openModal() {
-        if (fontsLoaded && props.transcript.parts.length > 0) {
-            setIsModalOpen(true);
-        }
+        setIsModalOpen(true);
     }
 
     function closeModal() {
