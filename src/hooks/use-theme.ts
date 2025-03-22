@@ -7,7 +7,7 @@ export function useTheme() {
     const [theme, setThemeState] = useState<ThemeName>(() => {
         // Check local storage or default to light theme
         const savedTheme = localStorage.getItem("app-theme") as ThemeName | null;
-        return savedTheme || "light";
+        return savedTheme || "system";
     });
 
     const [textSize, setTextSize] = useState<number>(() => {
