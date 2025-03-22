@@ -17,19 +17,19 @@ function TranscriptModal(props: TranscriptModalProps) {
     let font = "";
     switch (props.targetLanguage?.name) {
         case "Arabic":
-            font = "notoArabic";
+            font = "noto-arabic";
             break;
         case "Chinese":
-            font = "notoChinese";
+            font = "noto-chinese";
             break;
         case "Russian":
-            font = "notoChinese";
+            font = "noto-chinese";
             break;
         case "Japanese":
             font = "noto-japanese";
             break;
         case "Korean":
-            font = "notoKorean";
+            font = "noto-korean";
             break;
         default:
             font = "Helvetica";
