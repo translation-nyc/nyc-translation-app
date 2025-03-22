@@ -3,6 +3,12 @@ import {useEffect, useState} from "react";
 // Type for available themes
 export type ThemeName = "system" | "light" | "dark" | "cupcake" | "cyberpunk" | "corporate" | "forest" | "aqua";
 
+const darkModeMatchMedia = matchMedia("(prefers-color-scheme: dark)");
+
+function isDarkMode(): boolean {
+    return darkModeMatchMedia.matches;
+}
+
 export function useTheme() {
     const [theme, setThemeState] = useState<ThemeName>(() => {
         // Check local storage or default to light theme
@@ -52,7 +58,6 @@ export function useTheme() {
             }
         }
 
-        const darkModeMatchMedia = matchMedia("(prefers-color-scheme: dark)");
         darkModeMatchMedia.addEventListener("change", updateSystemTheme);
         return () => darkModeMatchMedia.removeEventListener("change", updateSystemTheme);
     }, [theme]);
@@ -65,8 +70,4 @@ export function useTheme() {
         textSize,
         setTextSize: updateTextSize
     };
-}
-
-function isDarkMode(): boolean {
-    return matchMedia("(prefers-color-scheme: dark)").matches;
 }
