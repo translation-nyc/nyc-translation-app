@@ -1,20 +1,59 @@
-import {useEffect, useState} from "react";
+import {JSX, useEffect, useState} from "react";
 import {getCurrentUser, signInWithRedirect, signOut} from "aws-amplify/auth";
-import {CircleUser, Coffee, Contrast, Menu, Moon, Palette, Sparkles, Sun, ZoomIn, ZoomOut} from "lucide-react";
-import {useTheme} from "../hooks/use-theme";
+import {CircleUser, Coffee, Contrast, Menu, Monitor, Moon, Palette, Sparkles, Sun, ZoomIn, ZoomOut} from "lucide-react";
+import {ThemeName, useTheme} from "../hooks/use-theme";
 import {ProfileIcon} from "../assets/icons";
 import Alert from "./Alert";
 import Help from "./Help.tsx";
 
+interface ThemeOption {
+    name: ThemeName;
+    label: string;
+    icon: JSX.Element;
+}
+
 // Define available themes with their icons
-const themeOptions = [
-    {name: "light", label: "Light", icon: <Sun className="w-4 h-4 text-yellow-500"/>},
-    {name: "dark", label: "Dark", icon: <Moon className="w-4 h-4 text-blue-200"/>},
-    {name: "cupcake", label: "Cupcake", icon: <Coffee className="w-4 h-4 text-pink-300"/>},
-    {name: "cyberpunk", label: "Cyberpunk", icon: <Sparkles className="w-4 h-4 text-purple-400"/>},
-    {name: "corporate", label: "Corporate", icon: <CircleUser className="w-4 h-4 text-blue-400"/>},
-    {name: "forest", label: "Forest", icon: <Contrast className="w-4 h-4 text-green-600"/>},
-    {name: "aqua", label: "Aqua", icon: <Palette className="w-4 h-4 text-cyan-500"/>},
+const themeOptions: ThemeOption[] = [
+    {
+        name: "system",
+        label: "System",
+        icon: <Monitor className="w-4 h-4 text-gray-500"/>,
+    },
+    {
+        name: "light",
+        label: "Light",
+        icon: <Sun className="w-4 h-4 text-yellow-500"/>,
+    },
+    {
+        name: "dark",
+        label: "Dark",
+        icon: <Moon className="w-4 h-4 text-blue-200"/>,
+    },
+    {
+        name: "cupcake",
+        label: "Cupcake",
+        icon: <Coffee className="w-4 h-4 text-pink-300"/>,
+    },
+    {
+        name: "cyberpunk",
+        label: "Cyberpunk",
+        icon: <Sparkles className="w-4 h-4 text-purple-400"/>,
+    },
+    {
+        name: "corporate",
+        label: "Corporate",
+        icon: <CircleUser className="w-4 h-4 text-blue-400"/>,
+    },
+    {
+        name: "forest",
+        label: "Forest",
+        icon: <Contrast className="w-4 h-4 text-green-600"/>,
+    },
+    {
+        name: "aqua",
+        label: "Aqua",
+        icon: <Palette className="w-4 h-4 text-cyan-500"/>,
+    },
 ];
 
 function Toolbar() {
@@ -106,7 +145,7 @@ function Toolbar() {
     }
 
     // Handle theme selection
-    function handleThemeChange(newTheme: string) {
+    function handleThemeChange(newTheme: ThemeName) {
         setTheme(newTheme);
     }
 
@@ -237,7 +276,9 @@ function Toolbar() {
 
                 {/* Theme Selection for Mobile */}
                 <div className="flex flex-col gap-2">
-                    <span>Theme</span>
+                    <span>
+                        Theme
+                    </span>
                     <div className="grid grid-cols-3 gap-2">
                         {themeOptions.map((option) => (
                             <button

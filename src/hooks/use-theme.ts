@@ -1,13 +1,13 @@
 import {useEffect, useState} from "react";
 
 // Type for available themes
-type ThemeName = "light" | "dark" | "cupcake" | "cyberpunk" | "corporate" | "forest" | "aqua";
+export type ThemeName = "system" | "light" | "dark" | "cupcake" | "cyberpunk" | "corporate" | "forest" | "aqua";
 
 export function useTheme() {
     const [theme, setThemeState] = useState<ThemeName>(() => {
         // Check local storage or default to light theme
-        const savedTheme = localStorage.getItem("app-theme");
-        return (savedTheme as ThemeName) || "light";
+        const savedTheme = localStorage.getItem("app-theme") as ThemeName | null;
+        return savedTheme || "light";
     });
 
     const [textSize, setTextSize] = useState<number>(() => {
@@ -17,8 +17,8 @@ export function useTheme() {
     });
 
     // Set theme and persist to local storage
-    function setTheme(newTheme: string) {
-        setThemeState(newTheme as ThemeName);
+    function setTheme(newTheme: ThemeName) {
+        setThemeState(newTheme);
         localStorage.setItem("app-theme", newTheme);
     }
 
@@ -37,14 +37,36 @@ export function useTheme() {
 
     // Apply theme and initial text size
     useEffect(() => {
-        document.documentElement.setAttribute("data-theme", theme);
-        updateTextSize(textSize);
-    }, [theme, textSize]);
+        let newTheme: ThemeName;
+        if (theme === "system") {
+            newTheme = isDarkMode() ? "dark" : "light";
+        } else {
+            newTheme = theme;
+        }
+        document.documentElement.setAttribute("data-theme", newTheme);
+
+        function updateSystemTheme(event: MediaQueryListEvent) {
+            if (theme === "system") {
+                const newTheme = event.matches ? "dark" : "light";
+                document.documentElement.setAttribute("data-theme", newTheme);
+            }
+        }
+
+        const darkModeMatchMedia = matchMedia("(prefers-color-scheme: dark)");
+        darkModeMatchMedia.addEventListener("change", updateSystemTheme);
+        return () => darkModeMatchMedia.removeEventListener("change", updateSystemTheme);
+    }, [theme]);
+
+    useEffect(() => updateTextSize(textSize), [textSize]);
 
     return {
-        theme, 
+        theme,
         setTheme,
-        textSize, 
+        textSize,
         setTextSize: updateTextSize
     };
+}
+
+function isDarkMode(): boolean {
+    return matchMedia("(prefers-color-scheme: dark)").matches;
 }
