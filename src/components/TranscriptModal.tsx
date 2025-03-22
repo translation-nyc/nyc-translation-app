@@ -106,7 +106,7 @@ function TranscriptModal(props: TranscriptModalProps) {
 
     function downloadPDF() {
         const doc = generatePDF();
-        doc.save("transcription.pdf");
+        doc.save("transcript.pdf");
     }
 
     function getBase64() {
