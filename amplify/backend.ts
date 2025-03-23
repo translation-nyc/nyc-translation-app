@@ -13,10 +13,10 @@ const backend = defineBackend({
 backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
     new PolicyStatement({
         actions: [
+            "comprehend:DetectKeyPhrases",
+            "polly:SynthesizeSpeech",
             "transcribe:StartStreamTranscriptionWebSocket",
             "translate:TranslateText",
-            "polly:SynthesizeSpeech",
-            "lambda:InvokeFunction"
         ],
         resources: ["*"],
     })
@@ -24,8 +24,11 @@ backend.auth.resources.authenticatedUserIamRole.addToPrincipalPolicy(
 
 backend.emailTranscript.resources.lambda.addToRolePolicy(
     new PolicyStatement({
-        actions: ["ses:SendEmail", "ses:SendRawEmail"],
-        resources: ['*'],
+        actions: [
+            "ses:SendEmail",
+            "ses:SendRawEmail",
+        ],
+        resources: ["*"],
     })
 );
 
@@ -33,6 +36,10 @@ backend.addOutput({
     custom: {
         Predictions: {
             convert: {
+                speechGenerator: {
+                    proxy: false,
+                    region: backend.auth.stack.region,
+                },
                 transcription: {
                     proxy: false,
                     region: backend.auth.stack.region,
@@ -41,14 +48,12 @@ backend.addOutput({
                     proxy: false,
                     region: backend.auth.stack.region,
                 },
-                speechGenerator: {
+            },
+            interpret: {
+                interpretText: {
                     proxy: false,
                     region: backend.auth.stack.region,
                 },
-                lambda: {
-                    proxy: false,
-                    region: backend.auth.stack.region,
-                }
             },
         },
     },
