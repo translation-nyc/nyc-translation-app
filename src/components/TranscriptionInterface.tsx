@@ -58,12 +58,8 @@ function TranscriptionInterface() {
         const authSession = await fetchAuthSession();
         const credentials = authSession.credentials!;
         const config: TranscribeStreamingClientConfig = {
-            region: region,
-            credentials: {
-                accessKeyId: credentials.accessKeyId,
-                secretAccessKey: credentials.secretAccessKey,
-                sessionToken: credentials.sessionToken,
-            },
+            region,
+            credentials,
         };
         const transcribeClient = new TranscribeStreamingClient(config);
         speechTranscriber.current = new SpeechTranscriber(transcribeClient, onTranscription);

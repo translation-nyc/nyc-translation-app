@@ -1,7 +1,6 @@
-import {useRef, useState} from "react";
+import {type MouseEvent, useRef, useState} from "react";
 import type {VoiceId} from "@aws-sdk/client-polly";
-import {BsMicMuteFill} from "react-icons/bs";
-import {HiMiniSpeakerWave} from "react-icons/hi2";
+import {MicOff, Volume2} from "lucide-react";
 import type {Phrase, Transcript, TtsVoice} from "../../amplify/utils/types.ts";
 import {Languages} from "../../amplify/utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
@@ -16,21 +15,28 @@ export interface TranscriptProps {
 }
 
 function TranscriptBox(props: TranscriptProps) {
-    const { showPopup } = usePopup();
+    const {showPopup} = usePopup();
 
-    const showDisambiguationPopup = (e: React.MouseEvent, alternateDefintion:string) => {
-        if (alternateDefintion) {
+    const showDisambiguationPopup = (e: MouseEvent, alternateDefinition: string) => {
+        if (alternateDefinition) {
             showPopup(
                 <div>
-                    <h3 className="card-title">Alternative Translation</h3>
-                    <p className={'text-sm'}>This could also mean:</p>
-                    <p>"{alternateDefintion}"</p>
+                    <h3 className="card-title">
+                        Alternative Translation
+                    </h3>
+                    <p className={"text-sm"}>
+                        This could also mean:
+                    </p>
+                    <p>
+                        "{alternateDefinition}"
+                    </p>
                 </div>,
                 e.clientX,
-                e.clientY
+                e.clientY,
             );
         }
     };
+
     return (
         <div className="flex-1 bg-base-100 rounded-lg shadow-lg p-4">
             <div className="w-full h-full relative">
@@ -54,11 +60,16 @@ function TranscriptBox(props: TranscriptProps) {
                                     showPlayIconFirst = true;
                                     showPlayIconSecond = false;
                                 }
-                                const ambiguity = addAmbiguityInformation(part.ambiguousWords, part.translatedText).split('*');
+
+                                const ambiguity = addAmbiguityInformation(
+                                    part.ambiguousWords,
+                                    part.translatedText,
+                                ).split("*");
                                 const ambiguousWordMap = new Map();
-                                part.ambiguousWords.forEach((amb) => {
+                                part.ambiguousWords.forEach(amb => {
                                     ambiguousWordMap.set(amb.text, amb.alternateDefinition);
                                 });
+
                                 return (
                                     <div key={index} className={className}>
                                         <div className="flex flex-row">
@@ -83,13 +94,13 @@ function TranscriptBox(props: TranscriptProps) {
                                             />
                                             <div className="flex-wrap items-center">
                                                 {ambiguity.map((amb) => {
-                                                    const ambText = amb.replace('(', '').replace(')', '');
-                                                    const ambAlternateDefintion: string = ambiguousWordMap.get(ambText);
+                                                    const ambText = amb.replace("(", "").replace(")", "");
+                                                    const ambAlternateDefinition: string = ambiguousWordMap.get(ambText);
                                                     return (
                                                     <span
                                                         key={ambiguity.indexOf(amb)}
-                                                        className={ambiguity.indexOf(amb) % 2 == 1 && ambAlternateDefintion ? "text-accent mx-0.5 " : "text-gray-400 "}
-                                                        onClick={(e) => showDisambiguationPopup(e, ambAlternateDefintion)}>
+                                                        className={ambiguity.indexOf(amb) % 2 == 1 && ambAlternateDefinition ? "text-accent mx-0.5 " : "text-gray-400 "}
+                                                        onClick={e => showDisambiguationPopup(e, ambAlternateDefinition)}>
                                                         {ambText}
                                                     </span>);
                                                 })}
@@ -102,7 +113,7 @@ function TranscriptBox(props: TranscriptProps) {
                     </div>
                 </div>
                 <div className="absolute top-2 right-2 pointer-events-none">
-                    <BsMicMuteFill
+                    <MicOff
                         className={`transition duration-300 text-red-600 ${props.ttsPlaying && props.isTranslating ? "" : "opacity-0"}`}
                     />
                 </div>
@@ -157,7 +168,7 @@ function PlayTtsButton(props: PlayTtsButtonProps) {
     }
 
     return (
-        <HiMiniSpeakerWave
+        <Volume2
             className={`mr-2 shrink-0 transition duration-200 ${className}`}
             onClick={toggleTts}
         />
@@ -173,10 +184,11 @@ function addAmbiguityInformation(phrases: Phrase[], text: string): string {
     }
     return finalText;
 }
+
 function split_at_index(value:string, index:number, end:boolean) {
-    if (end){
+    if (end) {
         return value.substring(0, index) + ")*" + value.substring(index);
-    }else{
+    } else {
         return value.substring(0, index) + "*(" + value.substring(index);
     }
 }
