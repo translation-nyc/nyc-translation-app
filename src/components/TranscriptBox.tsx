@@ -2,10 +2,9 @@ import {useRef, useState} from "react";
 import type {VoiceId} from "@aws-sdk/client-polly";
 import {BsMicMuteFill} from "react-icons/bs";
 import {HiMiniSpeakerWave} from "react-icons/hi2";
-import type {Transcript, TtsVoice} from "../utils/types.ts";
-import {Languages} from "../utils/languages.ts";
+import type {Phrase, Transcript, TtsVoice} from "../../amplify/utils/types.ts";
+import {Languages} from "../../amplify/utils/languages.ts";
 import {textToSpeech} from "../utils/text-to-speech.ts";
-import {Phrase} from "../utils/ambiguity-detection.ts";
 import {usePopup} from "./Popup.tsx";
 
 export interface TranscriptProps {
@@ -58,7 +57,7 @@ function TranscriptBox(props: TranscriptProps) {
                                 const ambiguity = addAmbiguityInformation(part.ambiguousWords, part.translatedText).split('*');
                                 const ambiguousWordMap = new Map();
                                 part.ambiguousWords.forEach((amb) => {
-                                    ambiguousWordMap.set(amb.text, amb.alternateDefintion);
+                                    ambiguousWordMap.set(amb.text, amb.alternateDefinition);
                                 });
                                 return (
                                     <div key={index} className={className}>
