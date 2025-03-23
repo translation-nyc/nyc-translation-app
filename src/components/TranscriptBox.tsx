@@ -20,15 +20,17 @@ function TranscriptBox(props: TranscriptProps) {
     const { showPopup } = usePopup();
 
     const showDisambiguationPopup = (e: React.MouseEvent, alternateDefintion:string) => {
-        showPopup(
-            <div>
-                <h3 className="card-title">Alternative Translation</h3>
-                <p className={'text-sm'}>This could also mean:</p>
-                <p>"{alternateDefintion}"</p>
-            </div>,
-            e.clientX,
-            e.clientY
-        );
+        if (alternateDefintion) {
+            showPopup(
+                <div>
+                    <h3 className="card-title">Alternative Translation</h3>
+                    <p className={'text-sm'}>This could also mean:</p>
+                    <p>"{alternateDefintion}"</p>
+                </div>,
+                e.clientX,
+                e.clientY
+            );
+        }
     };
     return (
         <div className="flex-1 bg-base-100 rounded-lg shadow-lg p-4">
@@ -80,16 +82,19 @@ function TranscriptBox(props: TranscriptProps) {
                                                 onPlaying={props.onTtsPlaying}
                                                 visible={showPlayIconSecond}
                                             />
-                                            {ambiguity.map((amb) => {
-                                                const ambText = amb.replace('(', '').replace(')', '');
-                                                const ambAlternateDefintion = ambiguousWordMap.get(ambText);
-                                                return (
-                                                <p key={ambiguity.indexOf(amb)} className={ambiguity.indexOf(amb) % 2 == 1 ? "text-accent" : "text-gray-400"} onClick={(e) => showDisambiguationPopup(e, ambAlternateDefintion)}>
-                                                    {amb}
-
-                                                </p>);
-                                            })}
-
+                                            <div className="flex-wrap items-center">
+                                                {ambiguity.map((amb) => {
+                                                    const ambText = amb.replace('(', '').replace(')', '');
+                                                    const ambAlternateDefintion: string = ambiguousWordMap.get(ambText);
+                                                    return (
+                                                    <span
+                                                        key={ambiguity.indexOf(amb)}
+                                                        className={ambiguity.indexOf(amb) % 2 == 1 && ambAlternateDefintion ? "text-accent mx-0.5 " : "text-gray-400 "}
+                                                        onClick={(e) => showDisambiguationPopup(e, ambAlternateDefintion)}>
+                                                        {ambText}
+                                                    </span>);
+                                                })}
+                                            </div>
                                         </div>
                                     </div>
                                 );
