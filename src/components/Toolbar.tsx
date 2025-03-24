@@ -137,7 +137,7 @@ function Toolbar() {
                 global: true,
             });
             setIsAuthenticated(false);
-            localStorage.clear();
+            // localStorage.clear();
             sessionStorage.clear();
         } catch (error) {
             console.error("Error signing out:", error);
