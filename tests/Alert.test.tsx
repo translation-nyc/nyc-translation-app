@@ -75,7 +75,7 @@ describe("Alert", () => {
 
     test("Auto dismiss alert", async () => {
         const alertMessage = "Test alert";
-        const autoDismissTime = 3000;
+        const autoDismissTime = 100;
         let closed = false;
         const dismissAlert = vi.fn(() => closed = true);
 
