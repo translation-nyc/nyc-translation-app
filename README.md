@@ -16,7 +16,8 @@
 6. Run `pnpm install` to install the dependencies
 
 ## Running the app
-1. Run `pnpm run dev` to start the app
+
+1. Run `pnpm dev` to start the app
 2. Open the app in your browser at http://localhost:5173
 
 ## Backend sandbox setup
@@ -27,11 +28,17 @@ You can create a personal backend sandbox for yourself to develop on without int
 2. Login with your IAM user credentials: https://docs.aws.amazon.com/cli/v1/userguide/cli-authentication-user.html
 3. Create a new sandbox environment: `npx ampx sandbox`
    - You can delete the sandbox environment with `npx ampx sandbox delete`
+   - Run `npx ampx sandbox --stream-function-logs` to get function logs
 4. To add the secrets to your sandbox:
    - `npx ampx sandbox secret set MICROSOFT_ENTRA_ID_CLIENT_ID` then input value
    - `npx ampx sandbox secret set MICROSOFT_ENTRA_ID_CLIENT_SECRET` then input value
 
+## Testing
+
+1. Run `pnpm test` to run tests
+
 ## Security Notes
+
 - The secrets file contains sensitive credentials for Microsoft Entra ID authentication
 - Keep the secrets file completely private and secure
 - Never share the secrets file or its contents with anyone

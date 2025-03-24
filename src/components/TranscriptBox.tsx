@@ -20,6 +20,8 @@ function TranscriptBox(props: TranscriptProps) {
     const showDisambiguationPopup = (e: MouseEvent, alternateDefinition: string) => {
         if (alternateDefinition) {
             showPopup(
+                e.clientX,
+                e.clientY,
                 <div>
                     <h3 className="card-title">
                         Alternative Translation
@@ -31,8 +33,6 @@ function TranscriptBox(props: TranscriptProps) {
                         "{alternateDefinition}"
                     </p>
                 </div>,
-                e.clientX,
-                e.clientY,
             );
         }
     };
@@ -80,7 +80,7 @@ function TranscriptBox(props: TranscriptProps) {
                                                 onPlaying={props.onTtsPlaying}
                                                 visible={showPlayIconFirst}
                                             />
-                                            <p className="mb-0">
+                                            <p className="mb-0" aria-label={`Transcript part ${index + 1}`}>
                                                 {part.text}
                                             </p>
                                         </div>
@@ -93,16 +93,20 @@ function TranscriptBox(props: TranscriptProps) {
                                                 visible={showPlayIconSecond}
                                             />
                                             <div className="flex-wrap items-center">
-                                                {ambiguity.map((amb) => {
+                                                {ambiguity.map(amb => {
                                                     const ambText = amb.replace("(", "").replace(")", "");
                                                     const ambAlternateDefinition: string = ambiguousWordMap.get(ambText);
                                                     return (
-                                                    <span
-                                                        key={ambiguity.indexOf(amb)}
-                                                        className={ambiguity.indexOf(amb) % 2 == 1 && ambAlternateDefinition ? "text-accent mx-0.5 " : "text-gray-400 "}
-                                                        onClick={e => showDisambiguationPopup(e, ambAlternateDefinition)}>
-                                                        {ambText}
-                                                    </span>);
+                                                        <span
+                                                            key={ambiguity.indexOf(amb)}
+                                                            className={ambiguity.indexOf(amb) % 2 == 1 && ambAlternateDefinition ? "text-accent mx-0.5 " : "text-gray-400 "}
+                                                            role="textbox"
+                                                            aria-label={`Translated transcript part ${index + 1}`}
+                                                            onClick={e => showDisambiguationPopup(e, ambAlternateDefinition)}
+                                                        >
+                                                            {ambText}
+                                                        </span>
+                                                    );
                                                 })}
                                             </div>
                                         </div>
@@ -179,13 +183,13 @@ function addAmbiguityInformation(phrases: Phrase[], text: string): string {
     let finalText = text;
     for (const phrase of phrases) {
         const index = text.indexOf(phrase.text);
-        const temp = split_at_index(finalText, index, false);
-        finalText = split_at_index(temp, index + phrase.text.length + 2, true);
+        const temp = splitAtIndex(finalText, index, false);
+        finalText = splitAtIndex(temp, index + phrase.text.length + 2, true);
     }
     return finalText;
 }
 
-function split_at_index(value:string, index:number, end:boolean) {
+function splitAtIndex(value: string, index: number, end: boolean) {
     if (end) {
         return value.substring(0, index) + ")*" + value.substring(index);
     } else {

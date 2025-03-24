@@ -1,38 +1,53 @@
-import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
+import {createContext, ReactNode, useContext, useEffect, useRef, useState} from "react";
 
 // Create a context to manage popup state globally
 interface PopupContextType {
-    showPopup: (content: React.ReactNode, x: number, y: number) => void;
+    showPopup: (x: number, y: number, content: React.ReactNode) => void;
     hidePopup: () => void;
 }
 
 const PopupContext = createContext<PopupContextType | null>(null);
 
+export interface PopupProviderProps {
+    children: ReactNode;
+}
+
+interface PopupState {
+    isVisible: boolean;
+    content: ReactNode;
+    position: {
+        x: number,
+        y: number,
+    };
+}
+
 // Provider component to wrap your application
-export const PopupProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [popupState, setPopupState] = useState<{
-        isVisible: boolean;
-        content: React.ReactNode;
-        position: { x: number, y: number };
-    }>({
+export function PopupProvider(props: PopupProviderProps) {
+    const [popupState, setPopupState] = useState<PopupState>({
         isVisible: false,
         content: null,
-        position: { x: 0, y: 0 },
+        position: {
+            x: 0,
+            y: 0,
+        },
     });
 
     const popupRef = useRef<HTMLDivElement>(null);
 
-    const showPopup = (content: React.ReactNode, x: number, y: number) => {
+    function showPopup(x: number, y: number, content: ReactNode) {
         setPopupState({
             isVisible: true,
             content,
-            position: { x, y },
+            position: {
+                x,
+                y,
+            },
         });
-    };
+    }
 
-    const hidePopup = () => {
-        setPopupState(prev => ({ ...prev, isVisible: false }));
-    };
+    function hidePopup() {
+        setPopupState(prev => ({...prev, isVisible: false}));
+    }
 
     // Close popup when clicking outside
     useEffect(() => {
@@ -43,17 +58,18 @@ export const PopupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         };
 
         if (popupState.isVisible) {
-            document.addEventListener('mousedown', handleClickOutside);
+            document.addEventListener("mousedown", handleClickOutside);
         }
 
         return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [popupState.isVisible]);
 
+    // noinspection JSUnusedGlobalSymbols
     return (
-        <PopupContext.Provider value={{ showPopup, hidePopup }}>
-            {children}
+        <PopupContext.Provider value={{showPopup, hidePopup}}>
+            {props.children}
             {popupState.isVisible && (
                 <div
                     ref={popupRef}
@@ -61,8 +77,8 @@ export const PopupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                     style={{
                         left: `${popupState.position.x}px`,
                         top: `${popupState.position.y}px`,
-                        transform: 'translate(-50%, -100%)',
-                        marginTop: '-10px'
+                        transform: "translate(-50%, -100%)",
+                        marginTop: "-10px"
                     }}
                 >
                     {popupState.content}
@@ -70,33 +86,14 @@ export const PopupProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             )}
         </PopupContext.Provider>
     );
-};
+}
 
 // Custom hook to use the popup functionality
-export const usePopup = () => {
+// eslint-disable-next-line react-refresh/only-export-components
+export function usePopup() {
     const context = useContext(PopupContext);
     if (!context) {
-        throw new Error('usePopup must be used within a PopupProvider');
+        throw new Error("usePopup must be used within a PopupProvider");
     }
     return context;
-};
-
-// Component that can trigger the popup
-export const PopupTrigger: React.FC<{
-    content: React.ReactNode;
-    children: React.ReactNode;
-    className?: string;
-}> = ({ content, children, className = '' }) => {
-    const { showPopup } = usePopup();
-
-    const handleClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        showPopup(content, e.clientX, e.clientY);
-    };
-
-    return (
-        <div className={className} onClick={handleClick}>
-            {children}
-        </div>
-    );
-};
+}

@@ -1,37 +1,60 @@
-.logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-    transition: filter 300ms;
+/* styles/textSize.css */
+
+/* Use relative units throughout the application */
+body {
+    line-height: 1.5;
 }
 
-.logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
+/* Define relative text sizes */
+.text-xs {
+    font-size: 0.75rem;
 }
 
-.logo.react:hover {
-    filter: drop-shadow(0 0 2em #61dafbaa);
+.text-sm {
+    font-size: 0.875rem;
 }
 
-@keyframes logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.text-base {
+    font-size: 1rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    a:nth-of-type(2) .logo {
-        animation: logo-spin infinite 20s linear;
-    }
+.text-lg {
+    font-size: 1.125rem;
 }
 
-.card {
-    padding: 2em;
+.text-xl {
+    font-size: 1.25rem;
 }
 
-.read-the-docs {
-    color: #888;
+.text-2xl {
+    font-size: 1.5rem;
+}
+
+.text-3xl {
+    font-size: 1.875rem;
+}
+
+.text-4xl {
+    font-size: 2.25rem;
+}
+
+/* Ensure headings scale properly */
+h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+}
+
+/* Add this to make form elements scale with font size */
+input, select, textarea, button {
+    font-size: inherit;
+}
+
+/* Scale UI components */
+.card, .btn, .modal-box, .select, .textarea {
+    font-size: inherit;
+}
+
+/* Scale icons */
+svg, .icon {
+    width: calc(1em * var(--scale-factor, 1));
+    height: calc(1em * var(--scale-factor, 1));
 }

@@ -1,10 +1,6 @@
 import {useEffect, useRef, useState} from "react";
 import {Amplify, fetchAuthSession} from "@aws-amplify/core";
-import {
-    LanguageCode,
-    TranscribeStreamingClient,
-    type TranscriptResultStream,
-} from "@aws-sdk/client-transcribe-streaming";
+import {TranscribeStreamingClient, type TranscriptResultStream,} from "@aws-sdk/client-transcribe-streaming";
 import type {
     TranscribeStreamingClientConfig,
 } from "@aws-sdk/client-transcribe-streaming/dist-types/TranscribeStreamingClient";
@@ -35,7 +31,7 @@ function TranscriptionInterface() {
     );
     const [transcript, setTranscript] = useState<Transcript>({
         parts: [],
-        lastLanguageCode: LanguageCode.EN_GB,
+        lastLanguageCode: Languages.ENGLISH.transcribeCode,
         lastTargetLanguageCode: null,
     });
 
@@ -125,7 +121,7 @@ function TranscriptionInterface() {
         if (transcriptPartText === undefined) {
             return;
         }
-        const languageCode = transcriptResult.LanguageCode ?? LanguageCode.EN_GB;
+        const languageCode = transcriptResult.LanguageCode ?? Languages.ENGLISH.transcribeCode;
         const language = Languages.get(languageCode);
         const resultId = transcriptResult.ResultId ?? "";
 
@@ -138,15 +134,15 @@ function TranscriptionInterface() {
         }
 
         const translated = await translate(transcriptPartText, language.translateCode, otherLanguage.translateCode);
-        const tempPart:TranscriptPart = {
-            ambiguousWords: [],
-            language: language,
-            lastCompleteIndex: 0,
-            lastCompleteTranslatedIndex: 0,
-            lastResultId: "",
+        const tempPart: TranscriptPart = {
             text: "",
+            language: language,
+            lastResultId: "",
+            lastCompleteIndex: 0,
             translatedLanguage: otherLanguage,
-            translatedText: translated
+            translatedText: translated,
+            lastCompleteTranslatedIndex: 0,
+            ambiguousWords: [],
         };
         const ambiguity = await detectAmbiguity([tempPart]);
 
@@ -275,7 +271,6 @@ function TranscriptionInterface() {
                 onToggleTranslation={toggleTranslation}
                 targetLanguage={targetLanguage}
                 onChangeTargetLanguage={setLanguage}
-                voices={targetLanguage?.ttsVoices ?? []}
                 selectedVoices={selectedVoices}
                 onChangeVoice={setVoice}
                 transcript={transcript}

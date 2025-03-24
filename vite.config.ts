@@ -1,4 +1,4 @@
-import {defineConfig} from "vite";
+import {defineConfig, UserConfig} from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -11,4 +11,9 @@ export default defineConfig({
     define: {
         global: {},
     },
-});
+    test: {
+        environment: "jsdom",
+        globals: true,
+        setupFiles: "./tests/setup.ts",
+    },
+} as UserConfig);

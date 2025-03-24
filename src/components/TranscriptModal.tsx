@@ -1,9 +1,12 @@
 import {useState} from "react";
 import {jsPDF} from "jspdf";
-import {client} from "../main";
+import {generateClient} from "aws-amplify/api";
+import type {Schema} from "../../amplify/data/resource.ts";
 import type {BaseTranscriptPart, Font, Transcript, TranscriptComment} from "../../amplify/utils/types.ts";
 import {createPdf} from "../../amplify/utils/transcript-pdf.ts";
 import {Languages} from "../../amplify/utils/languages.ts";
+
+const client = generateClient<Schema>();
 
 export interface TranscriptModalProps {
     transcription: string;
@@ -18,7 +21,12 @@ function TranscriptModal(props: TranscriptModalProps) {
     function addComment(index: number, partIndex: number, isTranslated: boolean) {
         const commentText = prompt("Enter your comment");
         if (commentText) {
-            setComments([...comments, { text: commentText, index, partIndex, isTranslated }]);
+            setComments([...comments, {
+                text: commentText,
+                index,
+                partIndex,
+                isTranslated,
+            }]);
         }
     }
 
@@ -120,7 +128,11 @@ function TranscriptModal(props: TranscriptModalProps) {
                         </svg>
                     </div>
                     <div className="ml-4">
-                        <h3 className="text-lg font-medium" id="modal-title">
+                        <h3
+                            className="text-lg font-medium"
+                            id="modal-title"
+                            aria-label="Review transcript header"
+                        >
                             Review transcript and click to add comments
                         </h3>
                         <div className="mt-2">

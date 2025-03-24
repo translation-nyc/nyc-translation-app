@@ -25,8 +25,8 @@ export interface TranscriptPart {
     lastCompleteIndex: number;
     translatedText: string;
     translatedLanguage: Language;
-    ambiguousWords: Phrase[];
     lastCompleteTranslatedIndex: number;
+    ambiguousWords: Phrase[];
 }
 
 export interface Transcript {
