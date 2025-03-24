@@ -4,6 +4,7 @@ import type {Font, Language, Transcript, TtsVoice} from "../../amplify/utils/typ
 import {Languages} from "../../amplify/utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import TranscriptModal from "./TranscriptModal.tsx";
+import Alert from "./Alert.tsx";
 
 export interface ControlsProps {
     isLoggedIn: boolean;
@@ -194,6 +195,7 @@ function ReviewButton(props: ReviewButtonProps) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [fontsLoaded, setFontsLoaded] = useState(false);
     const [fonts, setFonts] = useState<Record<string, Font>>({});
+    const [showEmailedAlert, setShowEmailedAlert] = useState(false);
 
     async function loadFonts() {
         if (props.fonts !== undefined) {
@@ -249,8 +251,16 @@ function ReviewButton(props: ReviewButtonProps) {
                     closeModal={closeModal}
                     transcript={props.transcript}
                     fonts={fonts}
+                    onEmailSent={() => setShowEmailedAlert(true)}
                 />
             )}
+
+            <Alert
+                message="Email sent!"
+                isVisible={showEmailedAlert}
+                onDismiss={() => setShowEmailedAlert(false)}
+                autoDismissTime={3000}
+            />
         </>
     );
 }

@@ -1,6 +1,7 @@
 import {useState} from "react";
-import {jsPDF} from "jspdf";
 import {generateClient} from "aws-amplify/api";
+import {jsPDF} from "jspdf";
+import {LoaderCircle} from "lucide-react";
 import type {Schema} from "../../amplify/data/resource.ts";
 import type {BaseTranscriptPart, Font, Transcript, TranscriptComment} from "../../amplify/utils/types.ts";
 import {createPdf} from "../../amplify/utils/transcript-pdf.ts";
@@ -13,10 +14,13 @@ export interface TranscriptModalProps {
     closeModal: () => void;
     transcript: Transcript;
     fonts: Record<string, Font>;
+    onEmailSent: () => void;
 }
 
 function TranscriptModal(props: TranscriptModalProps) {
     const [comments, setComments] = useState<TranscriptComment[]>([]);
+    const [downloadingPdf, setDownloadingPdf] = useState(false);
+    const [sendingEmail, setSendingEmail] = useState(false);
 
     function addComment(index: number, partIndex: number, isTranslated: boolean) {
         const commentText = prompt("Enter your comment");
@@ -55,26 +59,30 @@ function TranscriptModal(props: TranscriptModalProps) {
     }
 
     async function downloadPDF() {
+        setDownloadingPdf(true);
         const pdf = await generatePdf();
         pdf.save("transcript.pdf");
+        setDownloadingPdf(false);
     }
 
     async function emailTranscript() {
+        setSendingEmail(true);
         try {
             const transcriptParts = props.transcript.parts.map(part => ({
                 text: part.text,
                 translatedText: part.translatedText,
             } as BaseTranscriptPart));
-            const response = await client.queries.emailTranscript({
+            await client.queries.emailTranscript({
                 transcriptParts: JSON.stringify(transcriptParts),
                 comments: JSON.stringify(comments),
                 languageCode: props.transcript.lastTargetLanguageCode ?? "",
             });
-            console.log(response.data);
+            props.onEmailSent();
         } catch (error) {
             console.error("Error sending email: ", error);
             alert(error);
         }
+        setSendingEmail(false);
     }
 
     return (
@@ -185,13 +193,30 @@ function TranscriptModal(props: TranscriptModalProps) {
                     </div>
                 </div>
                 <div className="modal-action">
-                    <button onClick={emailTranscript} className="btn btn-primary">
+                    <button
+                        className="btn btn-primary"
+                        disabled={sendingEmail}
+                        onClick={emailTranscript}
+                    >
                         Email Transcript
+                        {sendingEmail && (
+                            <LoaderCircle className="animate-spin"/>
+                        )}
                     </button>
-                    <button onClick={downloadPDF} className="btn btn-primary">
+                    <button
+                        className="btn btn-primary"
+                        disabled={downloadingPdf}
+                        onClick={downloadPDF}
+                    >
                         Download
+                        {downloadingPdf && (
+                            <LoaderCircle className="animate-spin"/>
+                        )}
                     </button>
-                    <button onClick={props.closeModal} className="btn btn-outline">
+                    <button
+                        className="btn btn-outline"
+                        onClick={props.closeModal}
+                    >
                         Cancel
                     </button>
                 </div>
