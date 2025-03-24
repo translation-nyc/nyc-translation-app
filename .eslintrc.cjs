@@ -20,6 +20,5 @@ module.exports = {
             },
         ],
         "semi": ["warn", "always"],
-        "@typescript-eslint/semi": ["warn", "always"],
     },
 };
