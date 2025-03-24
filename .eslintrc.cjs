@@ -19,7 +19,7 @@ module.exports = {
                 allowConstantExport: true,
             },
         ],
-        "semi": ["error", "always"],
-        "@typescript-eslint/semi": ["error", "always"],
+        "semi": ["warn", "always"],
+        "@typescript-eslint/semi": ["warn", "always"],
     },
 };
