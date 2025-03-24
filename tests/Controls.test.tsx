@@ -48,6 +48,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -70,6 +71,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -92,6 +94,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -118,6 +121,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -148,6 +152,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -185,6 +190,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -219,6 +225,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -241,6 +248,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -265,6 +273,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -304,6 +313,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={changeVoice}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -332,6 +342,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -359,6 +370,7 @@ describe("Controls", () => {
                     onChangeVoice={() => undefined}
                     transcript={transcript}
                     fonts={{}}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -381,6 +393,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -405,6 +418,7 @@ describe("Controls", () => {
                     onChangeVoice={() => undefined}
                     transcript={emptyTranscript}
                     fonts={{}}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -428,6 +442,7 @@ describe("Controls", () => {
                     onChangeVoice={() => undefined}
                     transcript={transcript}
                     fonts={{}}
+                    onClearTranscript={() => undefined}
                 />
             );
 
