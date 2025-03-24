@@ -30,10 +30,10 @@ export function useTheme() {
     function updateTextSize(size: number) {
         setTextSize(size);
         localStorage.setItem("app-text-size", size.toString());
-        
+
         // Set the base font size on the html element
         document.documentElement.style.fontSize = `${size}px`;
-        
+
         // Set a scaling factor for non-text elements
         const scaleFactor = size / 16;
         document.documentElement.style.setProperty("--scale-factor", scaleFactor.toString());

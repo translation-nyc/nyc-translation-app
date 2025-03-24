@@ -11,7 +11,7 @@ describe("Alert", () => {
             <Alert
                 message={alertMessage}
                 isVisible={true}
-                onDismiss={() => {}}
+                onDismiss={() => undefined}
                 autoDismissTime={0}
             />
         );
@@ -28,7 +28,7 @@ describe("Alert", () => {
             <Alert
                 message=""
                 isVisible={false}
-                onDismiss={() => {}}
+                onDismiss={() => undefined}
                 autoDismissTime={0}
             />
         );

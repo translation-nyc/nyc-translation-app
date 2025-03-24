@@ -36,7 +36,7 @@ describe("TranscriptBox", () => {
                     isTranslating={false}
                     selectedVoices={selectedVoices}
                     ttsPlaying={false}
-                    onTtsPlaying={() => {}}
+                    onTtsPlaying={() => undefined}
                 />
             </PopupProvider>
         );

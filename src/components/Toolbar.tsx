@@ -72,33 +72,33 @@ function Toolbar(props: ToolbarProps) {
 
     // Check screen size and set mobile view state
     useEffect(() => {
-        const checkScreenSize = () => {
+        function checkScreenSize() {
             setIsMobileView(window.innerWidth < 640); // Use sm breakpoint (640px)
-        };
-        
+        }
+
         // Check on mount
         checkScreenSize();
-        
+
         // Add resize listener
         window.addEventListener("resize", checkScreenSize);
-        
+
         // Clean up
         return () => window.removeEventListener("resize", checkScreenSize);
     }, []);
 
     useEffect(() => {
-        const handleRedirect = async () => {
+        async function handleRedirect() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const code = urlParams.get("code");
-                
+
                 if (code) {
                     await checkAuthStatus();
                 }
             } catch (error) {
                 console.error("Error handling redirect:", error);
             }
-        };
+        }
 
         // noinspection JSIgnoredPromiseFromCall
         handleRedirect();
@@ -146,22 +146,22 @@ function Toolbar(props: ToolbarProps) {
         try {
             const savedTheme = localStorage.getItem("app-theme");
             const savedTextSize = localStorage.getItem("app-text-size");
-            
+
             await signOut({
                 global: true,
             });
-            
+
             localStorage.clear();
             sessionStorage.clear();
-            
+
             if (savedTheme) {
                 localStorage.setItem("app-theme", savedTheme);
             }
-            
+
             if (savedTextSize) {
                 localStorage.setItem("app-text-size", savedTextSize);
             }
-            
+
             setIsAuthenticated(false);
         } catch (error) {
             console.error("Error signing out:", error);

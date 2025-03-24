@@ -42,11 +42,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -64,11 +64,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={Languages.FRENCH}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -86,11 +86,11 @@ describe("Controls", () => {
                     isLoggedIn={false}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -114,9 +114,9 @@ describe("Controls", () => {
                     isTranslating={false}
                     onToggleTranslation={toggleTranslation}
                     targetLanguage={Languages.FRENCH}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -142,11 +142,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -179,11 +179,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
                     onChangeTargetLanguage={changeLanguage}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -213,11 +213,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -235,11 +235,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={Languages.FRENCH}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -259,11 +259,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={Languages.FRENCH}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -298,9 +298,9 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={Languages.FRENCH}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
                     onChangeVoice={changeVoice}
                     transcript={transcript}
@@ -326,11 +326,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={Languages.FRENCH}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -352,11 +352,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                     fonts={{}}
                 />
@@ -375,11 +375,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                 />
             );
@@ -398,11 +398,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={emptyTranscript}
                     fonts={{}}
                 />
@@ -421,11 +421,11 @@ describe("Controls", () => {
                     isLoggedIn={true}
                     isLoading={false}
                     isTranslating={false}
-                    onToggleTranslation={() => {}}
+                    onToggleTranslation={() => undefined}
                     targetLanguage={null}
-                    onChangeTargetLanguage={() => {}}
+                    onChangeTargetLanguage={() => undefined}
                     selectedVoices={selectedVoices}
-                    onChangeVoice={() => {}}
+                    onChangeVoice={() => undefined}
                     transcript={transcript}
                     fonts={{}}
                 />

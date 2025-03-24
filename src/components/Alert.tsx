@@ -17,7 +17,7 @@ function Alert(props: AlertProps) {
                 props.onDismiss();
             }, props.autoDismissTime);
         }
-        
+
         return () => {
             if (dismissTimer) {
                 clearTimeout(dismissTimer);

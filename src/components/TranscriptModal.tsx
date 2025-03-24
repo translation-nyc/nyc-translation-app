@@ -196,7 +196,7 @@ function TranscriptModal(props: TranscriptModalProps) {
                     </button>
                 </div>
             </div>
-            <div className="modal-backdrop" onClick={props.closeModal} />
+            <div className="modal-backdrop" onClick={props.closeModal}/>
         </div>
     );
 }
