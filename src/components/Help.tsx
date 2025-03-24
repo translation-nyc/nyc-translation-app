@@ -91,10 +91,10 @@ function Help() {
                                 </div>
                                 <div>
                                     <div>
-                                        Speech to Text
+                                        Text to Speech
                                     </div>
                                     <div className="text-xs uppercase font-semibold opacity-60">
-                                        Text to Speech
+                                        Plays audio through your speakers or connected audio devices
                                     </div>
                                 </div>
                                 <p className="list-col-wrap text-xs">

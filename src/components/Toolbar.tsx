@@ -144,12 +144,25 @@ function Toolbar(props: ToolbarProps) {
 
     async function handleSignOut() {
         try {
+            const savedTheme = localStorage.getItem("app-theme");
+            const savedTextSize = localStorage.getItem("app-text-size");
+            
             await signOut({
                 global: true,
             });
-            setIsAuthenticated(false);
+            
             localStorage.clear();
             sessionStorage.clear();
+            
+            if (savedTheme) {
+                localStorage.setItem("app-theme", savedTheme);
+            }
+            
+            if (savedTextSize) {
+                localStorage.setItem("app-text-size", savedTextSize);
+            }
+            
+            setIsAuthenticated(false);
         } catch (error) {
             console.error("Error signing out:", error);
         }
