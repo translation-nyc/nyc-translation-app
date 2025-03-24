@@ -193,19 +193,30 @@ function TranscriptModal(props: TranscriptModalProps) {
                     </div>
                 </div>
                 <div className="modal-action">
-                    <button onClick={emailTranscript} className="btn btn-primary">
+                    <button
+                        className="btn btn-primary"
+                        disabled={sendingEmail}
+                        onClick={emailTranscript}
+                    >
                         Email Transcript
                         {sendingEmail && (
                             <LoaderCircle className="animate-spin"/>
                         )}
                     </button>
-                    <button onClick={downloadPDF} className="btn btn-primary">
+                    <button
+                        className="btn btn-primary"
+                        disabled={downloadingPdf}
+                        onClick={downloadPDF}
+                    >
                         Download
                         {downloadingPdf && (
                             <LoaderCircle className="animate-spin"/>
                         )}
                     </button>
-                    <button onClick={props.closeModal} className="btn btn-outline">
+                    <button
+                        className="btn btn-outline"
+                        onClick={props.closeModal}
+                    >
                         Cancel
                     </button>
                 </div>
