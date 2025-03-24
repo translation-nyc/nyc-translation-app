@@ -77,16 +77,18 @@ describe("Alert", () => {
         const alertMessage = "Test alert";
         const autoDismissTime = 3000;
         let closed = false;
+        const dismissAlert = vi.fn(() => closed = true);
 
         render(
             <Alert
                 message={alertMessage}
                 isVisible={true}
-                onDismiss={() => closed = true}
+                onDismiss={dismissAlert}
                 autoDismissTime={autoDismissTime}
             />
         );
 
+        expect(dismissAlert).not.toHaveBeenCalled();
         expect(closed).toBe(false);
 
         const alert = screen.getByRole("alert", {
@@ -97,6 +99,7 @@ describe("Alert", () => {
 
         await new Promise(resolve => setTimeout(resolve, autoDismissTime));
 
+        expect(dismissAlert).toHaveBeenCalled();
         expect(closed).toBe(true);
     });
 });
