@@ -1,28 +1,25 @@
-import {useRef} from "react";
 import {HelpCircle, Languages, Mail, Mic, Volume2} from "lucide-react";
+import {useDialog} from "../hooks/use-dialog.tsx";
 
 function Help() {
-    const dialogRef = useRef<HTMLDialogElement>(null);
-
-    function openModal() {
-        dialogRef.current?.showModal();
-    }
+    const {dialogRef, openDialog} = useDialog();
 
     return (
         <>
             <button
                 className="btn btn-ghost btn-circle"
                 aria-label="Help button"
-                onClick={openModal}
+                onClick={openDialog}
             >
                 <HelpCircle className="w-5 h-5 text-blue-500"/>
             </button>
 
-            {/* Help Modal */}
             <dialog ref={dialogRef} className="modal">
                 <div className="modal-box max-w-xl max-h-150 p-5">
                     <form method="dialog">
-                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                            ✕
+                        </button>
                     </form>
                     <div className="flex w-full flex-col">
                         <h3 className="font-bold text-2xl">

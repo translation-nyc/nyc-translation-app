@@ -5,6 +5,7 @@ import {Languages} from "../../amplify/utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import TranscriptModal from "./TranscriptModal.tsx";
 import Alert from "./Alert.tsx";
+import {useDialog} from "../hooks/use-dialog.tsx";
 
 export interface ControlsProps {
     isLoggedIn: boolean;
@@ -16,6 +17,7 @@ export interface ControlsProps {
     selectedVoices: Record<string, TtsVoice>;
     onChangeVoice: (voiceId: VoiceId) => void;
     transcript: Transcript;
+    onClearTranscript: () => void;
     /**
      * For test mocking purposes.
      */
@@ -47,6 +49,10 @@ function Controls(props: ControlsProps) {
                     <ReviewButton
                         transcript={props.transcript}
                         fonts={props.fonts}
+                    />
+                    <ClearTranscriptButton
+                        transcript={props.transcript}
+                        onClearTranscript={props.onClearTranscript}
                     />
                 </div>
             </div>
@@ -261,6 +267,55 @@ function ReviewButton(props: ReviewButtonProps) {
                 onDismiss={() => setShowEmailedAlert(false)}
                 autoDismissTime={3000}
             />
+        </>
+    );
+}
+
+interface ClearTranscriptButtonProps {
+    transcript: Transcript;
+    onClearTranscript: () => void;
+}
+
+function ClearTranscriptButton(props: ClearTranscriptButtonProps) {
+    const {dialogRef, openDialog} = useDialog();
+
+    function clearTranscript() {
+        props.onClearTranscript();
+    }
+
+    return (
+        <>
+            <button
+                className="btn btn-error w-full"
+                aria-label="Clear transcript button"
+                disabled={props.transcript.parts.length === 0}
+                onClick={openDialog}
+            >
+                Clear transcript
+            </button>
+
+            <dialog ref={dialogRef} className="modal">
+                <div className="modal-box p-4">
+                    <div className="flex w-full flex-col">
+                        <h1 className="font-bold text-xl mb-4">
+                            Are you sure you want to clear the transcript?
+                        </h1>
+                        <form method="dialog">
+                            <div className="grid grid-cols-2 gap-4">
+                                <button
+                                    className="btn btn-error"
+                                    onClick={clearTranscript}
+                                >
+                                    Clear transcript
+                                </button>
+                                <button className="btn btn-primary">
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </dialog>
         </>
     );
 }
