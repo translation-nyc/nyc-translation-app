@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import type {VoiceId} from "@aws-sdk/client-polly";
 import type {Font, Language, Transcript, TtsVoice} from "../../amplify/utils/types.ts";
 import {Languages} from "../../amplify/utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
@@ -11,10 +12,13 @@ export interface ControlsProps {
     onToggleTranslation: () => void;
     targetLanguage: Language | null;
     onChangeTargetLanguage: (language: Language) => void;
-    voices: TtsVoice[],
     selectedVoices: Record<string, TtsVoice>;
-    onChangeVoice: (voiceId: string) => void;
+    onChangeVoice: (voiceId: VoiceId) => void;
     transcript: Transcript;
+    /**
+     * For test mocking purposes.
+     */
+    fonts?: Record<string, Font>;
 }
 
 function Controls(props: ControlsProps) {
@@ -36,13 +40,12 @@ function Controls(props: ControlsProps) {
                     />
                     <VoiceSelector
                         targetLanguage={props.targetLanguage}
-                        voices={props.voices}
                         selectedVoices={props.selectedVoices}
                         onChangeVoice={props.onChangeVoice}
                     />
                     <ReviewButton
                         transcript={props.transcript}
-                        targetLanguage={props.targetLanguage}
+                        fonts={props.fonts}
                     />
                 </div>
             </div>
@@ -63,6 +66,7 @@ function ToggleTranslationButton(props: ToggleTranslationButtonProps) {
         <div className="flex justify-center">
             <button
                 className={`btn w-full ${props.isTranslating ? "btn-error" : "btn-success"}`}
+                aria-label="Toggle translation button"
                 disabled={!props.isLoggedIn || props.isLoading || props.targetLanguage === null}
                 onClick={props.onToggleTranslation}
             >
@@ -113,9 +117,10 @@ function LanguageSelector(props: LanguageSelectorProps) {
 
             <select
                 className="select select-bordered w-full"
-                onChange={e => props.onChangeTargetLanguage(languagesNoEnglish[parseInt(e.target.value)])}
+                aria-label="Select language"
                 defaultValue="default"
                 disabled={props.isTranslating}
+                onChange={e => props.onChangeTargetLanguage(languagesNoEnglish[parseInt(e.target.value)])}
             >
                 <option disabled hidden value="default">
                     Select a language
@@ -127,22 +132,22 @@ function LanguageSelector(props: LanguageSelectorProps) {
                 )}
             </select>
 
-            <div>
+            <p aria-label="Selected language status">
                 The currently selected language is: {props.targetLanguage?.name ?? "none"}
-            </div>
+            </p>
         </div>
     );
 }
 
 interface VoiceSelectorProps {
     targetLanguage: Language | null;
-    voices: TtsVoice[],
     selectedVoices: Record<string, TtsVoice | undefined>;
-    onChangeVoice: (voiceId: string) => void;
+    onChangeVoice: (voiceId: VoiceId) => void;
 }
 
 function VoiceSelector(props: VoiceSelectorProps) {
     const selectedVoice = props.selectedVoices[props.targetLanguage?.name ?? ""];
+    const voices = props.targetLanguage?.ttsVoices ?? [];
 
     return (
         <div className="space-y-2">
@@ -154,27 +159,31 @@ function VoiceSelector(props: VoiceSelectorProps) {
 
             <select
                 className="select select-bordered w-full"
-                onChange={e => props.onChangeVoice(e.target.value)}
-                value={selectedVoice?.id}
+                aria-label="Select voice"
                 disabled={props.targetLanguage === null}
+                value={selectedVoice?.id}
+                onChange={e => props.onChangeVoice(e.target.value as VoiceId)}
             >
-                {props.voices.map((voice, index) =>
+                {voices.map((voice, index) =>
                     <option key={index} value={voice.id}>
                         {voice.name ?? voice.id}
                     </option>
                 )}
             </select>
 
-            <div>
+            <p aria-label="Selected voice status">
                 The currently selected voice is: {(selectedVoice?.name ?? selectedVoice?.id) ?? "none"}
-            </div>
+            </p>
         </div>
     );
 }
 
 interface ReviewButtonProps {
     transcript: Transcript;
-    targetLanguage: Language | null;
+    /**
+     * For test mocking purposes.
+     */
+    fonts?: Record<string, Font>;
 }
 
 function ReviewButton(props: ReviewButtonProps) {
@@ -187,6 +196,12 @@ function ReviewButton(props: ReviewButtonProps) {
     const [fonts, setFonts] = useState<Record<string, Font>>({});
 
     async function loadFonts() {
+        if (props.fonts !== undefined) {
+            setFonts(props.fonts);
+            setFontsLoaded(true);
+            return;
+        }
+
         const {notoArabic} = await import("../../amplify/fonts/noto-arabic-normal");
         const {notoChinese} = await import("../../amplify/fonts/noto-chinese-normal");
         const {notoJapanese} = await import("../../amplify/fonts/noto-japanese-normal");
@@ -204,6 +219,7 @@ function ReviewButton(props: ReviewButtonProps) {
     useEffect(() => {
         // noinspection JSIgnoredPromiseFromCall
         loadFonts();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     function openModal() {
@@ -219,6 +235,7 @@ function ReviewButton(props: ReviewButtonProps) {
             <div>
                 <button
                     className="btn btn-primary w-full"
+                    aria-label="Review button"
                     disabled={!fontsLoaded || props.transcript.parts.length === 0}
                     onClick={openModal}
                 >

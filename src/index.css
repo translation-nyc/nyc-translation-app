@@ -1,4 +1,5 @@
 @import "tailwindcss";
+
 @tailwind utilities;
 @plugin "daisyui" {
     themes: all;
@@ -26,17 +27,41 @@ body {
 }
 
 /* Scale spacing based on font size */
-.p-2 { padding: 0.5rem; }
-.p-4 { padding: 1rem; }
-.p-6 { padding: 1.5rem; }
+.p-2 {
+    padding: 0.5rem;
+}
 
-.m-2 { margin: 0.5rem; }
-.m-4 { margin: 1rem; }
-.m-6 { margin: 1.5rem; }
+.p-4 {
+    padding: 1rem;
+}
 
-.gap-2 { gap: 0.5rem; }
-.gap-4 { gap: 1rem; }
-.gap-6 { gap: 1.5rem; }
+.p-6 {
+    padding: 1.5rem;
+}
+
+.m-2 {
+    margin: 0.5rem;
+}
+
+.m-4 {
+    margin: 1rem;
+}
+
+.m-6 {
+    margin: 1.5rem;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.gap-4 {
+    gap: 1rem;
+}
+
+.gap-6 {
+    gap: 1.5rem;
+}
 
 .btn, .card, .modal, .input, .select, .textarea {
     font-size: inherit;

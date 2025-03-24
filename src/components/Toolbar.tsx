@@ -56,8 +56,15 @@ const themeOptions: ThemeOption[] = [
     },
 ];
 
-function Toolbar() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+export interface ToolbarProps {
+    /**
+     * For test mocking purposes.
+     */
+    authenticated?: boolean;
+}
+
+function Toolbar(props: ToolbarProps) {
+    const [isAuthenticated, setIsAuthenticated] = useState(props.authenticated ?? false);
     const {theme, setTheme, textSize, setTextSize} = useTheme();
     const [showSignInAlert, setShowSignInAlert] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -65,33 +72,33 @@ function Toolbar() {
 
     // Check screen size and set mobile view state
     useEffect(() => {
-        const checkScreenSize = () => {
+        function checkScreenSize() {
             setIsMobileView(window.innerWidth < 640); // Use sm breakpoint (640px)
-        };
-        
+        }
+
         // Check on mount
         checkScreenSize();
-        
+
         // Add resize listener
         window.addEventListener("resize", checkScreenSize);
-        
+
         // Clean up
         return () => window.removeEventListener("resize", checkScreenSize);
     }, []);
 
     useEffect(() => {
-        const handleRedirect = async () => {
+        async function handleRedirect() {
             try {
                 const urlParams = new URLSearchParams(window.location.search);
                 const code = urlParams.get("code");
-                
+
                 if (code) {
                     await checkAuthStatus();
                 }
             } catch (error) {
                 console.error("Error handling redirect:", error);
             }
-        };
+        }
 
         // noinspection JSIgnoredPromiseFromCall
         handleRedirect();
@@ -101,6 +108,10 @@ function Toolbar() {
     }, []);
 
     async function checkAuthStatus() {
+        if (props.authenticated) {
+            return;
+        }
+
         try {
             const user = await getCurrentUser();
             const hasUser = !!user;
@@ -135,22 +146,22 @@ function Toolbar() {
         try {
             const savedTheme = localStorage.getItem("app-theme");
             const savedTextSize = localStorage.getItem("app-text-size");
-            
+
             await signOut({
                 global: true,
             });
-            
+
             localStorage.clear();
             sessionStorage.clear();
-            
+
             if (savedTheme) {
                 localStorage.setItem("app-theme", savedTheme);
             }
-            
+
             if (savedTextSize) {
                 localStorage.setItem("app-text-size", savedTextSize);
             }
-            
+
             setIsAuthenticated(false);
         } catch (error) {
             console.error("Error signing out:", error);
@@ -236,18 +247,20 @@ function Toolbar() {
                 {isAuthenticated ? (
                     <button
                         className="btn btn-error"
+                        aria-label="Sign out button"
                         onClick={handleSignOut}
                     >
                         <ProfileIcon className="mr-2 h-4 w-4"/>
-                        Sign Out
+                        Sign out
                     </button>
                 ) : (
                     <button
                         className="btn btn-primary"
+                        aria-label="Login button"
                         onClick={handleSignIn}
                     >
                         <ProfileIcon className="mr-2 h-4 w-4"/>
-                        Log In
+                        Login
                     </button>
                 )}
             </div>
@@ -318,18 +331,20 @@ function Toolbar() {
                     {isAuthenticated ? (
                         <button
                             className="btn btn-error w-full"
+                            aria-label="Sign out button"
                             onClick={handleSignOut}
                         >
                             <ProfileIcon className="mr-2 h-4 w-4"/>
-                            Sign Out
+                            Sign out
                         </button>
                     ) : (
                         <button
                             className="btn btn-primary w-full"
+                            aria-label="Login button"
                             onClick={handleSignIn}
                         >
                             <ProfileIcon className="mr-2 h-4 w-4"/>
-                            Log In
+                            Login
                         </button>
                     )}
                 </div>
@@ -341,7 +356,10 @@ function Toolbar() {
         <>
             <div className="navbar bg-base-100 shadow-md p-4">
                 <div className="navbar-start">
-                    <h1 className="normal-case text-3xl font-bold">
+                    <h1
+                        className="normal-case text-3xl font-bold"
+                        aria-label="App title"
+                    >
                         Conversate.
                     </h1>
                 </div>

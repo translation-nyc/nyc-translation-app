@@ -5,7 +5,7 @@ export async function translate(text: string, sourceLanguage: string, targetLang
         translateText: {
             source: {
                 text: text,
-                language : sourceLanguage,
+                language: sourceLanguage,
             },
             targetLanguage: targetLanguage,
         },
