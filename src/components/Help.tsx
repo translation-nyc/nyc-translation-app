@@ -67,8 +67,8 @@ function Help() {
                                 <div className="text-4xl font-thin opacity-30 tabular-nums">03</div>
                                 <div><Volume2 className="size-10 rounded-box"/></div>
                                 <div>
-                                    <div>Speech to Text</div>
-                                    <div className="text-xs uppercase font-semibold opacity-60">Text to Speech</div>
+                                    <div>Text to Speech</div>
+                                    <div className="text-xs uppercase font-semibold opacity-60">Plays audio through your speakers or connected audio devices</div>
                                 </div>
                                 <p className="list-col-wrap text-xs">
                                     Each time, you the council member has finished speaking, your translated words will
