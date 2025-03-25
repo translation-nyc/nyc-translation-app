@@ -3,9 +3,9 @@ import type {VoiceId} from "@aws-sdk/client-polly";
 import type {Font, Language, Transcript, TtsVoice} from "../../amplify/utils/types.ts";
 import {Languages} from "../../amplify/utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
-import TranscriptModal from "./TranscriptModal.tsx";
-import Alert from "./Alert.tsx";
 import {useDialog} from "../hooks/use-dialog.ts";
+import Alert from "./Alert.tsx";
+import TranscriptModal from "./TranscriptModal.tsx";
 
 export interface ControlsProps {
     isLoggedIn: boolean;
