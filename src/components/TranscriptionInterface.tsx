@@ -13,6 +13,12 @@ import {translate} from "../utils/translation.ts";
 import {getCurrentUser} from "aws-amplify/auth";
 import {detectAmbiguity} from "../utils/ambiguity-detection.ts";
 
+const EMPTY_TRANSCRIPT: Transcript = {
+    parts: [],
+    lastLanguageCode: Languages.ENGLISH.transcribeCode,
+    lastTargetLanguageCode: null,
+};
+
 function TranscriptionInterface() {
     const speechTranscriber = useRef<SpeechTranscriber | null>(null);
 
@@ -29,11 +35,7 @@ function TranscriptionInterface() {
             {},
         )
     );
-    const [transcript, setTranscript] = useState<Transcript>({
-        parts: [],
-        lastLanguageCode: Languages.ENGLISH.transcribeCode,
-        lastTargetLanguageCode: null,
-    });
+    const [transcript, setTranscript] = useState<Transcript>(EMPTY_TRANSCRIPT);
 
     const [ttsPlaying, setTtsPlaying] = useState(false);
 
@@ -94,6 +96,10 @@ function TranscriptionInterface() {
             newSelectedVoices[targetLanguage!.name] = targetLanguage!.ttsVoices.find(voice => voice.id === voiceId)!;
             return newSelectedVoices;
         });
+    }
+
+    function clearTranscript() {
+        setTranscript(EMPTY_TRANSCRIPT);
     }
 
     function onTtsPlaying(playing: boolean) {
@@ -274,6 +280,7 @@ function TranscriptionInterface() {
                 selectedVoices={selectedVoices}
                 onChangeVoice={setVoice}
                 transcript={transcript}
+                onClearTranscript={clearTranscript}
             />
             <TranscriptBox
                 transcript={transcript}

@@ -48,6 +48,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -70,6 +71,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -92,6 +94,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -118,6 +121,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -148,6 +152,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -185,6 +190,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -219,6 +225,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -241,6 +248,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -265,6 +273,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -304,6 +313,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={changeVoice}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -332,6 +342,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -359,6 +370,7 @@ describe("Controls", () => {
                     onChangeVoice={() => undefined}
                     transcript={transcript}
                     fonts={{}}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -381,6 +393,7 @@ describe("Controls", () => {
                     selectedVoices={selectedVoices}
                     onChangeVoice={() => undefined}
                     transcript={transcript}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -405,6 +418,7 @@ describe("Controls", () => {
                     onChangeVoice={() => undefined}
                     transcript={emptyTranscript}
                     fonts={{}}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -428,6 +442,7 @@ describe("Controls", () => {
                     onChangeVoice={() => undefined}
                     transcript={transcript}
                     fonts={{}}
+                    onClearTranscript={() => undefined}
                 />
             );
 
@@ -442,6 +457,90 @@ describe("Controls", () => {
             });
 
             expect(header.innerHTML).toBe("Review transcript and click to add comments");
+        });
+    });
+
+    describe("Clear transcript button", () => {
+        test("Button enabled", () => {
+            render(
+                <Controls
+                    isLoggedIn={true}
+                    isLoading={false}
+                    isTranslating={false}
+                    onToggleTranslation={() => undefined}
+                    targetLanguage={null}
+                    onChangeTargetLanguage={() => undefined}
+                    selectedVoices={selectedVoices}
+                    onChangeVoice={() => undefined}
+                    transcript={transcript}
+                    onClearTranscript={() => undefined}
+                />
+            );
+
+            const button = screen.getByRole("button", {
+                name: "Clear transcript button",
+            });
+
+            expect(button.innerHTML).toBe("Clear transcript");
+            expect(button.hasAttribute("disabled")).toBe(false);
+        });
+
+        test("Button disabled", () => {
+            render(
+                <Controls
+                    isLoggedIn={true}
+                    isLoading={false}
+                    isTranslating={false}
+                    onToggleTranslation={() => undefined}
+                    targetLanguage={null}
+                    onChangeTargetLanguage={() => undefined}
+                    selectedVoices={selectedVoices}
+                    onChangeVoice={() => undefined}
+                    transcript={emptyTranscript}
+                    onClearTranscript={() => undefined}
+                />
+            );
+
+            const button = screen.getByRole("button", {
+                name: "Clear transcript button",
+            });
+
+            expect(button.innerHTML).toBe("Clear transcript");
+            expect(button.hasAttribute("disabled")).toBe(true);
+        });
+
+        test("Open confirmation popup", async () => {
+            // Mock the showModal method because dialog is not supported in jsdom
+            let opened = false;
+            const openPopup = vi.fn(() => opened = true);
+            HTMLDialogElement.prototype.showModal = openPopup;
+
+            render(
+                <Controls
+                    isLoggedIn={true}
+                    isLoading={false}
+                    isTranslating={false}
+                    onToggleTranslation={() => undefined}
+                    targetLanguage={null}
+                    onChangeTargetLanguage={() => undefined}
+                    selectedVoices={selectedVoices}
+                    onChangeVoice={() => undefined}
+                    transcript={transcript}
+                    onClearTranscript={() => undefined}
+                />
+            );
+
+            expect(openPopup).not.toHaveBeenCalled();
+            expect(opened).toBe(false);
+
+            const button = screen.getByRole("button", {
+                name: "Clear transcript button",
+            });
+
+            await userEvent.click(button);
+
+            expect(openPopup).toHaveBeenCalled();
+            expect(opened).toBe(true);
         });
     });
 });
