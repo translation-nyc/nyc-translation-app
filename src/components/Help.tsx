@@ -1,5 +1,5 @@
 import {HelpCircle, Languages, Mail, Mic, Volume2} from "lucide-react";
-import {useDialog} from "../hooks/use-dialog.tsx";
+import {useDialog} from "../hooks/use-dialog.ts";
 
 function Help() {
     const {dialogRef, openDialog} = useDialog();

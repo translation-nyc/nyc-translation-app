@@ -5,7 +5,7 @@ import {Languages} from "../../amplify/utils/languages.ts";
 import {PlayIcon, StopIcon} from "../assets/icons";
 import TranscriptModal from "./TranscriptModal.tsx";
 import Alert from "./Alert.tsx";
-import {useDialog} from "../hooks/use-dialog.tsx";
+import {useDialog} from "../hooks/use-dialog.ts";
 
 export interface ControlsProps {
     isLoggedIn: boolean;
