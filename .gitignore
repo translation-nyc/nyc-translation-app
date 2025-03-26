@@ -31,3 +31,4 @@ amplifyconfiguration*
 
 # Other
 .env
+coverage/
