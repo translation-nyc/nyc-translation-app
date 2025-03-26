@@ -28,33 +28,31 @@ function Controls(props: ControlsProps) {
     return (
         <div className="w-full md:w-72 p-2 bg-base-100 rounded-lg shadow-lg">
             <div className="max-h-40 md:h-0 min-h-full p-4 overflow-auto">
-                <div className="space-y-6">
-                    <ToggleTranslationButton
-                        isLoggedIn={props.isLoggedIn}
-                        isLoading={props.isLoading}
-                        isTranslating={props.isTranslating}
-                        onToggleTranslation={props.onToggleTranslation}
-                        targetLanguage={props.targetLanguage}
-                    />
-                    <LanguageSelector
-                        isTranslating={props.isTranslating}
-                        targetLanguage={props.targetLanguage}
-                        onChangeTargetLanguage={props.onChangeTargetLanguage}
-                    />
-                    <VoiceSelector
-                        targetLanguage={props.targetLanguage}
-                        selectedVoices={props.selectedVoices}
-                        onChangeVoice={props.onChangeVoice}
-                    />
-                    <ReviewButton
-                        transcript={props.transcript}
-                        fonts={props.fonts}
-                    />
-                    <ClearTranscriptButton
-                        transcript={props.transcript}
-                        onClearTranscript={props.onClearTranscript}
-                    />
-                </div>
+                <ToggleTranslationButton
+                    isLoggedIn={props.isLoggedIn}
+                    isLoading={props.isLoading}
+                    isTranslating={props.isTranslating}
+                    onToggleTranslation={props.onToggleTranslation}
+                    targetLanguage={props.targetLanguage}
+                />
+                <LanguageSelector
+                    isTranslating={props.isTranslating}
+                    targetLanguage={props.targetLanguage}
+                    onChangeTargetLanguage={props.onChangeTargetLanguage}
+                />
+                <VoiceSelector
+                    targetLanguage={props.targetLanguage}
+                    selectedVoices={props.selectedVoices}
+                    onChangeVoice={props.onChangeVoice}
+                />
+                <ReviewButton
+                    transcript={props.transcript}
+                    fonts={props.fonts}
+                />
+                <ClearTranscriptButton
+                    transcript={props.transcript}
+                    onClearTranscript={props.onClearTranscript}
+                />
             </div>
         </div>
     );
@@ -70,7 +68,7 @@ interface ToggleTranslationButtonProps {
 
 function ToggleTranslationButton(props: ToggleTranslationButtonProps) {
     return (
-        <div className="flex justify-center">
+        <div className="flex justify-center mb-6">
             <button
                 className={`btn w-full ${props.isTranslating ? "btn-error" : "btn-success"}`}
                 aria-label="Toggle translation button"
@@ -115,7 +113,7 @@ function LanguageSelector(props: LanguageSelectorProps) {
     const languagesNoEnglish = Languages.ALL.filter(language => language !== Languages.ENGLISH);
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2 mb-6">
             <div>
                 <h3 className="font-bold text-lg">
                     Target Language
@@ -157,7 +155,7 @@ function VoiceSelector(props: VoiceSelectorProps) {
     const voices = props.targetLanguage?.ttsVoices ?? [];
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-2 mb-6">
             <div>
                 <h3 className="font-bold text-lg">
                     Voice
@@ -240,16 +238,14 @@ function ReviewButton(props: ReviewButtonProps) {
 
     return (
         <>
-            <div>
-                <button
-                    className="btn btn-primary w-full"
-                    aria-label="Review button"
-                    disabled={!fontsLoaded || props.transcript.parts.length === 0}
-                    onClick={openModal}
-                >
-                    {fontsLoaded ? "Review" : "Loading..."}
-                </button>
-            </div>
+            <button
+                className="btn btn-primary w-full mb-6"
+                aria-label="Review button"
+                disabled={!fontsLoaded || props.transcript.parts.length === 0}
+                onClick={openModal}
+            >
+                {fontsLoaded ? "Review" : "Loading..."}
+            </button>
 
             {isModalOpen && (
                 <TranscriptModal
