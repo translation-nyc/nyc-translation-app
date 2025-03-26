@@ -1,7 +1,7 @@
 # North Yorkshire Council Translation App
 
 <div align="center">
-    <img src="deliverables/conversate-interface.png" alt="drawing" width=1000/>
+    <img src="deliverables/conversate-interface.png" alt="Conversate interface" width=1000/>
 </div>
 
 ## Demo
