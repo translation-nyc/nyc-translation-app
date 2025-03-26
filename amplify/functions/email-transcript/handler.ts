@@ -41,25 +41,7 @@ export const handler: Schema["emailTranscript"]["functionHandler"] = async (even
         const comments = event.arguments.comments as TranscriptComment[];
         const languageCode = event.arguments.languageCode;
 
-        let font: Font | undefined;
-        switch (languageCode) {
-            case Languages.ARABIC.transcribeCode:
-                font = notoArabic;
-                break;
-            case Languages.CHINESE.transcribeCode:
-            case Languages.RUSSIAN.transcribeCode:
-                font = notoChinese;
-                break;
-            case Languages.JAPANESE.transcribeCode:
-                font = notoJapanese;
-                break;
-            case Languages.KOREAN.transcribeCode:
-                font = notoKorean;
-                break;
-            default:
-                font = undefined;
-        }
-
+        const font = getFont(languageCode);
         const pdf = createPdf(transcriptParts, comments, font);
         const pdfBase64 = pdf.output("datauristring").split(",")[1];
 
@@ -87,3 +69,19 @@ export const handler: Schema["emailTranscript"]["functionHandler"] = async (even
         };
     }
 };
+
+function getFont(languageCode: string): Font | undefined {
+    switch (languageCode) {
+        case Languages.ARABIC.transcribeCode:
+            return notoArabic;
+        case Languages.CHINESE.transcribeCode:
+        case Languages.RUSSIAN.transcribeCode:
+            return notoChinese;
+        case Languages.JAPANESE.transcribeCode:
+            return notoJapanese;
+        case Languages.KOREAN.transcribeCode:
+            return notoKorean;
+        default:
+            return undefined;
+    }
+}
