@@ -44,6 +44,7 @@ You can create a personal backend sandbox for yourself to develop on without int
 ## Testing
 
 1. Run `pnpm test` to run tests
+   - Run `pnpm coverage` to run tests with coverage. The coverage report will be generated in the `coverage` folder.
 
 ## Security Notes
 
