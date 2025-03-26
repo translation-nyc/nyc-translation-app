@@ -43,7 +43,7 @@ export const handler: Schema["emailTranscript"]["functionHandler"] = async (even
 
         const font = getFont(languageCode);
         const pdf = createPdf(transcriptParts, comments, font);
-        const pdfBase64 = pdf.output("datauristring").split(",")[1];
+        const pdfBuffer = pdf.output("arraybuffer");
 
         await emailTransporter.sendMail({
             from: {
@@ -55,7 +55,7 @@ export const handler: Schema["emailTranscript"]["functionHandler"] = async (even
             attachments: [
                 {
                     filename: "transcript.pdf",
-                    content: Buffer.from(pdfBase64, "base64"),
+                    content: Buffer.from(pdfBuffer),
                 },
             ],
         });
