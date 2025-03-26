@@ -1,5 +1,15 @@
 # North Yorkshire Council Translation App
 
+<div align="center">
+    <img src="deliverables/conversate-interface.png" alt="Conversate interface" width=1000/>
+</div>
+
+---
+
+Deployed at: https://conversateapp.com
+
+[Demo video](https://www.youtube.com/watch?v=3KscQ6l8dik)
+
 ## Setup
 
 1. Install Node.js
@@ -33,14 +43,20 @@ You can create a personal backend sandbox for yourself to develop on without int
    - `npx ampx sandbox secret set MICROSOFT_ENTRA_ID_CLIENT_ID` then input value
    - `npx ampx sandbox secret set MICROSOFT_ENTRA_ID_CLIENT_SECRET` then input value
 
-## Testing
-
-1. Run `pnpm test` to run tests
-   - Run `pnpm coverage` to run tests with coverage. The coverage report will be generated in the `coverage` folder.
-
 ## Security Notes
 
 - The secrets file contains sensitive credentials for Microsoft Entra ID authentication
 - Keep the secrets file completely private and secure
 - Never share the secrets file or its contents with anyone
 - Immediately rotate credentials if the secrets file is compromised
+
+## Testing
+
+1. Run `pnpm test` to run tests
+   - Run `pnpm coverage` to run tests with coverage. The coverage report will be generated in the `coverage` folder.
+
+Live test coverage report can be found here: https://coverage.conversateapp.com
+
+<div align="center">
+    <img src="deliverables/test-coverage.png" alt="Test coverage" width=1000/>
+</div>
