@@ -10,7 +10,7 @@ Deployed at: https://conversateapp.com
 
 [Demo video](https://www.youtube.com/watch?v=3KscQ6l8dik)
 
-## Setup
+## Setup for development
 
 1. Install Node.js
 2. Install pnpm: `npm install -g pnpm`
