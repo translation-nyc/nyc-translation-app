@@ -18,7 +18,7 @@ const TARGET_SAMPLE_RATE = 16000;
 export class SpeechTranscriber {
 
     private readonly transcribeClient: TranscribeStreamingClient;
-    private readonly onTranscription: (event: TranscriptResultStream) => void;
+    private readonly onTranscription: (event: TranscriptResultStream) => Promise<void>;
 
     private audioContext?: AudioContext;
     private audioWorkletNode?: AudioWorkletNode;
@@ -27,7 +27,7 @@ export class SpeechTranscriber {
 
     private stopped: boolean = false;
 
-    constructor(client: TranscribeStreamingClient, onTranscription: (event: TranscriptResultStream) => void) {
+    constructor(client: TranscribeStreamingClient, onTranscription: (event: TranscriptResultStream) => Promise<void>) {
         this.transcribeClient = client;
         this.onTranscription = onTranscription;
     }
@@ -79,7 +79,7 @@ export class SpeechTranscriber {
             try {
                 const response = await this.transcribeClient.send(command);
                 for await (const event of response.TranscriptResultStream!) {
-                    this.onTranscription(event);
+                    await this.onTranscription(event);
                     if (this.stopped) break;
                 }
             } catch (e) {
